@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
+import { useLoginTracker } from "@/hooks/use-login-tracker";
 
 // Public
 import Landing from "./pages/Landing";
@@ -51,6 +52,11 @@ import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
 
 const queryClient = new QueryClient();
 
+function LoginTrackerWrapper() {
+  useLoginTracker();
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -58,6 +64,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <LoginTrackerWrapper />
           <Routes>
             {/* Public */}
             <Route path="/" element={<Landing />} />

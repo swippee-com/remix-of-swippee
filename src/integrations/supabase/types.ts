@@ -270,6 +270,39 @@ export type Database = {
           },
         ]
       }
+      login_events: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          login_method: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          login_method?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          login_method?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -526,6 +559,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_2fa_enabled: boolean | null
           phone: string | null
           timezone: string | null
           updated_at: string
@@ -537,6 +571,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          is_2fa_enabled?: boolean | null
           phone?: string | null
           timezone?: string | null
           updated_at?: string
@@ -548,6 +583,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_2fa_enabled?: boolean | null
           phone?: string | null
           timezone?: string | null
           updated_at?: string
@@ -788,6 +824,36 @@ export type Database = {
           },
         ]
       }
+      user_2fa_secrets: {
+        Row: {
+          backup_codes: string[] | null
+          created_at: string
+          id: string
+          is_enabled: boolean | null
+          secret: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          backup_codes?: string[] | null
+          created_at?: string
+          id?: string
+          is_enabled?: boolean | null
+          secret: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          backup_codes?: string[] | null
+          created_at?: string
+          id?: string
+          is_enabled?: boolean | null
+          secret?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -805,6 +871,42 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          is_current: boolean | null
+          last_active_at: string | null
+          revoked_at: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          is_current?: boolean | null
+          last_active_at?: string | null
+          revoked_at?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          is_current?: boolean | null
+          last_active_at?: string | null
+          revoked_at?: string | null
+          session_id?: string | null
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
