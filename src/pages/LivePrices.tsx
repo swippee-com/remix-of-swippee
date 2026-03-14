@@ -21,6 +21,7 @@ function formatMarketCap(n: number, currency: Currency): string {
 
 export default function LivePrices() {
   const { prices, isLoading, lastUpdated } = useMarketPrices();
+  const nprRate = useNprRate();
   const [currency, setCurrency] = useState<Currency>("usd");
   const [search, setSearch] = useState("");
   const sym = currencySymbol(currency);
