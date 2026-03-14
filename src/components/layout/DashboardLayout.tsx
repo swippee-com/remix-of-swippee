@@ -2,12 +2,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BRAND } from "@/config/brand";
 import { userNavItems } from "@/config/navigation";
 import { cn } from "@/lib/utils";
-import { LogOut, Menu, X, Sun, Moon } from "lucide-react";
+import { LogOut, Menu, X, Sun, Moon, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/shared/NotificationBell";
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -16,6 +17,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { profile, signOut } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
+  const { locale, setLocale, t } = useLanguage();
 
   const handleSignOut = async () => {
     await signOut();
@@ -42,7 +44,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             )}
           >
             <Icon className="h-4 w-4" />
-            {item.label}
+            {t(item.labelKey)}
           </Link>
         );
       })}
@@ -59,7 +61,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <NavContent />
         <div className="border-t p-3">
           <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4" /> Sign Out
+            <LogOut className="h-4 w-4" /> {t("nav.signOut")}
           </Button>
         </div>
       </aside>
@@ -86,6 +88,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Button>
           <div className="hidden lg:block" />
           <div className="flex items-center gap-2">
+            {/* Language toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocale(locale === "en" ? "ne" : "en")}
+              aria-label="Toggle language"
+              className="text-xs font-bold"
+            >
+              {locale === "en" ? "ने" : "EN"}
+            </Button>
             <Button
               variant="ghost"
               size="icon"

@@ -3,18 +3,19 @@ import {
   HeadphonesIcon, Settings, Users, ClipboardCheck, BookOpen, ScrollText,
   Activity, BarChart3, WalletCards, PieChart
 } from "lucide-react";
+import type { TranslationKey } from "@/i18n/en";
 
-export const userNavItems = [
-  { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Wallet", href: "/dashboard/wallet", icon: WalletCards },
-  { label: "Portfolio", href: "/dashboard/portfolio", icon: PieChart },
-  { label: "KYC", href: "/dashboard/kyc", icon: Shield },
-  { label: "Quote Requests", href: "/dashboard/quotes", icon: FileText },
-  { label: "Trades", href: "/dashboard/trades", icon: ArrowLeftRight },
-  { label: "Payment Methods", href: "/dashboard/payment-methods", icon: CreditCard },
-  { label: "Payout Addresses", href: "/dashboard/payout-addresses", icon: Wallet },
-  { label: "Support", href: "/dashboard/support", icon: HeadphonesIcon },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+export const userNavItems: { labelKey: TranslationKey; href: string; icon: typeof LayoutDashboard }[] = [
+  { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard },
+  { labelKey: "nav.wallet", href: "/dashboard/wallet", icon: WalletCards },
+  { labelKey: "nav.portfolio", href: "/dashboard/portfolio", icon: PieChart },
+  { labelKey: "nav.kyc", href: "/dashboard/kyc", icon: Shield },
+  { labelKey: "nav.quotes", href: "/dashboard/quotes", icon: FileText },
+  { labelKey: "nav.trades", href: "/dashboard/trades", icon: ArrowLeftRight },
+  { labelKey: "nav.paymentMethods", href: "/dashboard/payment-methods", icon: CreditCard },
+  { labelKey: "nav.payoutAddresses", href: "/dashboard/payout-addresses", icon: Wallet },
+  { labelKey: "nav.support", href: "/dashboard/support", icon: HeadphonesIcon },
+  { labelKey: "nav.settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export const adminNavItems = [
