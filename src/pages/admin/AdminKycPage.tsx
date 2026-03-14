@@ -220,7 +220,6 @@ export default function AdminKycPage() {
         </DialogContent>
       </Dialog>
 
-      </Dialog>
 
       {/* Document Viewer Dialog */}
       <Dialog open={!!viewingDoc} onOpenChange={(open) => { if (!open) setViewingDoc(null); }}>
