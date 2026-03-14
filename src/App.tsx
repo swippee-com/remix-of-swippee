@@ -20,6 +20,10 @@ import HowItWorks from "./pages/HowItWorks";
 import Fees from "./pages/Fees";
 import Support from "./pages/Support";
 import LivePrices from "./pages/LivePrices";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
+import AmlPolicy from "./pages/AmlPolicy";
 import NotFound from "./pages/NotFound";
 
 // Auth
@@ -86,6 +90,10 @@ const App = () => (
             <Route path="/fees" element={<Fees />} />
             <Route path="/support" element={<Support />} />
             <Route path="/live" element={<LivePrices />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/aml-policy" element={<AmlPolicy />} />
 
             {/* Auth */}
             <Route path="/auth/login" element={<Login />} />
