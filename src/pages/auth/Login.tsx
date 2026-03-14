@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [show2fa, setShow2fa] = useState(false);
+  const [pendingLogin, setPendingLogin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -21,15 +22,16 @@ export default function LoginPage() {
 
   const from = (location.state as any)?.from?.pathname || "/dashboard";
 
-  if (!isLoading && session && !show2fa) {
+  // Only auto-redirect if not in the middle of a login/2FA flow
+  if (!isLoading && session && !show2fa && !pendingLogin) {
     return <Navigate to={from} replace />;
   }
 
   const completeLogin = () => {
-    // Track login via edge function
     supabase.functions.invoke("track-login", {
       body: { login_method: "password", session_id: session?.access_token?.slice(-12) || "" },
     });
+    setPendingLogin(false);
     toast({ title: "Welcome back!" });
     navigate(from, { replace: true });
   };
@@ -37,12 +39,14 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setPendingLogin(true);
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
       setLoading(false);
+      setPendingLogin(false);
       return;
     }
 
@@ -63,6 +67,7 @@ export default function LoginPage() {
     supabase.functions.invoke("track-login", {
       body: { login_method: "password", session_id: data.session?.access_token?.slice(-12) || "" },
     });
+    setPendingLogin(false);
     toast({ title: "Welcome back!" });
     navigate(from, { replace: true });
   };
