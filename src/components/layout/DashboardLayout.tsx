@@ -3,8 +3,6 @@ import { BRAND } from "@/config/brand";
 import { userNavItems } from "@/config/navigation";
 import { cn } from "@/lib/utils";
 import { LogOut, Menu, X, Sun, Moon, Globe, ShieldAlert } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { LogOut, Menu, X, Sun, Moon, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/shared/NotificationBell";
 import { useState } from "react";
