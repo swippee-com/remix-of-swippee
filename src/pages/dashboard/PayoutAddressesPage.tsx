@@ -2,21 +2,107 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Wallet, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Wallet, Plus, Trash2 } from "lucide-react";
+import { BRAND } from "@/config/brand";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import type { Database } from "@/integrations/supabase/types";
 
-const addresses = [
-  { id: "1", label: "Main USDT TRC20", asset: "USDT", network: "TRC20", address: "TXkj...8a2F", whitelisted: true },
-  { id: "2", label: "BTC Address", asset: "BTC", network: "BTC", address: "bc1q...z4f9", whitelisted: true },
-];
+type CryptoAsset = Database["public"]["Enums"]["crypto_asset"];
+type CryptoNetwork = Database["public"]["Enums"]["crypto_network"];
+
+interface FormState {
+  label: string;
+  asset: CryptoAsset | "";
+  network: CryptoNetwork | "";
+  address: string;
+  destination_tag: string;
+}
+
+const emptyForm: FormState = { label: "", asset: "", network: "", address: "", destination_tag: "" };
 
 export default function PayoutAddressesPage() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
+
+  const { data: addresses = [], isLoading } = useQuery({
+    queryKey: ["user-payout-addresses"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("payout_addresses").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!form.asset || !form.network) throw new Error("Asset and network are required.");
+      const payload = {
+        user_id: user!.id,
+        label: form.label,
+        asset: form.asset as CryptoAsset,
+        network: form.network as CryptoNetwork,
+        address: form.address,
+        destination_tag: form.destination_tag || null,
+      };
+      if (editId) {
+        const { error } = await supabase.from("payout_addresses").update(payload).eq("id", editId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("payout_addresses").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-payout-addresses"] });
+      setModalOpen(false);
+      setEditId(null);
+      setForm(emptyForm);
+      toast({ title: editId ? "Address updated" : "Address added" });
+    },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("payout_addresses").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-payout-addresses"] });
+      setDeleteId(null);
+      toast({ title: "Address removed" });
+    },
+  });
+
+  const openEdit = (a: any) => {
+    setForm({ label: a.label, asset: a.asset, network: a.network, address: a.address, destination_tag: a.destination_tag || "" });
+    setEditId(a.id);
+    setModalOpen(true);
+  };
+
   return (
     <DashboardLayout>
       <PageHeader title="Payout Addresses" description="Manage your crypto receiving addresses.">
-        <Button><Plus className="mr-1 h-4 w-4" /> Add Address</Button>
+        <Button onClick={() => { setForm(emptyForm); setEditId(null); setModalOpen(true); }}><Plus className="mr-1 h-4 w-4" /> Add Address</Button>
       </PageHeader>
 
-      {addresses.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center py-12"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>
+      ) : addresses.length === 0 ? (
         <EmptyState icon={<Wallet className="mx-auto h-10 w-10" />} title="No payout addresses" description="Add wallet addresses for receiving crypto." className="mt-6" />
       ) : (
         <div className="mt-6 rounded-lg border bg-card shadow-card">
@@ -35,8 +121,11 @@ export default function PayoutAddressesPage() {
                     <td className="px-6 py-4 font-medium">{a.label}</td>
                     <td className="px-6 py-4">{a.asset}</td>
                     <td className="px-6 py-4">{a.network}</td>
-                    <td className="px-6 py-4 font-mono text-xs">{a.address}</td>
-                    <td className="px-6 py-4"><Button variant="ghost" size="sm">Edit</Button></td>
+                    <td className="px-6 py-4 font-mono text-xs max-w-[200px] truncate">{a.address}</td>
+                    <td className="px-6 py-4 flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => openEdit(a)}>Edit</Button>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setDeleteId(a.id)}><Trash2 className="h-3 w-3" /></Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -44,6 +133,42 @@ export default function PayoutAddressesPage() {
           </div>
         </div>
       )}
+
+      <Dialog open={modalOpen} onOpenChange={(o) => { if (!o) { setModalOpen(false); setEditId(null); } }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{editId ? "Edit" : "Add"} Payout Address</DialogTitle></DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); saveMutation.mutate(); }} className="space-y-4">
+            <div><label className="text-sm font-medium">Label *</label><Input className="mt-1" value={form.label} onChange={(e) => set("label", e.target.value)} placeholder="e.g. Main USDT TRC20" required /></div>
+            <div>
+              <label className="text-sm font-medium">Asset *</label>
+              <Select value={form.asset} onValueChange={(v) => set("asset", v)}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>{BRAND.supportedAssets.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Network *</label>
+              <Select value={form.network} onValueChange={(v) => set("network", v)}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>{BRAND.supportedNetworks.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div><label className="text-sm font-medium">Address *</label><Input className="mt-1" value={form.address} onChange={(e) => set("address", e.target.value)} placeholder="Wallet address" required /></div>
+            <div><label className="text-sm font-medium">Destination Tag / Memo</label><Input className="mt-1" value={form.destination_tag} onChange={(e) => set("destination_tag", e.target.value)} placeholder="Optional" /></div>
+            <DialogFooter><Button type="submit" disabled={saveMutation.isPending}>{saveMutation.isPending ? "Saving…" : "Save"}</Button></DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => { if (!o) setDeleteId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader><AlertDialogTitle>Delete address?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && deleteMutation.mutate(deleteId)}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
