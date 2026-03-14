@@ -100,10 +100,12 @@ export default function TradeDetailPage() {
     return <DashboardLayout><div className="py-20 text-center"><p className="text-muted-foreground">Trade not found.</p><Button asChild className="mt-4"><Link to="/dashboard/trades">Back to Trades</Link></Button></div></DashboardLayout>;
   }
 
-  const timelineItems = history.map((h) => ({
+  const timelineSteps = history.map((h, i) => ({
     label: h.to_status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-    date: format(new Date(h.created_at), "PPp"),
+    timestamp: h.created_at,
     description: h.note || undefined,
+    completed: true,
+    active: i === history.length - 1,
   }));
 
   const showUpload = ["awaiting_fiat_payment", "pending_settlement"].includes(trade.status);
