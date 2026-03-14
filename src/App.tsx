@@ -47,6 +47,7 @@ import PortfolioPage from "./pages/dashboard/PortfolioPage";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
+import AdminUserDetailPage from "./pages/admin/AdminUserDetailPage";
 import AdminKycPage from "./pages/admin/AdminKycPage";
 import AdminQuotesPage from "./pages/admin/AdminQuotesPage";
 import AdminQuoteDetailPage from "./pages/admin/AdminQuoteDetailPage";
