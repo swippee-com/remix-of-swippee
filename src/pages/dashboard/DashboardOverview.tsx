@@ -9,8 +9,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
+import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 
 export default function DashboardPage() {
   const { user } = useAuth();
