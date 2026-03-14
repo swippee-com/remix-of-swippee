@@ -41,6 +41,7 @@ import AdminKycPage from "./pages/admin/AdminKycPage";
 import AdminQuotesPage from "./pages/admin/AdminQuotesPage";
 import AdminQuoteDetailPage from "./pages/admin/AdminQuoteDetailPage";
 import AdminTradesPage from "./pages/admin/AdminTradesPage";
+import AdminTradeDetailPage from "./pages/admin/AdminTradeDetailPage";
 import AdminLedgerPage from "./pages/admin/AdminLedgerPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 import AdminSupportPage from "./pages/admin/AdminSupportPage";
