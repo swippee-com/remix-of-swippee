@@ -220,6 +220,24 @@ export default function AdminKycPage() {
         </DialogContent>
       </Dialog>
 
+      </Dialog>
+
+      {/* Document Viewer Dialog */}
+      <Dialog open={!!viewingDoc} onOpenChange={(open) => { if (!open) setViewingDoc(null); }}>
+        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="truncate">{viewingDoc?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 overflow-auto flex items-center justify-center bg-muted/30 rounded-lg">
+            {viewingDoc?.type === "image" ? (
+              <img src={viewingDoc.url} alt={viewingDoc.name} className="max-w-full max-h-[65vh] object-contain" />
+            ) : (
+              <iframe src={viewingDoc?.url} title={viewingDoc?.name} className="w-full h-[65vh] rounded" />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Action Dialog */}
       <Dialog open={!!actionType} onOpenChange={(open) => { if (!open) { setActionType(null); setAdminNotes(""); } }}>
         <DialogContent>
