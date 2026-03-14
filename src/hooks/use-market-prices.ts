@@ -72,13 +72,13 @@ export function currencySymbol(currency: Currency): string {
 }
 
 export function useNprRate() {
-  const { data: rate = FALLBACK_NPR_RATE } = useQuery({
+  const { data = { rate: FALLBACK_NPR_RATE, sell: FALLBACK_NPR_RATE, date: null } } = useQuery({
     queryKey: ["npr-rate"],
     queryFn: fetchNprRate,
-    refetchInterval: 300000, // refresh every 5 min
+    refetchInterval: 300000,
     staleTime: 120000,
   });
-  return rate;
+  return data;
 }
 
 export function useMarketPrices() {
