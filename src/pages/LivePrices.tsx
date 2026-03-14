@@ -10,6 +10,7 @@ import { TrendingUp, TrendingDown, ArrowRight, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
+import { AdBanner } from "@/components/ads/AdBanner";
 
 function formatMarketCap(n: number, currency: Currency): string {
   const sym = currencySymbol(currency);
