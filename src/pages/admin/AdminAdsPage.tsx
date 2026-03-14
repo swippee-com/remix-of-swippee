@@ -62,7 +62,7 @@ export default function AdminAdsPage() {
     queryKey: ["admin-ads"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("ads")
+        .from("promotions")
         .select("*")
         .order("created_at", { ascending: false });
       return data || [];
