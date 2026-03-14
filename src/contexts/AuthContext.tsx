@@ -17,6 +17,7 @@ interface AuthContextType {
     avatar_url: string | null;
     is_2fa_enabled: boolean;
     is_frozen: boolean;
+    phone_verified: boolean;
   } | null;
   roles: AppRole[];
   isLoading: boolean;
