@@ -134,7 +134,14 @@ export default function PaymentMethodsPage() {
               <label className="text-sm font-medium">{t("pm.type")} *</label>
               <Select value={form.payment_type} onValueChange={(v) => set("payment_type", v)}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>{BRAND.paymentMethods.map((p) => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}</SelectContent>
+                <SelectContent>{BRAND.paymentMethods.map((p) => (
+                  <SelectItem key={p.value} value={p.value}>
+                    <span className="flex items-center gap-2">
+                      {BRAND.paymentLogos[p.value] && <img src={BRAND.paymentLogos[p.value]} alt={p.label} className="h-4 w-4 rounded object-contain" />}
+                      {p.label}
+                    </span>
+                  </SelectItem>
+                ))}</SelectContent>
               </Select>
             </div>
             <div><label className="text-sm font-medium">{t("pm.accountHolderName")} *</label><Input className="mt-1" value={form.account_holder_name} onChange={(e) => set("account_holder_name", e.target.value)} required /></div>
