@@ -14,8 +14,9 @@ export const BRAND = {
     { value: "other", label: "Other" },
   ] as const,
   paymentLogos: {
+    bank_transfer: "/logos/bank-icon.png",
     esewa: "https://cdn.brandfetch.io/domain/esewa.com.np?c=1id01bgBTiGcf_p1fhi",
-    khalti: "https://cdn.brandfetch.io/domain/khalti.np?c=1id01bgBTiGcf_p1fhi",
+    khalti: "/logos/khalti.png",
   } as Record<string, string>,
 } as const;
 
