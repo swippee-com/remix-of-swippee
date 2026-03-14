@@ -25,7 +25,7 @@ export default function NewQuotePage() {
   const [side, setSide] = useState<TradeSide>("buy");
   const [asset, setAsset] = useState<CryptoAsset | "">("");
   const [network, setNetwork] = useState<CryptoNetwork | "">("");
-  const [fiatCurrency, setFiatCurrency] = useState(BRAND.defaultFiatCurrency);
+  const [fiatCurrency, setFiatCurrency] = useState<string>(BRAND.defaultFiatCurrency);
   const [amountType, setAmountType] = useState<"crypto" | "fiat" | "">("");
   const [amount, setAmount] = useState("");
   const [paymentMethodId, setPaymentMethodId] = useState("");

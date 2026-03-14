@@ -142,7 +142,7 @@ export default function TradeDetailPage() {
           {timelineItems.length === 0 ? (
             <p className="text-sm text-muted-foreground">No status history yet.</p>
           ) : (
-            <Timeline items={timelineItems} />
+            <Timeline steps={timelineSteps} />
           )}
         </div>
       </div>
