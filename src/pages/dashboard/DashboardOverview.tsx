@@ -188,7 +188,7 @@ export default function DashboardPage() {
                 <div key={item.id} className="flex items-center justify-between px-6 py-4">
                   <div>
                     <p className="text-sm font-medium">{item.type === "quote" ? t("dashboard.quoteRequest") : t("dashboard.trade")} — {item.amount} {item.asset}</p>
-                    <p className="text-xs text-muted-foreground">{format(new Date(item.date), "PPp")}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(item.date, "PPp")}</p>
                   </div>
                   <StatusBadge status={item.status} />
                 </div>

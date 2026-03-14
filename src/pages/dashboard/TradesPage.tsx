@@ -132,7 +132,7 @@ export default function TradesPage() {
                     <td className="px-6 py-4">{t_item.gross_amount} {t_item.asset}</td>
                     <td className="px-6 py-4">{Number(t_item.quoted_rate).toLocaleString()} {t_item.fiat_currency}</td>
                     <td className="px-6 py-4"><StatusBadge status={t_item.status} /></td>
-                    <td className="px-6 py-4 text-muted-foreground">{format(new Date(t_item.created_at), "PP")}</td>
+                    <td className="px-6 py-4 text-muted-foreground">{formatDate(t_item.created_at, "PP")}</td>
                     <td className="px-6 py-4"><Button variant="ghost" size="sm" asChild><Link to={`/dashboard/trades/${t_item.id}`}><Eye className="h-3 w-3 mr-1" /> {t("trades.view")}</Link></Button></td>
                   </tr>
                 ))}

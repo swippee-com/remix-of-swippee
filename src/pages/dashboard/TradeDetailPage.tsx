@@ -135,7 +135,7 @@ export default function TradeDetailPage() {
                 <div className="flex items-center justify-between">
                   <div className="text-sm">
                     <p className="font-medium">{p.file_name}</p>
-                    <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{format(new Date(p.created_at), "PPp")}</p>
+                    <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{formatDate(p.created_at, "PPp")}</p>
                   </div>
                   <StatusBadge status={p.status} />
                 </div>

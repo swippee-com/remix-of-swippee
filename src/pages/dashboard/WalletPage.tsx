@@ -98,7 +98,7 @@ export default function WalletPage() {
                           </td>
                           <td className="px-6 py-4"><StatusBadge status={tx.status} /></td>
                           <td className="px-6 py-4 text-muted-foreground text-xs max-w-[200px] truncate">{tx.description || "—"}</td>
-                          <td className="px-6 py-4 text-muted-foreground">{format(new Date(tx.created_at), "PP")}</td>
+                          <td className="px-6 py-4 text-muted-foreground">{formatDate(tx.created_at, "PP")}</td>
                         </tr>
                       ))}
                     </tbody>

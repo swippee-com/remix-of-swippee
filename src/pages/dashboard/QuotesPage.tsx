@@ -65,7 +65,7 @@ export default function QuotesPage() {
                     <td className="px-6 py-4">{q.asset}</td>
                     <td className="px-6 py-4">{q.amount_crypto ? `${q.amount_crypto} ${q.asset}` : `${q.fiat_currency} ${Number(q.amount_fiat).toLocaleString()}`}</td>
                     <td className="px-6 py-4"><StatusBadge status={q.status} /></td>
-                    <td className="px-6 py-4 text-muted-foreground">{format(new Date(q.created_at), "PP")}</td>
+                    <td className="px-6 py-4 text-muted-foreground">{formatDate(q.created_at, "PP")}</td>
                     <td className="px-6 py-4"><Button variant="ghost" size="sm" asChild><Link to={`/dashboard/quotes/${q.id}`}>{t("quotes.view")}</Link></Button></td>
                   </tr>
                 ))}

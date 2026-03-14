@@ -303,7 +303,7 @@ export default function PortfolioPage() {
                     {trades.map((trade) => (
                       <TableRow key={trade.id}>
                         <TableCell className="text-muted-foreground">
-                          {format(new Date(trade.created_at), "MMM d, yyyy")}
+                          {formatDate(trade.created_at, "MMM d, yyyy")}
                         </TableCell>
                         <TableCell>
                           <span className={cn(

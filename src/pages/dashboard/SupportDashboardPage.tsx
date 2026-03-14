@@ -140,7 +140,7 @@ export default function SupportDashboardPage() {
                     <td className="px-6 py-4 font-medium">{t_item.subject}</td>
                     <td className="px-6 py-4">{t_item.category || "—"}</td>
                     <td className="px-6 py-4"><StatusBadge status={t_item.status} /></td>
-                    <td className="px-6 py-4 text-muted-foreground">{format(new Date(t_item.updated_at), "PP")}</td>
+                    <td className="px-6 py-4 text-muted-foreground">{formatDate(t_item.updated_at, "PP")}</td>
                     <td className="px-6 py-4"><Button variant="ghost" size="sm">{t("support.open")}</Button></td>
                   </tr>
                 ))}
