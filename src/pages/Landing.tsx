@@ -2,9 +2,10 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { BRAND } from "@/config/brand";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Shield, Clock, Wallet, CheckCircle } from "lucide-react";
+import { ArrowRight, Shield, Clock, Wallet, CheckCircle, LayoutDashboard } from "lucide-react";
 import { motion } from "framer-motion";
 import { SponsorStrip } from "@/components/ads/SponsorStrip";
+import { useAuth } from "@/contexts/AuthContext";
 
 const features = [
   { icon: Shield, title: "KYC Verified", description: "All users are verified before trading. Your security is our priority." },
@@ -20,6 +21,7 @@ const steps = [
 ];
 
 export default function LandingPage() {
+  const { user } = useAuth();
   return (
     <PublicLayout>
       {/* Hero */}
@@ -42,9 +44,20 @@ export default function LandingPage() {
               {BRAND.description}
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Button variant="hero" asChild>
-                <Link to="/auth/signup">Get Started <ArrowRight className="ml-1 h-4 w-4" /></Link>
-              </Button>
+              {user ? (
+                <Button variant="hero" asChild>
+                  <Link to="/dashboard">Dashboard <LayoutDashboard className="ml-1 h-4 w-4" /></Link>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="hero" asChild>
+                    <Link to="/auth/signup">Get Started <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                  </Button>
+                  <Button variant="hero-outline" asChild>
+                    <Link to="/auth/login">Sign In</Link>
+                  </Button>
+                </>
+              )}
               <Button variant="hero-outline" asChild>
                 <Link to="/how-it-works">How It Works</Link>
               </Button>
