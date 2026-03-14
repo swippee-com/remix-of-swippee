@@ -1,35 +1,56 @@
 import { useQuery } from "@tanstack/react-query";
 
+export type Currency = "usd" | "npr";
+
+const NPR_RATE = 133.5; // approximate USD→NPR rate
+
 export interface MarketPrice {
+  id: string;
   asset: string;
   symbol: string;
+  image: string;
   price: number;
   change24h: number;
   marketCap: number;
+  rank: number;
 }
 
-const COIN_MAP: Record<string, { asset: string; symbol: string }> = {
-  bitcoin: { asset: "Bitcoin", symbol: "BTC" },
-  ethereum: { asset: "Ethereum", symbol: "ETH" },
-  tether: { asset: "Tether", symbol: "USDT" },
-  "usd-coin": { asset: "USD Coin", symbol: "USDC" },
-};
+interface CoinGeckoMarket {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h: number | null;
+  market_cap: number;
+  market_cap_rank: number;
+}
 
 async function fetchPrices(): Promise<MarketPrice[]> {
-  const ids = Object.keys(COIN_MAP).join(",");
   const res = await fetch(
-    `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`
+    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=12&page=1&sparkline=false&price_change_percentage=24h"
   );
   if (!res.ok) throw new Error("Failed to fetch prices");
-  const data = await res.json();
+  const data: CoinGeckoMarket[] = await res.json();
 
-  return Object.entries(COIN_MAP).map(([id, meta]) => ({
-    asset: meta.asset,
-    symbol: meta.symbol,
-    price: data[id]?.usd ?? 0,
-    change24h: data[id]?.usd_24h_change ?? 0,
-    marketCap: data[id]?.usd_market_cap ?? 0,
+  return data.map((coin) => ({
+    id: coin.id,
+    asset: coin.name,
+    symbol: coin.symbol.toUpperCase(),
+    image: coin.image,
+    price: coin.current_price ?? 0,
+    change24h: coin.price_change_percentage_24h ?? 0,
+    marketCap: coin.market_cap ?? 0,
+    rank: coin.market_cap_rank ?? 0,
   }));
+}
+
+export function convertPrice(usdPrice: number, currency: Currency): number {
+  return currency === "npr" ? usdPrice * NPR_RATE : usdPrice;
+}
+
+export function currencySymbol(currency: Currency): string {
+  return currency === "npr" ? "रू" : "$";
 }
 
 export function useMarketPrices() {

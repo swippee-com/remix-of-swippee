@@ -1,23 +1,37 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { useMarketPrices } from "@/hooks/use-market-prices";
+import { useMarketPrices, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { PriceTicker } from "@/components/shared/PriceTicker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import { TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowRight, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { useState, useMemo } from "react";
 
-function formatMarketCap(n: number): string {
-  if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
-  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
-  return `$${n.toLocaleString()}`;
+function formatMarketCap(n: number, currency: Currency): string {
+  const sym = currencySymbol(currency);
+  if (n >= 1e12) return `${sym}${(n / 1e12).toFixed(2)}T`;
+  if (n >= 1e9) return `${sym}${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `${sym}${(n / 1e6).toFixed(2)}M`;
+  return `${sym}${n.toLocaleString()}`;
 }
 
 export default function LivePrices() {
   const { prices, isLoading, lastUpdated } = useMarketPrices();
+  const [currency, setCurrency] = useState<Currency>("usd");
+  const [search, setSearch] = useState("");
+  const sym = currencySymbol(currency);
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return prices;
+    const q = search.toLowerCase();
+    return prices.filter(
+      (p) => p.asset.toLowerCase().includes(q) || p.symbol.toLowerCase().includes(q)
+    );
+  }, [prices, search]);
 
   return (
     <PublicLayout>
@@ -25,12 +39,50 @@ export default function LivePrices() {
         <div className="mb-2">
           <h1 className="text-3xl font-semibold tracking-tight">Live Market Prices</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Indicative rates updated every 60 seconds via CoinGecko.
+            Top cryptocurrencies by market cap · Updated every 60 seconds
           </p>
         </div>
 
         <div className="mt-6">
-          <PriceTicker />
+          <PriceTicker currency={currency} />
+        </div>
+
+        {/* Controls row */}
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative max-w-xs flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search coins…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+
+          <div className="flex items-center rounded-lg border bg-card p-1">
+            <button
+              onClick={() => setCurrency("usd")}
+              className={cn(
+                "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+                currency === "usd"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              USD ($)
+            </button>
+            <button
+              onClick={() => setCurrency("npr")}
+              className={cn(
+                "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+                currency === "npr"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              NPR (रू)
+            </button>
+          </div>
         </div>
 
         {lastUpdated && (
@@ -39,9 +91,9 @@ export default function LivePrices() {
           </p>
         )}
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {isLoading
-            ? Array.from({ length: 4 }).map((_, i) => (
+            ? Array.from({ length: 12 }).map((_, i) => (
                 <Card key={i}>
                   <CardHeader className="pb-2">
                     <Skeleton className="h-5 w-24" />
@@ -53,18 +105,30 @@ export default function LivePrices() {
                   </CardContent>
                 </Card>
               ))
-            : prices.map((p) => {
+            : filtered.length === 0 ? (
+                <div className="col-span-full py-12 text-center text-muted-foreground">
+                  No coins match "{search}"
+                </div>
+              ) : filtered.map((p) => {
                 const positive = p.change24h >= 0;
+                const displayPrice = convertPrice(p.price, currency);
+                const displayCap = convertPrice(p.marketCap, currency);
                 return (
                   <Card key={p.symbol}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base font-medium">
-                        {p.asset} <span className="text-muted-foreground">({p.symbol})</span>
-                      </CardTitle>
+                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                      <img src={p.image} alt={p.asset} className="h-8 w-8 rounded-full" />
+                      <div className="min-w-0">
+                        <CardTitle className="truncate text-base font-medium">
+                          {p.asset}
+                        </CardTitle>
+                        <p className="text-xs text-muted-foreground">
+                          {p.symbol} · #{p.rank}
+                        </p>
+                      </div>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       <p className="text-2xl font-semibold tracking-tight">
-                        ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {sym}{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                       <div
                         className={cn(
@@ -76,7 +140,7 @@ export default function LivePrices() {
                         {Math.abs(p.change24h).toFixed(2)}% (24h)
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Market Cap: {formatMarketCap(p.marketCap)}
+                        Market Cap: {formatMarketCap(displayCap, currency)}
                       </p>
                     </CardContent>
                   </Card>
