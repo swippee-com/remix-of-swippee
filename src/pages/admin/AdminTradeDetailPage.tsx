@@ -29,6 +29,7 @@ export default function AdminTradeDetailPage() {
   const [newStatus, setNewStatus] = useState<TradeStatus | "">("");
   const [statusNote, setStatusNote] = useState("");
   const [settlementNotes, setSettlementNotes] = useState("");
+  const [proofUrls, setProofUrls] = useState<Record<string, string>>({});
 
   const { data: trade, isLoading } = useQuery({
     queryKey: ["admin-trade-detail", id],
