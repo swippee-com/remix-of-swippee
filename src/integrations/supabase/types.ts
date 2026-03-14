@@ -599,6 +599,7 @@ export type Database = {
           full_name: string | null
           id: string
           is_2fa_enabled: boolean | null
+          is_frozen: boolean
           phone: string | null
           timezone: string | null
           updated_at: string
@@ -611,6 +612,7 @@ export type Database = {
           full_name?: string | null
           id: string
           is_2fa_enabled?: boolean | null
+          is_frozen?: boolean
           phone?: string | null
           timezone?: string | null
           updated_at?: string
@@ -623,6 +625,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_2fa_enabled?: boolean | null
+          is_frozen?: boolean
           phone?: string | null
           timezone?: string | null
           updated_at?: string
