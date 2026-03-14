@@ -88,7 +88,7 @@ export default function AdminAdsPage() {
         if (error) throw error;
       } else {
         payload.created_by = user!.id;
-        const { error } = await supabase.from("ads").insert(payload);
+        const { error } = await supabase.from("promotions").insert(payload);
         if (error) throw error;
       }
     },
