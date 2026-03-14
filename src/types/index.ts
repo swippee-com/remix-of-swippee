@@ -6,7 +6,7 @@ export type TradeStatus = "pending_settlement" | "awaiting_fiat_payment" | "paym
 export type TradeSide = "buy" | "sell";
 export type LedgerBucket = "client_receivable" | "client_payable" | "fees_revenue" | "settlement_pending" | "otc_inventory" | "fiat_clearing" | "crypto_clearing" | "manual_adjustment";
 export type LedgerDirection = "debit" | "credit";
-export type PaymentMethodType = "bank_transfer" | "esewa" | "khalti" | "ime_pay" | "other";
+export type PaymentMethodType = "bank_transfer" | "esewa" | "khalti" | "ime_pay" | "other"; // ime_pay kept for DB compat but hidden from UI
 export type TicketStatus = "open" | "pending_user" | "pending_admin" | "resolved" | "closed";
 
 // ===== Models =====

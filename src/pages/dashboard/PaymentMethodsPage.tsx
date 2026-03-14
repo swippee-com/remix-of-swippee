@@ -82,7 +82,7 @@ export default function PaymentMethodsPage() {
     setEditId(m.id); setModalOpen(true);
   };
 
-  const isWallet = ["esewa", "khalti", "ime_pay"].includes(form.payment_type);
+  const isWallet = ["esewa", "khalti"].includes(form.payment_type);
 
   return (
     <DashboardLayout>
@@ -99,7 +99,14 @@ export default function PaymentMethodsPage() {
           {methods.map((m) => (
             <div key={m.id} className="rounded-lg border bg-card p-5 shadow-card">
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-muted-foreground" /><span className="font-medium text-sm">{m.label}</span></div>
+                <div className="flex items-center gap-2">
+                  {BRAND.paymentLogos[m.payment_type] ? (
+                    <img src={BRAND.paymentLogos[m.payment_type]} alt={m.payment_type} className="h-5 w-5 rounded object-contain" />
+                  ) : (
+                    <CreditCard className="h-5 w-5 text-muted-foreground" />
+                  )}
+                  <span className="font-medium text-sm">{m.label}</span>
+                </div>
                 {m.is_default && <Star className="h-4 w-4 text-warning fill-warning" />}
               </div>
               <div className="mt-3 space-y-1 text-sm text-muted-foreground">
@@ -127,7 +134,14 @@ export default function PaymentMethodsPage() {
               <label className="text-sm font-medium">{t("pm.type")} *</label>
               <Select value={form.payment_type} onValueChange={(v) => set("payment_type", v)}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>{BRAND.paymentMethods.map((p) => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}</SelectContent>
+                <SelectContent>{BRAND.paymentMethods.map((p) => (
+                  <SelectItem key={p.value} value={p.value}>
+                    <span className="flex items-center gap-2">
+                      {BRAND.paymentLogos[p.value] && <img src={BRAND.paymentLogos[p.value]} alt={p.label} className="h-4 w-4 rounded object-contain" />}
+                      {p.label}
+                    </span>
+                  </SelectItem>
+                ))}</SelectContent>
               </Select>
             </div>
             <div><label className="text-sm font-medium">{t("pm.accountHolderName")} *</label><Input className="mt-1" value={form.account_holder_name} onChange={(e) => set("account_holder_name", e.target.value)} required /></div>
