@@ -111,20 +111,6 @@ export default function AdminTradeDetailPage() {
     },
   });
 
-  useEffect(() => {
-    if (proofs.length === 0) return;
-    const fetchUrls = async () => {
-      const urls: Record<string, string> = {};
-      await Promise.all(
-        proofs.map(async (p) => {
-          const { data } = await supabase.storage.from("payment-proofs").createSignedUrl(p.file_path, 3600);
-          if (data?.signedUrl) urls[p.id] = data.signedUrl;
-        })
-      );
-      setProofUrls(urls);
-    };
-    fetchUrls();
-  }, [proofs]);
 
   if (isLoading) {
     return <AdminLayout><div className="flex justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div></AdminLayout>;
