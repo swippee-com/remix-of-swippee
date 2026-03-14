@@ -42,7 +42,7 @@ export default function LoginPage() {
     if (frozenCheck?.is_frozen) {
       toast({
         title: "Account Frozen",
-        description: "This account is currently frozen. You cannot perform any transactions.",
+        description: "This account is currently frozen. You cannot perform any transactions. Please contact support.",
         variant: "destructive",
       });
     } else {
