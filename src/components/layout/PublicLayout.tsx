@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { AdBanner } from "@/components/ads/AdBanner";
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -52,6 +53,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         )}
       </header>
       <main className="flex-1">{children}</main>
+      <AdBanner placement="public_footer" className="container py-4" />
       <footer className="border-t bg-muted/30">
         <div className="container py-8 text-center text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>

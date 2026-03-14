@@ -10,6 +10,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
+import { AdBanner } from "@/components/ads/AdBanner";
+import { SidebarAd } from "@/components/ads/SidebarAd";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -71,6 +73,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <Link to="/dashboard" className="text-lg font-bold tracking-tight">{BRAND.name}</Link>
         </div>
         <NavContent />
+        <SidebarAd />
         <div className="border-t p-3">
           <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground" onClick={handleSignOut}>
             <LogOut className="h-4 w-4" /> {t("nav.signOut")}
@@ -132,6 +135,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
           )}
           <AnnouncementBanner />
+          <AdBanner placement="dashboard_banner" className="mb-4" />
           {children}
         </main>
       </div>

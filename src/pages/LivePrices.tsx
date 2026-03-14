@@ -10,6 +10,7 @@ import { TrendingUp, TrendingDown, ArrowRight, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
+import { AdBanner } from "@/components/ads/AdBanner";
 
 function formatMarketCap(n: number, currency: Currency): string {
   const sym = currencySymbol(currency);
@@ -105,6 +106,8 @@ export default function LivePrices() {
             Last updated: {format(lastUpdated, "PPpp")}
           </p>
         )}
+
+        <AdBanner placement="live_prices" className="mt-6" />
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {isLoading
