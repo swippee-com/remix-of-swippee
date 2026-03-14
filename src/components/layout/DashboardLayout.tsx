@@ -85,6 +85,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Button>
           <div className="hidden lg:block" />
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              aria-label="Toggle theme"
+            >
+              {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
             <NotificationBell />
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-primary-foreground">
               {initials}
