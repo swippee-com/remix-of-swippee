@@ -590,6 +590,36 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_verification_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          user_id: string | null
+          verified: boolean
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone: string
+          user_id?: string | null
+          verified?: boolean
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          user_id?: string | null
+          verified?: boolean
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -601,6 +631,7 @@ export type Database = {
           is_2fa_enabled: boolean | null
           is_frozen: boolean
           phone: string | null
+          phone_verified: boolean
           timezone: string | null
           updated_at: string
         }
@@ -614,6 +645,7 @@ export type Database = {
           is_2fa_enabled?: boolean | null
           is_frozen?: boolean
           phone?: string | null
+          phone_verified?: boolean
           timezone?: string | null
           updated_at?: string
         }
@@ -627,6 +659,7 @@ export type Database = {
           is_2fa_enabled?: boolean | null
           is_frozen?: boolean
           phone?: string | null
+          phone_verified?: boolean
           timezone?: string | null
           updated_at?: string
         }
