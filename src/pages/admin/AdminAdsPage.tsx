@@ -12,8 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { Plus, Trash2, BarChart3, Eye, MousePointer } from "lucide-react";
+import { useState, useRef } from "react";
+import { Plus, Trash2, BarChart3, Eye, MousePointer, Upload, Loader2 } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { format } from "date-fns";
 
@@ -55,6 +55,8 @@ export default function AdminAdsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<AdForm>(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: ads = [], isLoading } = useQuery({
     queryKey: ["admin-ads"],
@@ -169,8 +171,50 @@ export default function AdminAdsPage() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label>Image URL</Label>
-                <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+                <Label>Banner Image</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={form.image_url}
+                    onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                    placeholder="https://... or upload →"
+                    className="flex-1"
+                  />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setUploading(true);
+                      const ext = file.name.split(".").pop();
+                      const path = `${crypto.randomUUID()}.${ext}`;
+                      const { error } = await supabase.storage.from("ad-images").upload(path, file);
+                      if (error) {
+                        toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+                      } else {
+                        const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
+                        setForm((f) => ({ ...f, image_url: urlData.publicUrl }));
+                        toast({ title: "Image uploaded" });
+                      }
+                      setUploading(false);
+                      e.target.value = "";
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    disabled={uploading}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  </Button>
+                </div>
+                {form.image_url && (
+                  <img src={form.image_url} alt="Preview" className="mt-1.5 h-20 w-full rounded-md object-cover border" />
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
