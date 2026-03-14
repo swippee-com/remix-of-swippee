@@ -1,15 +1,15 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
+import { useMarketPrices, useNprRate, convertPrice, currencySymbol, searchCoins, type Currency, type MarketPrice } from "@/hooks/use-market-prices";
 import { PriceTicker } from "@/components/shared/PriceTicker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import { TrendingUp, TrendingDown, ArrowRight, Search } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowRight, Search, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { AdBanner } from "@/components/ads/AdBanner";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
@@ -30,7 +30,10 @@ export default function LivePrices() {
   const nprData = useNprRate();
   const [currency, setCurrency] = useState<Currency>("usd");
   const [search, setSearch] = useState("");
+  const [remoteResults, setRemoteResults] = useState<MarketPrice[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const sym = currencySymbol(currency);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const filtered = useMemo(() => {
     if (!search.trim()) return prices;
@@ -39,6 +42,33 @@ export default function LivePrices() {
       (p) => p.asset.toLowerCase().includes(q) || p.symbol.toLowerCase().includes(q)
     );
   }, [prices, search]);
+
+  // Remote search fallback when local filter finds nothing
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (filtered.length > 0 || search.trim().length < 2) {
+      setRemoteResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const results = await searchCoins(search.trim());
+        setRemoteResults(results);
+      } catch {
+        setRemoteResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [search, filtered.length]);
+
+  const displayPrices = filtered.length > 0 ? filtered : remoteResults;
 
   return (
     <PublicLayout>
@@ -128,16 +158,22 @@ export default function LivePrices() {
                   </CardContent>
                 </Card>
               ))
-            : filtered.length === 0 ? (
+            : isSearching ? (
+                <div className="col-span-full flex items-center justify-center gap-2 py-12 text-muted-foreground">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Searching for "{search}"…
+                </div>
+              )
+            : displayPrices.length === 0 && search.trim().length > 0 ? (
                 <div className="col-span-full py-12 text-center text-muted-foreground">
                   No coins match "{search}"
                 </div>
-              ) : filtered.map((p) => {
+              ) : displayPrices.map((p) => {
                 const positive = p.change24h >= 0;
                 const displayPrice = convertPrice(p.price, currency, nprData.rate);
                 const displayCap = convertPrice(p.marketCap, currency, nprData.rate);
                 return (
-                  <Card key={p.symbol}>
+                  <Card key={p.id}>
                     <CardHeader className="flex flex-row items-center gap-3 pb-2">
                       <img src={p.image} alt={p.asset} className="h-8 w-8 rounded-full" />
                       <div className="min-w-0">
