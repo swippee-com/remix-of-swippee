@@ -41,5 +41,8 @@ Swippee OTC Crypto Desk - design system, brand config, architecture decisions
 - Admin Ledger from ledger_entries with bucket/search filters
 - Admin Audit Logs from audit_logs with action filters + actor names
 
-## Remaining for MVP
-- Phase 3: Support tickets, Settings profile/password, Notifications
+- Support tickets (user: create/list/message thread; admin: list/reply/internal notes/status management)
+- Settings page with profile update + password change
+- Notification bell with unread count, mark-read, polling every 30s
+
+## All MVP pages are now wired to live Supabase data.

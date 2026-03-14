@@ -2,8 +2,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BRAND } from "@/config/brand";
 import { adminNavItems } from "@/config/navigation";
 import { cn } from "@/lib/utils";
-import { LogOut, Bell, Menu, X, ShieldCheck } from "lucide-react";
+import { LogOut, Menu, X, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -80,7 +81,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </Button>
           <div className="hidden lg:block" />
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon"><Bell className="h-4 w-4" /></Button>
+            <NotificationBell />
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-primary-foreground">
               {initials}
             </div>
