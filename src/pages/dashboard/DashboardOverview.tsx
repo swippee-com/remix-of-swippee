@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { useMemo, useState, useCallback } from "react";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
@@ -18,6 +18,7 @@ import { PriceTicker } from "@/components/shared/PriceTicker";
 export default function DashboardPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
 
   const tradeKeys = useMemo(() => [["dashboard-trades", user?.id || ""], ["dashboard-activity", user?.id || ""]], [user?.id]);
   const quoteKeys = useMemo(() => [["dashboard-activity", user?.id || ""]], [user?.id]);
@@ -188,7 +189,7 @@ export default function DashboardPage() {
                 <div key={item.id} className="flex items-center justify-between px-6 py-4">
                   <div>
                     <p className="text-sm font-medium">{item.type === "quote" ? t("dashboard.quoteRequest") : t("dashboard.trade")} — {item.amount} {item.asset}</p>
-                    <p className="text-xs text-muted-foreground">{format(new Date(item.date), "PPp")}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(item.date, "PPp")}</p>
                   </div>
                   <StatusBadge status={item.status} />
                 </div>

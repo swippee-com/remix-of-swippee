@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { useMemo, useState } from "react";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { DepositModal } from "@/components/dashboard/DepositModal";
@@ -18,6 +18,7 @@ import { WithdrawModal } from "@/components/dashboard/WithdrawModal";
 export default function WalletPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
 
@@ -98,7 +99,7 @@ export default function WalletPage() {
                           </td>
                           <td className="px-6 py-4"><StatusBadge status={tx.status} /></td>
                           <td className="px-6 py-4 text-muted-foreground text-xs max-w-[200px] truncate">{tx.description || "—"}</td>
-                          <td className="px-6 py-4 text-muted-foreground">{format(new Date(tx.created_at), "PP")}</td>
+                          <td className="px-6 py-4 text-muted-foreground">{formatDate(tx.created_at, "PP")}</td>
                         </tr>
                       ))}
                     </tbody>

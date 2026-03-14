@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { useState, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 
@@ -20,6 +20,7 @@ export default function TradeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [refNumber, setRefNumber] = useState("");
@@ -105,7 +106,7 @@ export default function TradeDetailPage() {
             <p><span className="font-medium">{t("tradeDetail.fee")}</span> {trade.fee_amount}</p>
             <p><span className="font-medium">{t("tradeDetail.netAmount")}</span> {trade.net_amount}</p>
             <p><span className="font-medium">{t("tradeDetail.rate")}</span> {Number(trade.quoted_rate).toLocaleString()} {trade.fiat_currency}</p>
-            <p><span className="font-medium">{t("tradeDetail.created")}</span> {format(new Date(trade.created_at), "PPp")}</p>
+            <p><span className="font-medium">{t("tradeDetail.created")}</span> {formatDate(trade.created_at, "PPp")}</p>
           </div>
           {trade.settlement_notes && (
             <div className="mt-2 rounded bg-muted/50 p-3 text-sm">
@@ -135,7 +136,7 @@ export default function TradeDetailPage() {
                 <div className="flex items-center justify-between">
                   <div className="text-sm">
                     <p className="font-medium">{p.file_name}</p>
-                    <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{format(new Date(p.created_at), "PPp")}</p>
+                    <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{formatDate(p.created_at, "PPp")}</p>
                   </div>
                   <StatusBadge status={p.status} />
                 </div>

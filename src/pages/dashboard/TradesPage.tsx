@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeftRight, Eye, Download, FileText, FileSpreadsheet } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -50,6 +51,7 @@ async function exportPDF(trades: any[]) {
 export default function TradesPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const keys = useMemo(() => [["user-trades"]], []);
   useRealtimeInvalidation("otc_trades", keys);
 
@@ -132,7 +134,7 @@ export default function TradesPage() {
                     <td className="px-6 py-4">{t_item.gross_amount} {t_item.asset}</td>
                     <td className="px-6 py-4">{Number(t_item.quoted_rate).toLocaleString()} {t_item.fiat_currency}</td>
                     <td className="px-6 py-4"><StatusBadge status={t_item.status} /></td>
-                    <td className="px-6 py-4 text-muted-foreground">{format(new Date(t_item.created_at), "PP")}</td>
+                    <td className="px-6 py-4 text-muted-foreground">{formatDate(t_item.created_at, "PP")}</td>
                     <td className="px-6 py-4"><Button variant="ghost" size="sm" asChild><Link to={`/dashboard/trades/${t_item.id}`}><Eye className="h-3 w-3 mr-1" /> {t("trades.view")}</Link></Button></td>
                   </tr>
                 ))}

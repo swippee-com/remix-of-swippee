@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { PieChart, TrendingUp, TrendingDown, Wallet, BarChart3, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 
 interface OtcTrade {
   id: string;
@@ -79,6 +79,7 @@ function computeHoldings(trades: OtcTrade[]): Holding[] {
 export default function PortfolioPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const [currency, setCurrency] = useState<Currency>("npr");
   const { prices, isLoading: pricesLoading } = useMarketPrices();
   const nprData = useNprRate();
@@ -303,7 +304,7 @@ export default function PortfolioPage() {
                     {trades.map((trade) => (
                       <TableRow key={trade.id}>
                         <TableCell className="text-muted-foreground">
-                          {format(new Date(trade.created_at), "MMM d, yyyy")}
+                          {formatDate(trade.created_at, "MMM d, yyyy")}
                         </TableCell>
                         <TableCell>
                           <span className={cn(

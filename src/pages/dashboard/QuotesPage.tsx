@@ -9,13 +9,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { useMemo } from "react";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 
 export default function QuotesPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const keys = useMemo(() => [["user-quote-requests"]], []);
   useRealtimeInvalidation("quote_requests", keys);
   useRealtimeInvalidation("quotes", keys);
@@ -65,7 +66,7 @@ export default function QuotesPage() {
                     <td className="px-6 py-4">{q.asset}</td>
                     <td className="px-6 py-4">{q.amount_crypto ? `${q.amount_crypto} ${q.asset}` : `${q.fiat_currency} ${Number(q.amount_fiat).toLocaleString()}`}</td>
                     <td className="px-6 py-4"><StatusBadge status={q.status} /></td>
-                    <td className="px-6 py-4 text-muted-foreground">{format(new Date(q.created_at), "PP")}</td>
+                    <td className="px-6 py-4 text-muted-foreground">{formatDate(q.created_at, "PP")}</td>
                     <td className="px-6 py-4"><Button variant="ghost" size="sm" asChild><Link to={`/dashboard/quotes/${q.id}`}>{t("quotes.view")}</Link></Button></td>
                   </tr>
                 ))}

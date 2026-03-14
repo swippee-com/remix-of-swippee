@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -20,6 +20,7 @@ import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 export default function SupportDashboardPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const queryClient = useQueryClient();
   const ticketKeys = useMemo(() => [["user-support-tickets"]], []);
   useRealtimeInvalidation("support_tickets", ticketKeys);
@@ -95,7 +96,7 @@ export default function SupportDashboardPage() {
                 <div key={m.id} className={`px-6 py-4 ${m.sender_id === user!.id ? "" : "bg-muted/30"}`}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium">{m.sender_id === user!.id ? t("support.you") : t("support.supportTeam")}</span>
-                    <span className="text-xs text-muted-foreground">{format(new Date(m.created_at), "PPp")}</span>
+                    <span className="text-xs text-muted-foreground">{formatDate(m.created_at, "PPp")}</span>
                   </div>
                   <p className="text-sm whitespace-pre-wrap">{m.message}</p>
                 </div>
@@ -140,7 +141,7 @@ export default function SupportDashboardPage() {
                     <td className="px-6 py-4 font-medium">{t_item.subject}</td>
                     <td className="px-6 py-4">{t_item.category || "—"}</td>
                     <td className="px-6 py-4"><StatusBadge status={t_item.status} /></td>
-                    <td className="px-6 py-4 text-muted-foreground">{format(new Date(t_item.updated_at), "PP")}</td>
+                    <td className="px-6 py-4 text-muted-foreground">{formatDate(t_item.updated_at, "PP")}</td>
                     <td className="px-6 py-4"><Button variant="ghost" size="sm">{t("support.open")}</Button></td>
                   </tr>
                 ))}
