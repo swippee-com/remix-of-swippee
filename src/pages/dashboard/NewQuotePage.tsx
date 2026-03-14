@@ -8,6 +8,7 @@ import { BRAND } from "@/config/brand";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
@@ -20,6 +21,7 @@ type TradeSide = Database["public"]["Enums"]["trade_side"];
 export default function NewQuotePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   const [side, setSide] = useState<TradeSide>("buy");
@@ -35,10 +37,7 @@ export default function NewQuotePage() {
   const { data: paymentMethods = [] } = useQuery({
     queryKey: ["user-payment-methods"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payment_methods")
-        .select("id, label, payment_type")
-        .eq("user_id", user!.id);
+      const { data, error } = await supabase.from("payment_methods").select("id, label, payment_type").eq("user_id", user!.id);
       if (error) throw error;
       return data;
     },
@@ -48,40 +47,24 @@ export default function NewQuotePage() {
   const { data: payoutAddresses = [] } = useQuery({
     queryKey: ["user-payout-addresses"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payout_addresses")
-        .select("id, label, asset, network")
-        .eq("user_id", user!.id);
+      const { data, error } = await supabase.from("payout_addresses").select("id, label, asset, network").eq("user_id", user!.id);
       if (error) throw error;
       return data;
     },
     enabled: !!user,
   });
 
-  const filteredAddresses = payoutAddresses.filter(
-    (a) => (!asset || a.asset === asset) && (!network || a.network === network)
-  );
+  const filteredAddresses = payoutAddresses.filter((a) => (!asset || a.asset === asset) && (!network || a.network === network));
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!asset || !network || !amountType || !amount) {
-        throw new Error("Please fill in all required fields.");
-      }
+      if (!asset || !network || !amountType || !amount) throw new Error("Please fill in all required fields.");
       const payload: any = {
-        user_id: user!.id,
-        side,
-        asset,
-        network,
-        fiat_currency: fiatCurrency,
-        notes: notes || null,
-        preferred_payment_method_id: paymentMethodId || null,
-        payout_address_id: payoutAddressId || null,
+        user_id: user!.id, side, asset, network, fiat_currency: fiatCurrency, notes: notes || null,
+        preferred_payment_method_id: paymentMethodId || null, payout_address_id: payoutAddressId || null,
       };
-      if (amountType === "crypto") {
-        payload.amount_crypto = parseFloat(amount);
-      } else {
-        payload.amount_fiat = parseFloat(amount);
-      }
+      if (amountType === "crypto") payload.amount_crypto = parseFloat(amount);
+      else payload.amount_fiat = parseFloat(amount);
       const { error } = await supabase.from("quote_requests").insert(payload);
       if (error) throw error;
     },
@@ -90,116 +73,93 @@ export default function NewQuotePage() {
       toast({ title: "Quote request submitted", description: "We'll get back to you shortly with a quote." });
       navigate("/dashboard/quotes");
     },
-    onError: (err: any) => {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   return (
     <DashboardLayout>
-      <PageHeader title="New Quote Request" description="Tell us what you want to trade." />
-      <form
-        className="mt-6 max-w-2xl space-y-6"
-        onSubmit={(e) => { e.preventDefault(); submitMutation.mutate(); }}
-      >
+      <PageHeader title={t("newQuote.title")} description={t("newQuote.description")} />
+      <form className="mt-6 max-w-2xl space-y-6" onSubmit={(e) => { e.preventDefault(); submitMutation.mutate(); }}>
         <div className="rounded-lg border bg-card p-6 shadow-card space-y-4">
-          <h2 className="font-semibold">Trade Details</h2>
+          <h2 className="font-semibold">{t("newQuote.tradeDetails")}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium">Side *</label>
+              <label className="text-sm font-medium">{t("newQuote.side")} *</label>
               <Select value={side} onValueChange={(v) => setSide(v as TradeSide)}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="buy">Buy Crypto</SelectItem>
-                  <SelectItem value="sell">Sell Crypto</SelectItem>
+                  <SelectItem value="buy">{t("newQuote.buyCrypto")}</SelectItem>
+                  <SelectItem value="sell">{t("newQuote.sellCrypto")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Asset *</label>
+              <label className="text-sm font-medium">{t("newQuote.asset")} *</label>
               <Select value={asset} onValueChange={(v) => setAsset(v as CryptoAsset)}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select asset" /></SelectTrigger>
-                <SelectContent>
-                  {BRAND.supportedAssets.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-                </SelectContent>
+                <SelectTrigger className="mt-1"><SelectValue placeholder={t("newQuote.selectAsset")} /></SelectTrigger>
+                <SelectContent>{BRAND.supportedAssets.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Network *</label>
+              <label className="text-sm font-medium">{t("newQuote.network")} *</label>
               <Select value={network} onValueChange={(v) => setNetwork(v as CryptoNetwork)}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select network" /></SelectTrigger>
-                <SelectContent>
-                  {BRAND.supportedNetworks.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
-                </SelectContent>
+                <SelectTrigger className="mt-1"><SelectValue placeholder={t("newQuote.selectNetwork")} /></SelectTrigger>
+                <SelectContent>{BRAND.supportedNetworks.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Fiat Currency</label>
+              <label className="text-sm font-medium">{t("newQuote.fiatCurrency")}</label>
               <Select value={fiatCurrency} onValueChange={setFiatCurrency}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {BRAND.supportedFiatCurrencies.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
+                <SelectContent>{BRAND.supportedFiatCurrencies.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium">Amount Type *</label>
+              <label className="text-sm font-medium">{t("newQuote.amountType")} *</label>
               <Select value={amountType} onValueChange={(v) => setAmountType(v as "crypto" | "fiat")}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectTrigger className="mt-1"><SelectValue placeholder={t("common.select")} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="crypto">Crypto Amount</SelectItem>
-                  <SelectItem value="fiat">Fiat Amount</SelectItem>
+                  <SelectItem value="crypto">{t("newQuote.cryptoAmount")}</SelectItem>
+                  <SelectItem value="fiat">{t("newQuote.fiatAmount")}</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="mt-1 text-xs text-muted-foreground">Specify if you want a specific crypto or fiat amount.</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("newQuote.amountTypeHint")}</p>
             </div>
             <div>
-              <label className="text-sm font-medium">Amount *</label>
-              <Input
-                className="mt-1"
-                type="number"
-                step="any"
-                placeholder="e.g. 500 or 0.05"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-              />
+              <label className="text-sm font-medium">{t("newQuote.amount")} *</label>
+              <Input className="mt-1" type="number" step="any" placeholder="e.g. 500 or 0.05" value={amount} onChange={(e) => setAmount(e.target.value)} required />
             </div>
           </div>
         </div>
 
         <div className="rounded-lg border bg-card p-6 shadow-card space-y-4">
-          <h2 className="font-semibold">Settlement Details</h2>
+          <h2 className="font-semibold">{t("newQuote.settlementDetails")}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium">Preferred Payment Method</label>
+              <label className="text-sm font-medium">{t("newQuote.preferredPayment")}</label>
               <Select value={paymentMethodId} onValueChange={setPaymentMethodId}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectTrigger className="mt-1"><SelectValue placeholder={t("common.select")} /></SelectTrigger>
                 <SelectContent>
                   {paymentMethods.length === 0 ? (
-                    <SelectItem value="none" disabled>No payment methods added</SelectItem>
+                    <SelectItem value="none" disabled>{t("newQuote.noPaymentMethods")}</SelectItem>
                   ) : (
-                    paymentMethods.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>
-                    ))
+                    paymentMethods.map((p) => <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>)
                   )}
                 </SelectContent>
               </Select>
             </div>
             {side === "buy" && (
               <div>
-                <label className="text-sm font-medium">Receiving Wallet Address</label>
+                <label className="text-sm font-medium">{t("newQuote.receivingWallet")}</label>
                 <Select value={payoutAddressId} onValueChange={setPayoutAddressId}>
-                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select saved address" /></SelectTrigger>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder={t("newQuote.selectSavedAddress")} /></SelectTrigger>
                   <SelectContent>
                     {filteredAddresses.length === 0 ? (
-                      <SelectItem value="none" disabled>No matching addresses</SelectItem>
+                      <SelectItem value="none" disabled>{t("newQuote.noMatchingAddresses")}</SelectItem>
                     ) : (
-                      filteredAddresses.map((a) => (
-                        <SelectItem key={a.id} value={a.id}>{a.label} ({a.asset} • {a.network})</SelectItem>
-                      ))
+                      filteredAddresses.map((a) => <SelectItem key={a.id} value={a.id}>{a.label} ({a.asset} • {a.network})</SelectItem>)
                     )}
                   </SelectContent>
                 </Select>
@@ -207,22 +167,14 @@ export default function NewQuotePage() {
             )}
           </div>
           <div>
-            <label className="text-sm font-medium">Notes</label>
-            <Textarea
-              className="mt-1"
-              placeholder="Any additional information..."
-              rows={3}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
+            <label className="text-sm font-medium">{t("newQuote.notes")}</label>
+            <Textarea className="mt-1" placeholder={t("newQuote.notesPlaceholder")} rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />
           </div>
         </div>
 
         <div className="flex gap-3 justify-end">
-          <Button type="button" variant="outline" onClick={() => navigate("/dashboard/quotes")}>Cancel</Button>
-          <Button type="submit" disabled={submitMutation.isPending}>
-            {submitMutation.isPending ? "Submitting…" : "Submit Quote Request"}
-          </Button>
+          <Button type="button" variant="outline" onClick={() => navigate("/dashboard/quotes")}>{t("newQuote.cancel")}</Button>
+          <Button type="submit" disabled={submitMutation.isPending}>{submitMutation.isPending ? t("newQuote.submitting") : t("newQuote.submit")}</Button>
         </div>
       </form>
     </DashboardLayout>
