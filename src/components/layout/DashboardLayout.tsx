@@ -28,20 +28,32 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     ? profile.full_name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : "U";
 
+  const ALLOWED_FROZEN_PATHS = ["/dashboard", "/dashboard/settings", "/dashboard/support"];
+  const isFrozen = profile?.is_frozen ?? false;
+
   const NavContent = () => (
     <nav className="flex-1 space-y-1 px-3 py-4">
       {userNavItems.map((item) => {
         const Icon = item.icon;
         const active = location.pathname === item.href;
+        const isRestricted = isFrozen && !ALLOWED_FROZEN_PATHS.includes(item.href);
         return (
           <Link
             key={item.href}
-            to={item.href}
-            onClick={() => setSidebarOpen(false)}
+            to={isRestricted ? "#" : item.href}
+            onClick={(e) => {
+              if (isRestricted) {
+                e.preventDefault();
+                return;
+              }
+              setSidebarOpen(false);
+            }}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-              active ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              active ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+              isRestricted && "opacity-30 blur-[0.5px] pointer-events-auto cursor-not-allowed hover:bg-transparent hover:text-muted-foreground"
             )}
+            aria-disabled={isRestricted}
           >
             <Icon className="h-4 w-4" />
             {t(item.labelKey)}
