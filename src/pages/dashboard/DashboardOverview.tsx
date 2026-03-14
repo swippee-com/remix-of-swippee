@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { useMemo, useState, useCallback } from "react";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
+import { PriceTicker } from "@/components/shared/PriceTicker";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -148,6 +149,10 @@ export default function DashboardPage() {
           />
         </div>
       )}
+
+      <div className="mt-6">
+        <PriceTicker />
+      </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="KYC Status" value={kycLabel} icon={Shield} description={kycStatus === "approved" ? "Identity verified" : undefined} />

@@ -13,6 +13,7 @@ import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Fees from "./pages/Fees";
 import Support from "./pages/Support";
+import LivePrices from "./pages/LivePrices";
 import NotFound from "./pages/NotFound";
 
 // Auth
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/fees" element={<Fees />} />
             <Route path="/support" element={<Support />} />
+            <Route path="/live" element={<LivePrices />} />
 
             {/* Auth */}
             <Route path="/auth/login" element={<Login />} />

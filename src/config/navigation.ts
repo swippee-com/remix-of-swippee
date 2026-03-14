@@ -33,5 +33,6 @@ export const publicNavItems = [
   { label: "About", href: "/about" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "Fees", href: "/fees" },
+  { label: "Live Prices", href: "/live" },
   { label: "Support", href: "/support" },
 ];
