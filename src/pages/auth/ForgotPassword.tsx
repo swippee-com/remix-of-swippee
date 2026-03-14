@@ -1,3 +1,4 @@
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { BRAND } from "@/config/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
