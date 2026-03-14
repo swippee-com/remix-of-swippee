@@ -109,10 +109,12 @@ export default function AdminTradeDetailPage() {
     return <AdminLayout><div className="py-20 text-center"><p className="text-muted-foreground">Trade not found.</p><Button asChild className="mt-4"><Link to="/admin/trades">Back</Link></Button></div></AdminLayout>;
   }
 
-  const timelineItems = history.map((h) => ({
+  const timelineSteps = history.map((h, i) => ({
     label: h.to_status.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
-    date: format(new Date(h.created_at), "PPp"),
+    timestamp: h.created_at,
     description: h.note || undefined,
+    completed: true,
+    active: i === history.length - 1,
   }));
 
   const getProofUrl = (path: string) => {
