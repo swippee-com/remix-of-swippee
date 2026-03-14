@@ -327,10 +327,12 @@ export default function PortfolioPage() {
                           {format(new Date(t.created_at), "MMM d, yyyy")}
                         </TableCell>
                         <TableCell>
-                          <StatusBadge
-                            status={t.side === "buy" ? "approved" : "rejected"}
-                            label={t.side.toUpperCase()}
-                          />
+                          <span className={cn(
+                            "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+                            t.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                          )}>
+                            {t.side.toUpperCase()}
+                          </span>
                         </TableCell>
                         <TableCell className="font-medium">{t.asset}</TableCell>
                         <TableCell className="text-muted-foreground">{t.network}</TableCell>
