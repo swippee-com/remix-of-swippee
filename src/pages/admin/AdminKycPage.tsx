@@ -203,16 +203,14 @@ export default function AdminKycPage() {
                   <h4 className="font-medium mb-2">Documents</h4>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {kycDocs.map((doc) => (
-                      <a
+                      <button
                         key={doc.id}
-                        href={getDocUrl(doc.file_path)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-lg border p-3 hover:bg-muted/50 transition-colors"
+                        onClick={() => openDoc(doc.file_path, doc.file_name)}
+                        className="rounded-lg border p-3 hover:bg-muted/50 transition-colors text-left"
                       >
                         <p className="font-medium text-xs capitalize">{doc.document_type.replace(/_/g, " ")}</p>
                         <p className="text-xs text-muted-foreground truncate">{doc.file_name}</p>
-                      </a>
+                      </button>
                     ))}
                   </div>
                 </div>
