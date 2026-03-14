@@ -64,12 +64,14 @@ function LoginTrackerWrapper() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
+  <WagmiProvider config={wagmiConfig}>
+    <QueryClientProvider client={queryClient}>
+      <RainbowKitProvider theme={lightTheme({ accentColor: "hsl(240 6% 10%)", accentColorForeground: "white", borderRadius: "medium" })}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
           <LoginTrackerWrapper />
           <Routes>
             {/* Public */}
