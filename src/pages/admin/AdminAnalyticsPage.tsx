@@ -300,8 +300,9 @@ export default function AdminAnalyticsPage() {
 
         {/* Asset Distribution */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium">Asset Distribution</CardTitle>
+            <ExportButton disabled={!assetData?.length} onClick={() => exportCsv("asset-distribution", ["Asset", "Volume (NPR)", "Percent"], assetData || [], ["asset", "value", "percent"])} />
           </CardHeader>
           <CardContent>
             {assetLoading ? (
