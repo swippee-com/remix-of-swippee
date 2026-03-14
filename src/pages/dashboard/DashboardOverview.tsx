@@ -157,6 +157,7 @@ export default function DashboardPage() {
         <div className="mt-6">
           <OnboardingWizard
             emailVerified={emailVerified}
+            phoneVerified={profile?.phone_verified ?? false}
             kycStatus={kycStatus || "not_submitted"}
             paymentMethodCount={pmCount ?? 0}
             quoteCount={quoteCount ?? 0}
