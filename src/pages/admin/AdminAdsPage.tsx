@@ -55,6 +55,8 @@ export default function AdminAdsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<AdForm>(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: ads = [], isLoading } = useQuery({
     queryKey: ["admin-ads"],
