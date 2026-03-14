@@ -1,11 +1,12 @@
 import {
   LayoutDashboard, Shield, CreditCard, Wallet, FileText, ArrowLeftRight,
   HeadphonesIcon, Settings, Users, ClipboardCheck, BookOpen, ScrollText,
-  Activity, BarChart3
+  Activity, BarChart3, WalletCards
 } from "lucide-react";
 
 export const userNavItems = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Wallet", href: "/dashboard/wallet", icon: WalletCards },
   { label: "KYC", href: "/dashboard/kyc", icon: Shield },
   { label: "Quote Requests", href: "/dashboard/quotes", icon: FileText },
   { label: "Trades", href: "/dashboard/trades", icon: ArrowLeftRight },
@@ -22,6 +23,7 @@ export const adminNavItems = [
   { label: "KYC Queue", href: "/admin/kyc", icon: ClipboardCheck },
   { label: "Quote Requests", href: "/admin/quotes", icon: FileText },
   { label: "Trades", href: "/admin/trades", icon: ArrowLeftRight },
+  { label: "Wallets", href: "/admin/wallets", icon: WalletCards },
   { label: "Ledger", href: "/admin/ledger", icon: BookOpen },
   { label: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText },
   { label: "Support", href: "/admin/support", icon: HeadphonesIcon },
