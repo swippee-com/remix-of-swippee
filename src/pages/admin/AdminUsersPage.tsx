@@ -174,9 +174,14 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4">{u.trades}</td>
                   <td className="px-6 py-4 text-muted-foreground">{format(new Date(u.created_at), "PP")}</td>
                   <td className="px-6 py-4">
-                    <Button variant="ghost" size="sm" onClick={() => setRoleModal({ userId: u.id, name: u.full_name || u.email || "User", currentRoles: u.roles })}>
-                      Manage Roles
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => setRoleModal({ userId: u.id, name: u.full_name || u.email || "User", currentRoles: u.roles })}>
+                        Roles
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => setPayoutModal({ userId: u.id, name: u.full_name || u.email || "User" })}>
+                        <Wallet className="mr-1 h-3.5 w-3.5" /> Payouts
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
