@@ -87,6 +87,33 @@ export function OnboardingWizard({
 
   const completedCount = steps.filter((s) => s.completed).length;
   const allDone = completedCount === steps.length;
+  const firedRef = useRef(false);
+
+  useEffect(() => {
+    if (allDone && !dismissed && !firedRef.current) {
+      firedRef.current = true;
+      const duration = 2000;
+      const end = Date.now() + duration;
+      const frame = () => {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.7 },
+          colors: ["#16a34a", "#22c55e", "#4ade80"],
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.7 },
+          colors: ["#16a34a", "#22c55e", "#4ade80"],
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      };
+      frame();
+    }
+  }, [allDone, dismissed]);
 
   if (dismissed) return null;
 
