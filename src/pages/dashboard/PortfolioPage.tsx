@@ -218,7 +218,7 @@ export default function PortfolioPage() {
                 <EmptyState
                   title="No holdings yet"
                   description="Complete a buy trade to see your portfolio here."
-                  icon={PieChart}
+                  icon={<PieChart className="h-10 w-10" />}
                 />
               ) : (
                 <Table>
