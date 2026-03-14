@@ -24,6 +24,10 @@ function getTradingFeePercent(amountUsd: number): number {
 }
 
 export default function FeesPage() {
+  usePageMeta(
+    "Fees & Pricing — Swippee Nepal Crypto Trading",
+    "Transparent fee structure for buying and selling crypto in Nepal. Calculate trading fees, network fees, and total costs at Swippee."
+  );
   const { prices } = useMarketPrices();
   const { rate: nprRate } = useNprRate();
 
