@@ -36,6 +36,10 @@ Swippee OTC Crypto Desk - design system, brand config, architecture decisions
 - Trades list (user + admin) from otc_trades
 - Trade detail pages (user: payment proof upload; admin: status management + proof review)
 
+- Admin Users page with role management (add/remove roles + audit logs)
+- Admin Overview with real stats (pending KYC, open quotes, active/disputed trades, daily volume, monthly fees)
+- Admin Ledger from ledger_entries with bucket/search filters
+- Admin Audit Logs from audit_logs with action filters + actor names
+
 ## Remaining for MVP
-- Phase 2: Admin Users, Admin Overview stats, Ledger, Audit Logs
 - Phase 3: Support tickets, Settings profile/password, Notifications
