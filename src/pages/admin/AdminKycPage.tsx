@@ -22,6 +22,7 @@ export default function AdminKycPage() {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedKyc, setSelectedKyc] = useState<any>(null);
+  const [viewingDoc, setViewingDoc] = useState<{ url: string; name: string; type: string } | null>(null);
   const [actionType, setActionType] = useState<"approve" | "reject" | "request_info" | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
 
