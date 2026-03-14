@@ -89,12 +89,22 @@ export default function PayoutAddressesPage() {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("payout_addresses").delete().eq("id", id);
-      if (error) throw error;
+      if (error) {
+        // Check if it's a foreign key constraint error
+        if (error.code === "23503" || error.message?.includes("violates foreign key")) {
+          throw new Error("This address has been used in a quote or trade and cannot be deleted.");
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-payout-addresses"] });
       setDeleteId(null);
       toast({ title: "Address removed" });
+    },
+    onError: (err: any) => {
+      setDeleteId(null);
+      toast({ title: "Cannot delete", description: err.message, variant: "destructive" });
     },
   });
 
