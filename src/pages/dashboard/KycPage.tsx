@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, CheckCircle } from "lucide-react";
 import { useState } from "react";
 
-const kycStatus = "not_submitted" as const;
+const kycStatus: string = "not_submitted";
 
 export default function KycPage() {
   const [submitted, setSubmitted] = useState(false);
