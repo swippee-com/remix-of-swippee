@@ -9,6 +9,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ArrowLeft, Eye, Mail, Phone, MapPin, Calendar, Shield, Wallet, CreditCard, ArrowLeftRight, FileText, MessageSquare } from "lucide-react";
+import { AdminUserActions } from "@/components/admin/AdminUserActions";
+import type { Database } from "@/integrations/supabase/types";
+
+type KycStatus = Database["public"]["Enums"]["kyc_status"];
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
