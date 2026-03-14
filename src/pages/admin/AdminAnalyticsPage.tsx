@@ -1,13 +1,18 @@
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useMemo } from "react";
-import { format, subDays, subMonths, startOfDay, startOfWeek, startOfMonth } from "date-fns";
+import { useState } from "react";
+import { format, subDays, subMonths, startOfWeek, differenceInDays, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, startOfMonth } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { DateRange } from "react-day-picker";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, Legend,
@@ -20,53 +25,64 @@ const ASSET_COLORS: Record<string, string> = {
   USDC: "hsl(210 70% 50%)",
 };
 
-type Period = "7d" | "30d" | "90d";
-
-function periodToDays(p: Period) {
-  return p === "7d" ? 7 : p === "30d" ? 30 : 90;
-}
+const PRESETS = [
+  { label: "7d", days: 7 },
+  { label: "30d", days: 30 },
+  { label: "90d", days: 90 },
+  { label: "6m", days: 180 },
+  { label: "1y", days: 365 },
+] as const;
 
 export default function AdminAnalyticsPage() {
-  const [volumePeriod, setVolumePeriod] = useState<Period>("30d");
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
+
+  const from = dateRange.from ?? subDays(new Date(), 30);
+  const to = dateRange.to ?? new Date();
+  const sinceISO = from.toISOString();
+  const untilISO = to.toISOString();
+  const totalDays = differenceInDays(to, from) + 1;
+
+  function applyPreset(days: number) {
+    setDateRange({ from: subDays(new Date(), days), to: new Date() });
+  }
 
   // 1. Trade Volume
   const { data: volumeData, isLoading: volumeLoading } = useQuery({
-    queryKey: ["admin-analytics-volume", volumePeriod],
+    queryKey: ["admin-analytics-volume", sinceISO, untilISO],
     queryFn: async () => {
-      const since = subDays(new Date(), periodToDays(volumePeriod)).toISOString();
       const { data } = await supabase
         .from("otc_trades")
         .select("gross_amount, quoted_rate, created_at")
-        .gte("created_at", since);
+        .gte("created_at", sinceISO)
+        .lte("created_at", untilISO);
       const byDay: Record<string, number> = {};
       for (const t of data || []) {
         const day = format(new Date(t.created_at), "yyyy-MM-dd");
         byDay[day] = (byDay[day] || 0) + Number(t.gross_amount) * Number(t.quoted_rate);
       }
-      // Fill missing days
-      const days = periodToDays(volumePeriod);
-      const result = [];
-      for (let i = days - 1; i >= 0; i--) {
-        const d = format(subDays(new Date(), i), "yyyy-MM-dd");
-        result.push({ date: d, label: format(new Date(d), "MMM d"), volume: Math.round(byDay[d] || 0) });
-      }
-      return result;
+      const days = eachDayOfInterval({ start: from, end: to });
+      return days.map((d) => {
+        const key = format(d, "yyyy-MM-dd");
+        return { date: key, label: format(d, "MMM d"), volume: Math.round(byDay[key] || 0) };
+      });
     },
   });
 
-  // 2. Revenue (last 6 months)
+  // 2. Revenue
   const { data: revenueData, isLoading: revLoading } = useQuery({
-    queryKey: ["admin-analytics-revenue"],
+    queryKey: ["admin-analytics-revenue", sinceISO, untilISO],
     queryFn: async () => {
-      const since = subMonths(new Date(), 6).toISOString();
       const [ledger, trades] = await Promise.all([
-        supabase.from("ledger_entries").select("amount, created_at").eq("account_bucket", "fees_revenue").gte("created_at", since),
-        supabase.from("otc_trades").select("created_at").gte("created_at", since),
+        supabase.from("ledger_entries").select("amount, created_at").eq("account_bucket", "fees_revenue").gte("created_at", sinceISO).lte("created_at", untilISO),
+        supabase.from("otc_trades").select("created_at").gte("created_at", sinceISO).lte("created_at", untilISO),
       ]);
+      const monthIntervals = eachMonthOfInterval({ start: from, end: to });
       const months: Record<string, { revenue: number; trades: number }> = {};
-      for (let i = 5; i >= 0; i--) {
-        const m = format(subMonths(new Date(), i), "yyyy-MM");
-        months[m] = { revenue: 0, trades: 0 };
+      for (const m of monthIntervals) {
+        months[format(m, "yyyy-MM")] = { revenue: 0, trades: 0 };
       }
       for (const e of ledger.data || []) {
         const m = format(new Date(e.created_at), "yyyy-MM");
@@ -84,42 +100,42 @@ export default function AdminAnalyticsPage() {
     },
   });
 
-  // 3. User Growth (last 6 months, weekly)
+  // 3. User Growth
   const { data: growthData, isLoading: growthLoading } = useQuery({
-    queryKey: ["admin-analytics-growth"],
+    queryKey: ["admin-analytics-growth", sinceISO, untilISO],
     queryFn: async () => {
       const { data } = await supabase.from("profiles").select("created_at").order("created_at", { ascending: true });
       if (!data?.length) return [];
-      const since = subMonths(new Date(), 6);
-      let cumulative = (data || []).filter((p) => new Date(p.created_at) < since).length;
+      let cumulative = data.filter((p) => new Date(p.created_at) < from).length;
       const weeks: Record<string, number> = {};
-      for (const p of data || []) {
+      for (const p of data) {
         const d = new Date(p.created_at);
-        if (d < since) continue;
+        if (d < from || d > to) continue;
         const wk = format(startOfWeek(d), "yyyy-MM-dd");
         cumulative++;
         weeks[wk] = cumulative;
       }
-      // Fill weeks
+      const weekIntervals = eachWeekOfInterval({ start: from, end: to });
       const result: { week: string; label: string; users: number }[] = [];
-      let last = (data || []).filter((p) => new Date(p.created_at) < since).length;
-      let cursor = startOfWeek(since);
-      const now = new Date();
-      while (cursor <= now) {
-        const wk = format(cursor, "yyyy-MM-dd");
+      let last = data.filter((p) => new Date(p.created_at) < from).length;
+      for (const w of weekIntervals) {
+        const wk = format(w, "yyyy-MM-dd");
         if (weeks[wk]) last = weeks[wk];
-        result.push({ week: wk, label: format(cursor, "MMM d"), users: last });
-        cursor = new Date(cursor.getTime() + 7 * 86400000);
+        result.push({ week: wk, label: format(w, "MMM d"), users: last });
       }
       return result;
     },
   });
 
-  // 4. Asset Distribution
+  // 4. Asset Distribution (within date range)
   const { data: assetData, isLoading: assetLoading } = useQuery({
-    queryKey: ["admin-analytics-assets"],
+    queryKey: ["admin-analytics-assets", sinceISO, untilISO],
     queryFn: async () => {
-      const { data } = await supabase.from("otc_trades").select("asset, gross_amount, quoted_rate");
+      const { data } = await supabase
+        .from("otc_trades")
+        .select("asset, gross_amount, quoted_rate")
+        .gte("created_at", sinceISO)
+        .lte("created_at", untilISO);
       const byAsset: Record<string, number> = {};
       for (const t of data || []) {
         byAsset[t.asset] = (byAsset[t.asset] || 0) + Number(t.gross_amount) * Number(t.quoted_rate);
@@ -145,20 +161,54 @@ export default function AdminAnalyticsPage() {
 
   return (
     <AdminLayout>
-      <PageHeader title="Analytics" description="Trade volume, revenue, user growth, and asset distribution." />
+      <PageHeader title="Analytics" description="Trade volume, revenue, user growth, and asset distribution.">
+        <div className="flex items-center gap-2">
+          {PRESETS.map((p) => (
+            <Button
+              key={p.label}
+              variant={totalDays === p.days + 1 ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-8 px-2.5"
+              onClick={() => applyPreset(p.days)}
+            >
+              {p.label}
+            </Button>
+          ))}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={cn("h-8 text-xs gap-1.5", !dateRange.from && "text-muted-foreground")}>
+                <CalendarIcon className="h-3.5 w-3.5" />
+                {dateRange.from ? (
+                  dateRange.to ? (
+                    `${format(dateRange.from, "MMM d")} – ${format(dateRange.to, "MMM d, yyyy")}`
+                  ) : (
+                    format(dateRange.from, "MMM d, yyyy")
+                  )
+                ) : (
+                  "Pick dates"
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="range"
+                selected={dateRange}
+                onSelect={(range) => range && setDateRange(range)}
+                numberOfMonths={2}
+                disabled={(date) => date > new Date()}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </PageHeader>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Trade Volume */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardHeader className="pb-2">
             <CardTitle className="text-base font-medium">Trade Volume Over Time</CardTitle>
-            <Tabs value={volumePeriod} onValueChange={(v) => setVolumePeriod(v as Period)}>
-              <TabsList className="h-8">
-                <TabsTrigger value="7d" className="text-xs px-2">7d</TabsTrigger>
-                <TabsTrigger value="30d" className="text-xs px-2">30d</TabsTrigger>
-                <TabsTrigger value="90d" className="text-xs px-2">90d</TabsTrigger>
-              </TabsList>
-            </Tabs>
           </CardHeader>
           <CardContent>
             {volumeLoading ? (
@@ -167,7 +217,7 @@ export default function AdminAnalyticsPage() {
               <ChartContainer config={volumeConfig} className="h-[250px] w-full">
                 <AreaChart data={volumeData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" />
-                  <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} interval={totalDays > 60 ? Math.floor(totalDays / 10) : undefined} />
                   <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => `₨${(v / 1000).toFixed(0)}k`} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Area type="monotone" dataKey="volume" stroke="var(--color-volume)" fill="var(--color-volume)" fillOpacity={0.15} strokeWidth={2} />
@@ -180,7 +230,7 @@ export default function AdminAnalyticsPage() {
         {/* Revenue */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Revenue & Trades (6 months)</CardTitle>
+            <CardTitle className="text-base font-medium">Revenue & Trades</CardTitle>
           </CardHeader>
           <CardContent>
             {revLoading ? (
@@ -204,7 +254,7 @@ export default function AdminAnalyticsPage() {
         {/* User Growth */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">User Growth (6 months)</CardTitle>
+            <CardTitle className="text-base font-medium">User Growth</CardTitle>
           </CardHeader>
           <CardContent>
             {growthLoading ? (
@@ -226,13 +276,13 @@ export default function AdminAnalyticsPage() {
         {/* Asset Distribution */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Asset Distribution (All Time)</CardTitle>
+            <CardTitle className="text-base font-medium">Asset Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             {assetLoading ? (
               <Skeleton className="h-[250px] w-full" />
             ) : !assetData?.length ? (
-              <p className="flex h-[250px] items-center justify-center text-sm text-muted-foreground">No trade data yet.</p>
+              <p className="flex h-[250px] items-center justify-center text-sm text-muted-foreground">No trade data in this range.</p>
             ) : (
               <ChartContainer config={assetConfig} className="h-[250px] w-full">
                 <PieChart>
