@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { useMemo, useState } from "react";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { DepositModal } from "@/components/dashboard/DepositModal";
