@@ -6,10 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 
 export function NotificationBell() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const keys = useMemo(() => [["notifications", user?.id || ""]], [user?.id]);
+  useRealtimeInvalidation("notifications", keys, user ? `user_id=eq.${user.id}` : undefined);
 
   const { data: notifications = [] } = useQuery({
     queryKey: ["notifications", user?.id],
@@ -24,7 +28,8 @@ export function NotificationBell() {
       return data;
     },
     enabled: !!user,
-    refetchInterval: 30000, // poll every 30s
+    // Realtime handles live updates; poll as fallback every 60s
+    refetchInterval: 60000,
   });
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;

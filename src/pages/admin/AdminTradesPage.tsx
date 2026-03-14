@@ -8,10 +8,13 @@ import { Search, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 
 export default function AdminTradesPage() {
+  const keys = useMemo(() => [["admin-trades"]], []);
+  useRealtimeInvalidation("otc_trades", keys);
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
 

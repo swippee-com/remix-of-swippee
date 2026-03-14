@@ -9,9 +9,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
+import { useMemo } from "react";
+import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 
 export default function QuotesPage() {
   const { user } = useAuth();
+  const keys = useMemo(() => [["user-quote-requests"]], []);
+  useRealtimeInvalidation("quote_requests", keys);
+  useRealtimeInvalidation("quotes", keys);
 
   const { data: quotes = [], isLoading } = useQuery({
     queryKey: ["user-quote-requests"],

@@ -11,13 +11,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 
 export default function SupportDashboardPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const ticketKeys = useMemo(() => [["user-support-tickets"]], []);
+  useRealtimeInvalidation("support_tickets", ticketKeys);
   const [createOpen, setCreateOpen] = useState(false);
   const [subject, setSubject] = useState("");
   const [category, setCategory] = useState("");
