@@ -26,6 +26,7 @@ import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import KycPage from "./pages/dashboard/KycPage";
 import QuotesPage from "./pages/dashboard/QuotesPage";
 import NewQuotePage from "./pages/dashboard/NewQuotePage";
+import QuoteDetailPage from "./pages/dashboard/QuoteDetailPage";
 import TradesPage from "./pages/dashboard/TradesPage";
 import PaymentMethodsPage from "./pages/dashboard/PaymentMethodsPage";
 import PayoutAddressesPage from "./pages/dashboard/PayoutAddressesPage";
