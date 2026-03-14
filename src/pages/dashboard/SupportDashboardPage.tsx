@@ -19,6 +19,8 @@ import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 export default function SupportDashboardPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const ticketKeys = useMemo(() => [["user-support-tickets"]], []);
+  useRealtimeInvalidation("support_tickets", ticketKeys);
   const [createOpen, setCreateOpen] = useState(false);
   const [subject, setSubject] = useState("");
   const [category, setCategory] = useState("");
