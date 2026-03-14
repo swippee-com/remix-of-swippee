@@ -40,6 +40,7 @@ import PayoutAddressesPage from "./pages/dashboard/PayoutAddressesPage";
 import SupportDashboardPage from "./pages/dashboard/SupportDashboardPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import WalletPage from "./pages/dashboard/WalletPage";
+import PortfolioPage from "./pages/dashboard/PortfolioPage";
 
 // Admin
 import AdminOverview from "./pages/admin/AdminOverview";
