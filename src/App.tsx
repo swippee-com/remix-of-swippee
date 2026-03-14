@@ -85,6 +85,7 @@ const App = () => (
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/kyc" element={<AdminRoute><AdminKycPage /></AdminRoute>} />
             <Route path="/admin/quotes" element={<AdminRoute><AdminQuotesPage /></AdminRoute>} />
+            <Route path="/admin/quotes/:id" element={<AdminRoute><AdminQuoteDetailPage /></AdminRoute>} />
             <Route path="/admin/trades" element={<AdminRoute><AdminTradesPage /></AdminRoute>} />
             <Route path="/admin/ledger" element={<AdminRoute><AdminLedgerPage /></AdminRoute>} />
             <Route path="/admin/audit-logs" element={<AdminRoute><AdminAuditLogsPage /></AdminRoute>} />
