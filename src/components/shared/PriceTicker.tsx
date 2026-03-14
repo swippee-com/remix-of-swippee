@@ -1,4 +1,4 @@
-import { useMarketPrices, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
+import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
@@ -9,6 +9,7 @@ interface PriceTickerProps {
 
 export function PriceTicker({ currency = "usd" }: PriceTickerProps) {
   const { prices, isLoading } = useMarketPrices();
+  const nprRate = useNprRate();
   const sym = currencySymbol(currency);
 
   if (isLoading) {
@@ -28,7 +29,7 @@ export function PriceTicker({ currency = "usd" }: PriceTickerProps) {
     <div className="flex gap-3 overflow-x-auto pb-1">
       {top.map((p) => {
         const positive = p.change24h >= 0;
-        const displayPrice = convertPrice(p.price, currency);
+        const displayPrice = convertPrice(p.price, currency, nprRate);
         return (
           <div
             key={p.symbol}

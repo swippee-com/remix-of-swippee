@@ -1,5 +1,5 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { useMarketPrices, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
+import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { PriceTicker } from "@/components/shared/PriceTicker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,6 +21,7 @@ function formatMarketCap(n: number, currency: Currency): string {
 
 export default function LivePrices() {
   const { prices, isLoading, lastUpdated } = useMarketPrices();
+  const nprRate = useNprRate();
   const [currency, setCurrency] = useState<Currency>("usd");
   const [search, setSearch] = useState("");
   const sym = currencySymbol(currency);
@@ -111,8 +112,8 @@ export default function LivePrices() {
                 </div>
               ) : filtered.map((p) => {
                 const positive = p.change24h >= 0;
-                const displayPrice = convertPrice(p.price, currency);
-                const displayCap = convertPrice(p.marketCap, currency);
+                const displayPrice = convertPrice(p.price, currency, nprRate);
+                const displayCap = convertPrice(p.marketCap, currency, nprRate);
                 return (
                   <Card key={p.symbol}>
                     <CardHeader className="flex flex-row items-center gap-3 pb-2">

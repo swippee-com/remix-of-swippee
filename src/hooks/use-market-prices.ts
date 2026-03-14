@@ -1,8 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Currency = "usd" | "npr";
 
-const NPR_RATE = 133.5; // approximate USD→NPR rate
+const FALLBACK_NPR_RATE = 147.64;
+
+async function fetchNprRate(): Promise<number> {
+  try {
+    const { data, error } = await supabase.functions.invoke("forex-rate");
+    if (error || !data?.success) throw new Error("Failed");
+    return data.buy as number;
+  } catch {
+    console.warn("Using fallback NPR rate");
+    return FALLBACK_NPR_RATE;
+  }
+}
 
 export interface MarketPrice {
   id: string;
@@ -45,12 +57,22 @@ async function fetchPrices(): Promise<MarketPrice[]> {
   }));
 }
 
-export function convertPrice(usdPrice: number, currency: Currency): number {
-  return currency === "npr" ? usdPrice * NPR_RATE : usdPrice;
+export function convertPrice(usdPrice: number, currency: Currency, nprRate: number): number {
+  return currency === "npr" ? usdPrice * nprRate : usdPrice;
 }
 
 export function currencySymbol(currency: Currency): string {
   return currency === "npr" ? "रू" : "$";
+}
+
+export function useNprRate() {
+  const { data: rate = FALLBACK_NPR_RATE } = useQuery({
+    queryKey: ["npr-rate"],
+    queryFn: fetchNprRate,
+    refetchInterval: 300000, // refresh every 5 min
+    staleTime: 120000,
+  });
+  return rate;
 }
 
 export function useMarketPrices() {
