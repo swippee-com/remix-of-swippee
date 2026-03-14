@@ -112,8 +112,8 @@ export default function LivePrices() {
                 </div>
               ) : filtered.map((p) => {
                 const positive = p.change24h >= 0;
-                const displayPrice = convertPrice(p.price, currency, nprRate);
-                const displayCap = convertPrice(p.marketCap, currency, nprRate);
+                const displayPrice = convertPrice(p.price, currency, nprData.rate);
+                const displayCap = convertPrice(p.marketCap, currency, nprData.rate);
                 return (
                   <Card key={p.symbol}>
                     <CardHeader className="flex flex-row items-center gap-3 pb-2">
