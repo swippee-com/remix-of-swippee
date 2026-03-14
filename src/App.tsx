@@ -7,6 +7,10 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
 import { useLoginTracker } from "@/hooks/use-login-tracker";
+import { WagmiProvider } from "wagmi";
+import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
+import { wagmiConfig } from "@/config/wagmi";
+import "@rainbow-me/rainbowkit/styles.css";
 
 // Public
 import Landing from "./pages/Landing";
@@ -60,12 +64,14 @@ function LoginTrackerWrapper() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
+  <WagmiProvider config={wagmiConfig}>
+    <QueryClientProvider client={queryClient}>
+      <RainbowKitProvider theme={lightTheme({ accentColor: "hsl(240 6% 10%)", accentColorForeground: "white", borderRadius: "medium" })}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
           <LoginTrackerWrapper />
           <Routes>
             {/* Public */}
@@ -113,10 +119,12 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </RainbowKitProvider>
+    </QueryClientProvider>
+  </WagmiProvider>
 );
 
 export default App;

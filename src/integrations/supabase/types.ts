@@ -519,6 +519,7 @@ export type Database = {
           created_at: string
           destination_tag: string | null
           id: string
+          is_verified: boolean
           is_whitelisted: boolean
           label: string
           network: Database["public"]["Enums"]["crypto_network"]
@@ -531,6 +532,7 @@ export type Database = {
           created_at?: string
           destination_tag?: string | null
           id?: string
+          is_verified?: boolean
           is_whitelisted?: boolean
           label: string
           network: Database["public"]["Enums"]["crypto_network"]
@@ -543,6 +545,7 @@ export type Database = {
           created_at?: string
           destination_tag?: string | null
           id?: string
+          is_verified?: boolean
           is_whitelisted?: boolean
           label?: string
           network?: Database["public"]["Enums"]["crypto_network"]

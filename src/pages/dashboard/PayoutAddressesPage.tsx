@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wallet, Plus, Trash2 } from "lucide-react";
+import { Wallet, Plus, Trash2, ShieldCheck, Link as LinkIcon } from "lucide-react";
 import { BRAND } from "@/config/brand";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,10 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import type { Database } from "@/integrations/supabase/types";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount, useDisconnect } from "wagmi";
+import { networkToChainId } from "@/config/wagmi";
+import { Badge } from "@/components/ui/badge";
 
 type CryptoAsset = Database["public"]["Enums"]["crypto_asset"];
 type CryptoNetwork = Database["public"]["Enums"]["crypto_network"];
@@ -36,6 +40,11 @@ export default function PayoutAddressesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
+
+  const { openConnectModal } = useConnectModal();
+  const { address: connectedAddress, isConnected, chain } = useAccount();
+  const { disconnect } = useDisconnect();
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
   const { data: addresses = [], isLoading } = useQuery({
     queryKey: ["user-payout-addresses"],
@@ -88,11 +97,69 @@ export default function PayoutAddressesPage() {
     },
   });
 
+  const verifyMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("payout_addresses").update({ is_verified: true }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-payout-addresses"] });
+      setVerifyingId(null);
+      disconnect();
+      toast({ title: "Address verified", description: "Wallet ownership confirmed." });
+    },
+    onError: (err: any) => toast({ title: "Verification failed", description: err.message, variant: "destructive" }),
+  });
+
+  // After wallet connects, check if the connected address matches the one being verified
+  const handleVerifyClick = (addressRecord: typeof addresses[0]) => {
+    const chainId = networkToChainId[addressRecord.network];
+    if (chainId === null) {
+      toast({ title: "Cannot verify", description: "TRC20 (Tron) addresses cannot be verified via wallet connection. Only EVM networks are supported.", variant: "destructive" });
+      return;
+    }
+    if (addressRecord.is_verified) {
+      toast({ title: "Already verified" });
+      return;
+    }
+    setVerifyingId(addressRecord.id);
+    if (isConnected) {
+      // Already connected — check match immediately
+      checkAndVerify(addressRecord);
+    } else {
+      openConnectModal?.();
+    }
+  };
+
+  const checkAndVerify = (addressRecord: typeof addresses[0]) => {
+    if (!connectedAddress) return;
+    if (connectedAddress.toLowerCase() === addressRecord.address.toLowerCase()) {
+      verifyMutation.mutate(addressRecord.id);
+    } else {
+      toast({
+        title: "Address mismatch",
+        description: `Connected wallet (${connectedAddress.slice(0, 6)}…${connectedAddress.slice(-4)}) doesn't match the payout address. Please connect the correct wallet.`,
+        variant: "destructive",
+      });
+      setVerifyingId(null);
+      disconnect();
+    }
+  };
+
+  // Effect: when wallet connects while verifying, auto-check
+  const pendingAddress = verifyingId ? addresses.find((a) => a.id === verifyingId) : null;
+  if (pendingAddress && isConnected && connectedAddress && !verifyMutation.isPending) {
+    // Use setTimeout to avoid state update during render
+    setTimeout(() => checkAndVerify(pendingAddress), 100);
+  }
+
   const openEdit = (a: any) => {
     setForm({ label: a.label, asset: a.asset, network: a.network, address: a.address, destination_tag: a.destination_tag || "" });
     setEditId(a.id);
     setModalOpen(true);
   };
+
+  const canVerify = (network: string) => networkToChainId[network] !== null;
 
   return (
     <DashboardLayout>
@@ -113,6 +180,7 @@ export default function PayoutAddressesPage() {
                 <th className="px-6 py-3 text-left font-medium text-muted-foreground">Asset</th>
                 <th className="px-6 py-3 text-left font-medium text-muted-foreground">Network</th>
                 <th className="px-6 py-3 text-left font-medium text-muted-foreground">Address</th>
+                <th className="px-6 py-3 text-left font-medium text-muted-foreground">Status</th>
                 <th className="px-6 py-3 text-left font-medium text-muted-foreground">Actions</th>
               </tr></thead>
               <tbody className="divide-y">
@@ -122,9 +190,34 @@ export default function PayoutAddressesPage() {
                     <td className="px-6 py-4">{a.asset}</td>
                     <td className="px-6 py-4">{a.network}</td>
                     <td className="px-6 py-4 font-mono text-xs max-w-[200px] truncate">{a.address}</td>
-                    <td className="px-6 py-4 flex gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(a)}>Edit</Button>
-                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setDeleteId(a.id)}><Trash2 className="h-3 w-3" /></Button>
+                    <td className="px-6 py-4">
+                      {(a as any).is_verified ? (
+                        <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-white gap-1">
+                          <ShieldCheck className="h-3 w-3" /> Verified
+                        </Badge>
+                      ) : canVerify(a.network) ? (
+                        <Badge variant="outline" className="text-muted-foreground">Unverified</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-muted-foreground">N/A</Badge>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        {!(a as any).is_verified && canVerify(a.network) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1"
+                            onClick={() => handleVerifyClick(a)}
+                            disabled={verifyMutation.isPending && verifyingId === a.id}
+                          >
+                            <LinkIcon className="h-3 w-3" />
+                            {verifyMutation.isPending && verifyingId === a.id ? "Verifying…" : "Verify"}
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="sm" onClick={() => openEdit(a)}>Edit</Button>
+                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setDeleteId(a.id)}><Trash2 className="h-3 w-3" /></Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
