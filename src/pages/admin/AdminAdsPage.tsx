@@ -171,8 +171,50 @@ export default function AdminAdsPage() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label>Image URL</Label>
-                <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+                <Label>Banner Image</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={form.image_url}
+                    onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                    placeholder="https://... or upload →"
+                    className="flex-1"
+                  />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setUploading(true);
+                      const ext = file.name.split(".").pop();
+                      const path = `${crypto.randomUUID()}.${ext}`;
+                      const { error } = await supabase.storage.from("ad-images").upload(path, file);
+                      if (error) {
+                        toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+                      } else {
+                        const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
+                        setForm((f) => ({ ...f, image_url: urlData.publicUrl }));
+                        toast({ title: "Image uploaded" });
+                      }
+                      setUploading(false);
+                      e.target.value = "";
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    disabled={uploading}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  </Button>
+                </div>
+                {form.image_url && (
+                  <img src={form.image_url} alt="Preview" className="mt-1.5 h-20 w-full rounded-md object-cover border" />
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
