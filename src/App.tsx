@@ -52,6 +52,11 @@ import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
 
 const queryClient = new QueryClient();
 
+function LoginTrackerWrapper() {
+  useLoginTracker();
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -60,6 +65,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <LoginTrackerWrapper />
+          <Routes>
             {/* Public */}
             <Route path="/" element={<Landing />} />
             <Route path="/about" element={<About />} />
