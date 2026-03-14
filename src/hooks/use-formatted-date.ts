@@ -19,13 +19,16 @@ export function useFormattedDate() {
       const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
 
       if (locale === "ne") {
-        // For formats that include time, append time in Nepali
+        // Convert to Nepal Time (UTC+5:45) for correct BS date and time
+        const nepalOffset = 5 * 60 + 45; // minutes
+        const nepalDate = new Date(date.getTime() + (nepalOffset + date.getTimezoneOffset()) * 60000);
+
         const includesTime = fmtString.includes("p") || fmtString.includes("H") || fmtString.includes("h");
-        const bsStr = formatBSDate(date, "short", true);
+        const bsStr = formatBSDate(nepalDate, "short", true);
         if (includesTime) {
-          const time = format(date, "HH:mm");
-          // Convert time digits to Nepali
-          const nepaliTime = time.replace(/[0-9]/g, (d) => "०१२३४५६७८९"[parseInt(d)]);
+          const hours = String(nepalDate.getHours()).padStart(2, "0");
+          const mins = String(nepalDate.getMinutes()).padStart(2, "0");
+          const nepaliTime = `${hours}:${mins}`.replace(/[0-9]/g, (d) => "०१२३४५६७८९"[parseInt(d)]);
           return `${bsStr} ${nepaliTime}`;
         }
         return bsStr;

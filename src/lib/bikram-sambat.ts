@@ -129,9 +129,10 @@ export interface BSDate {
 }
 
 export function adToBS(adDate: Date): BSDate {
-  // Calculate total days from reference AD date
-  const diffTime = adDate.getTime() - REF_AD.getTime();
-  let totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  // Use UTC date components to avoid timezone drift
+  const utcDate = Date.UTC(adDate.getFullYear(), adDate.getMonth(), adDate.getDate());
+  const utcRef = Date.UTC(1943, 3, 14);
+  let totalDays = Math.floor((utcDate - utcRef) / (1000 * 60 * 60 * 24));
 
   let bsYear = BS_YEAR_START;
   let bsMonth = 0;
