@@ -29,7 +29,7 @@ export function PriceTicker({ currency = "usd" }: PriceTickerProps) {
     <div className="flex gap-3 overflow-x-auto pb-1">
       {top.map((p) => {
         const positive = p.change24h >= 0;
-        const displayPrice = convertPrice(p.price, currency, nprRate);
+        const displayPrice = convertPrice(p.price, currency, nprData.rate);
         return (
           <div
             key={p.symbol}
