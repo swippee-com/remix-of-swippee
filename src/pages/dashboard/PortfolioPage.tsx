@@ -305,7 +305,7 @@ export default function PortfolioPage() {
                 <EmptyState
                   title="No completed trades"
                   description="Your completed trades will appear here."
-                  icon={BarChart3}
+                  icon={<BarChart3 className="h-10 w-10" />}
                 />
               ) : (
                 <Table>
