@@ -2,9 +2,10 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { BRAND } from "@/config/brand";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Shield, Clock, Wallet, CheckCircle } from "lucide-react";
+import { ArrowRight, Shield, Clock, Wallet, CheckCircle, LayoutDashboard } from "lucide-react";
 import { motion } from "framer-motion";
 import { SponsorStrip } from "@/components/ads/SponsorStrip";
+import { useAuth } from "@/contexts/AuthContext";
 
 const features = [
   { icon: Shield, title: "KYC Verified", description: "All users are verified before trading. Your security is our priority." },
