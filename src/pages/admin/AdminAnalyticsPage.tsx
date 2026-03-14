@@ -229,8 +229,9 @@ export default function AdminAnalyticsPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Trade Volume */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium">Trade Volume Over Time</CardTitle>
+            <ExportButton disabled={!volumeData?.length} onClick={() => exportCsv("trade-volume", ["Date", "Volume (NPR)"], volumeData || [], ["date", "volume"])} />
           </CardHeader>
           <CardContent>
             {volumeLoading ? (
