@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ArrowLeft, Eye, Mail, Phone, MapPin, Calendar, Shield, Wallet, CreditCard, ArrowLeftRight, FileText, MessageSquare } from "lucide-react";
 import { AdminUserActions } from "@/components/admin/AdminUserActions";
+import { AdminNotes } from "@/components/admin/AdminNotes";
 import type { Database } from "@/integrations/supabase/types";
 
 type KycStatus = Database["public"]["Enums"]["kyc_status"];
@@ -176,8 +177,8 @@ export default function AdminUserDetailPage() {
         </Card>
       </div>
 
-      {/* Admin Actions Panel */}
-      <div className="mt-6">
+      {/* Admin Actions + Notes */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <AdminUserActions
           userId={id!}
           roles={roles}
@@ -185,6 +186,7 @@ export default function AdminUserDetailPage() {
           kycId={kyc?.id || null}
           isFrozen={(profile as any)?.is_frozen || false}
         />
+        <AdminNotes targetId={id!} targetType="user" />
       </div>
 
       {/* Frozen banner */}
