@@ -1,7 +1,12 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { BRAND } from "@/config/brand";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 export default function AboutPage() {
+  usePageMeta(
+    "About Swippee — Nepal's Trusted OTC Crypto Desk",
+    "Learn about Swippee, Nepal's secure OTC cryptocurrency trading desk. KYC-verified users, manual settlement, and full transparency."
+  );
   return (
     <PublicLayout>
       <div className="container py-20">

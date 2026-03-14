@@ -1,7 +1,12 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { BRAND } from "@/config/brand";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 export default function RefundPolicy() {
+  usePageMeta(
+    "Refund & Cancellation Policy — Swippee",
+    "Swippee's refund and cancellation policy for OTC crypto trades in Nepal."
+  );
   return (
     <PublicLayout>
       <div className="container max-w-3xl py-16 md:py-24">

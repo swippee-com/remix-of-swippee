@@ -6,6 +6,7 @@ import { ArrowRight, Shield, Clock, Wallet, CheckCircle, LayoutDashboard } from 
 import { motion } from "framer-motion";
 import { SponsorStrip } from "@/components/ads/SponsorStrip";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const features = [
   { icon: Shield, title: "KYC Verified", description: "All users are verified before trading. Your security is our priority." },
@@ -22,6 +23,10 @@ const steps = [
 
 export default function LandingPage() {
   const { user } = useAuth();
+  usePageMeta(
+    "Swippee — Buy & Sell Crypto in Nepal | OTC Crypto Desk",
+    "Nepal's trusted OTC crypto desk. Buy and sell USDT, BTC, ETH, USDC securely with KYC-verified trading and manual settlement in NPR."
+  );
   return (
     <PublicLayout>
       {/* Hero */}

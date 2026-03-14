@@ -1,14 +1,22 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+Disallow: /reset-password
 
 User-agent: Bingbot
 Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+Disallow: /reset-password
 
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+Disallow: /reset-password
+
+Sitemap: https://swippee.com/sitemap.xml

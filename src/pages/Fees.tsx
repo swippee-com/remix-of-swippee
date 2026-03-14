@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { BRAND } from "@/config/brand";
+import { usePageMeta } from "@/hooks/use-page-meta";
 import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,10 @@ function getTradingFeePercent(amountUsd: number): number {
 }
 
 export default function FeesPage() {
+  usePageMeta(
+    "Fees & Pricing — Swippee Nepal Crypto Trading",
+    "Transparent fee structure for buying and selling crypto in Nepal. Calculate trading fees, network fees, and total costs at Swippee."
+  );
   const { prices } = useMarketPrices();
   const { rate: nprRate } = useNprRate();
 

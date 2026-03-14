@@ -3,6 +3,7 @@ import { BRAND } from "@/config/brand";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { UserPlus, Shield, FileText, ArrowLeftRight, CreditCard, CheckCircle } from "lucide-react";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const steps = [
   { icon: UserPlus, title: "1. Sign Up", description: "Create your account with email and password." },
@@ -14,6 +15,10 @@ const steps = [
 ];
 
 export default function HowItWorksPage() {
+  usePageMeta(
+    "How It Works — Buy & Sell Crypto in Nepal | Swippee",
+    "Learn how to buy and sell crypto in Nepal with Swippee. Simple 6-step process: sign up, complete KYC, request a quote, and settle securely."
+  );
   return (
     <PublicLayout>
       <div className="container py-20">

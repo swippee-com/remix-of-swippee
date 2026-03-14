@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
 import { AdBanner } from "@/components/ads/AdBanner";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 function formatMarketCap(n: number, currency: Currency): string {
   const sym = currencySymbol(currency);
@@ -21,6 +22,10 @@ function formatMarketCap(n: number, currency: Currency): string {
 }
 
 export default function LivePrices() {
+  usePageMeta(
+    "Live Crypto Prices in Nepal — USDT, BTC, ETH | Swippee",
+    "Track live cryptocurrency prices in NPR. Real-time USDT, BTC, ETH, USDC rates for Nepal. Updated every minute."
+  );
   const { prices, isLoading, lastUpdated } = useMarketPrices();
   const nprData = useNprRate();
   const [currency, setCurrency] = useState<Currency>("usd");

@@ -1,7 +1,12 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { BRAND } from "@/config/brand";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 export default function PrivacyPolicy() {
+  usePageMeta(
+    "Privacy Policy — Swippee",
+    "Swippee's privacy policy. Learn how we protect your personal data and KYC information for crypto trading in Nepal."
+  );
   return (
     <PublicLayout>
       <div className="container max-w-3xl py-16 md:py-24">
