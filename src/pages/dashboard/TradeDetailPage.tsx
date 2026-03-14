@@ -1,6 +1,7 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { ProofImage } from "@/components/shared/ProofImage";
 import { Timeline } from "@/components/shared/Timeline";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
