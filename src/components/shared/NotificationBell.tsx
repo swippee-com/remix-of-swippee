@@ -28,7 +28,8 @@ export function NotificationBell() {
       return data;
     },
     enabled: !!user,
-    refetchInterval: 30000, // poll every 30s
+    // Realtime handles live updates; poll as fallback every 60s
+    refetchInterval: 60000,
   });
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
