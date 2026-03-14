@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
 import { AdBanner } from "@/components/ads/AdBanner";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 function formatMarketCap(n: number, currency: Currency): string {
   const sym = currencySymbol(currency);
