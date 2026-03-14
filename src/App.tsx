@@ -123,6 +123,7 @@ const App = () => (
             <Route path="/admin/support" element={<AdminRoute><AdminSupportPage /></AdminRoute>} />
             <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
             <Route path="/admin/wallets" element={<AdminRoute><AdminWalletPage /></AdminRoute>} />
+            <Route path="/admin/ads" element={<AdminRoute><AdminAdsPage /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
