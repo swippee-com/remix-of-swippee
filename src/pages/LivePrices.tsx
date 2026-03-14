@@ -30,7 +30,10 @@ export default function LivePrices() {
   const nprData = useNprRate();
   const [currency, setCurrency] = useState<Currency>("usd");
   const [search, setSearch] = useState("");
+  const [remoteResults, setRemoteResults] = useState<MarketPrice[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const sym = currencySymbol(currency);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const filtered = useMemo(() => {
     if (!search.trim()) return prices;
@@ -39,6 +42,33 @@ export default function LivePrices() {
       (p) => p.asset.toLowerCase().includes(q) || p.symbol.toLowerCase().includes(q)
     );
   }, [prices, search]);
+
+  // Remote search fallback when local filter finds nothing
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (filtered.length > 0 || search.trim().length < 2) {
+      setRemoteResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const results = await searchCoins(search.trim());
+        setRemoteResults(results);
+      } catch {
+        setRemoteResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [search, filtered.length]);
+
+  const displayPrices = filtered.length > 0 ? filtered : remoteResults;
 
   return (
     <PublicLayout>
