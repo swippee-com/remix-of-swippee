@@ -177,7 +177,10 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4">{u.trades}</td>
                   <td className="px-6 py-4 text-muted-foreground">{format(new Date(u.created_at), "PP")}</td>
                   <td className="px-6 py-4">
-                    <div className="flex gap-1">
+                    <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to={`/admin/users/${u.id}`}><Eye className="h-3.5 w-3.5" /></Link>
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => setRoleModal({ userId: u.id, name: u.full_name || u.email || "User", currentRoles: u.roles })}>
                         Roles
                       </Button>
