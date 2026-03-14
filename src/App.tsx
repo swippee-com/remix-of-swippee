@@ -7,6 +7,10 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
 import { useLoginTracker } from "@/hooks/use-login-tracker";
+import { WagmiProvider } from "wagmi";
+import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
+import { wagmiConfig } from "@/config/wagmi";
+import "@rainbow-me/rainbowkit/styles.css";
 
 // Public
 import Landing from "./pages/Landing";
