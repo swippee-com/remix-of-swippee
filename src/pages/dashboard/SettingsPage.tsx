@@ -71,6 +71,30 @@ export default function SettingsPage() {
     <DashboardLayout>
       <PageHeader title="Settings" description="Manage your account settings." />
       <div className="mt-6 max-w-2xl space-y-8">
+        {/* Appearance Section */}
+        <section className="rounded-lg border bg-card p-6 shadow-card">
+          <h2 className="font-semibold">Appearance</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Choose your preferred theme.</p>
+          <div className="mt-4 flex gap-2">
+            {([
+              { value: "light" as Theme, label: "Light", icon: Sun },
+              { value: "dark" as Theme, label: "Dark", icon: Moon },
+              { value: "system" as Theme, label: "System", icon: Monitor },
+            ]).map(({ value, label, icon: Icon }) => (
+              <Button
+                key={value}
+                variant={theme === value ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTheme(value)}
+                className="gap-2"
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </Button>
+            ))}
+          </div>
+        </section>
+
         {/* Profile Section */}
         <section className="rounded-lg border bg-card p-6 shadow-card">
           <h2 className="font-semibold">Profile</h2>
