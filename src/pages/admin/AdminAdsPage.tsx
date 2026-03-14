@@ -104,7 +104,7 @@ export default function AdminAdsPage() {
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { error } = await supabase.from("ads").update({ is_active } as any).eq("id", id);
+      const { error } = await supabase.from("promotions").update({ is_active } as any).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-ads"] }),
