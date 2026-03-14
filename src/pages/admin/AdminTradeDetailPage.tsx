@@ -181,7 +181,14 @@ export default function AdminTradeDetailPage() {
             <Select value={newStatus} onValueChange={(v) => setNewStatus(v as TradeStatus)}>
               <SelectTrigger className="mt-1"><SelectValue placeholder="Select status" /></SelectTrigger>
               <SelectContent>
-                {statusOptions.map((s) => <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>)}
+                <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{trade.side === "buy" ? "Buy Flow (User pays fiat)" : "Sell Flow (User sends crypto)"}</p>
+                {(trade.side === "buy" ? buyStatusFlow : sellStatusFlow).map((s) => (
+                  <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>
+                ))}
+                <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-1 pt-1">Other</p>
+                {commonStatuses.map((s) => (
+                  <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
