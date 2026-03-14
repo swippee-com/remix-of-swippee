@@ -12,8 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { Plus, Trash2, BarChart3, Eye, MousePointer } from "lucide-react";
+import { useState, useRef } from "react";
+import { Plus, Trash2, BarChart3, Eye, MousePointer, Upload, Loader2 } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { format } from "date-fns";
 
