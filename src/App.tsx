@@ -3,6 +3,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminRoute } from "@/components/auth/AdminRoute";
 
 // Public
 import Landing from "./pages/Landing";
@@ -15,6 +18,8 @@ import NotFound from "./pages/NotFound";
 // Auth
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 // Dashboard
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
@@ -46,42 +51,46 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Public */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/fees" element={<Fees />} />
-          <Route path="/support" element={<Support />} />
+        <AuthProvider>
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/fees" element={<Fees />} />
+            <Route path="/support" element={<Support />} />
 
-          {/* Auth */}
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/signup" element={<Signup />} />
+            {/* Auth */}
+            <Route path="/auth/login" element={<Login />} />
+            <Route path="/auth/signup" element={<Signup />} />
+            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* User Dashboard */}
-          <Route path="/dashboard" element={<DashboardOverview />} />
-          <Route path="/dashboard/kyc" element={<KycPage />} />
-          <Route path="/dashboard/quotes" element={<QuotesPage />} />
-          <Route path="/dashboard/quotes/new" element={<NewQuotePage />} />
-          <Route path="/dashboard/trades" element={<TradesPage />} />
-          <Route path="/dashboard/payment-methods" element={<PaymentMethodsPage />} />
-          <Route path="/dashboard/payout-addresses" element={<PayoutAddressesPage />} />
-          <Route path="/dashboard/support" element={<SupportDashboardPage />} />
-          <Route path="/dashboard/settings" element={<SettingsPage />} />
+            {/* User Dashboard — Protected */}
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardOverview /></ProtectedRoute>} />
+            <Route path="/dashboard/kyc" element={<ProtectedRoute><KycPage /></ProtectedRoute>} />
+            <Route path="/dashboard/quotes" element={<ProtectedRoute><QuotesPage /></ProtectedRoute>} />
+            <Route path="/dashboard/quotes/new" element={<ProtectedRoute><NewQuotePage /></ProtectedRoute>} />
+            <Route path="/dashboard/trades" element={<ProtectedRoute><TradesPage /></ProtectedRoute>} />
+            <Route path="/dashboard/payment-methods" element={<ProtectedRoute><PaymentMethodsPage /></ProtectedRoute>} />
+            <Route path="/dashboard/payout-addresses" element={<ProtectedRoute><PayoutAddressesPage /></ProtectedRoute>} />
+            <Route path="/dashboard/support" element={<ProtectedRoute><SupportDashboardPage /></ProtectedRoute>} />
+            <Route path="/dashboard/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
-          {/* Admin */}
-          <Route path="/admin" element={<AdminOverview />} />
-          <Route path="/admin/users" element={<AdminUsersPage />} />
-          <Route path="/admin/kyc" element={<AdminKycPage />} />
-          <Route path="/admin/quotes" element={<AdminQuotesPage />} />
-          <Route path="/admin/trades" element={<AdminTradesPage />} />
-          <Route path="/admin/ledger" element={<AdminLedgerPage />} />
-          <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
-          <Route path="/admin/support" element={<AdminSupportPage />} />
-          <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            {/* Admin — Protected + Admin Role */}
+            <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />
+            <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+            <Route path="/admin/kyc" element={<AdminRoute><AdminKycPage /></AdminRoute>} />
+            <Route path="/admin/quotes" element={<AdminRoute><AdminQuotesPage /></AdminRoute>} />
+            <Route path="/admin/trades" element={<AdminRoute><AdminTradesPage /></AdminRoute>} />
+            <Route path="/admin/ledger" element={<AdminRoute><AdminLedgerPage /></AdminRoute>} />
+            <Route path="/admin/audit-logs" element={<AdminRoute><AdminAuditLogsPage /></AdminRoute>} />
+            <Route path="/admin/support" element={<AdminRoute><AdminSupportPage /></AdminRoute>} />
+            <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

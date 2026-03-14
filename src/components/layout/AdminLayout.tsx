@@ -1,14 +1,26 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BRAND } from "@/config/brand";
 import { adminNavItems } from "@/config/navigation";
 import { cn } from "@/lib/utils";
 import { LogOut, Bell, Menu, X, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const initials = profile?.full_name
+    ? profile.full_name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "A";
 
   const NavContent = () => (
     <nav className="flex-1 space-y-1 px-3 py-4">
@@ -35,7 +47,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-muted/20">
-      {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r bg-card lg:flex">
         <div className="flex h-16 items-center gap-2 border-b px-6">
           <ShieldCheck className="h-5 w-5 text-primary" />
@@ -43,8 +54,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </div>
         <NavContent />
         <div className="border-t p-3">
-          <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground" asChild>
-            <Link to="/"><LogOut className="h-4 w-4" /> Sign Out</Link>
+          <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground" onClick={handleSignOut}>
+            <LogOut className="h-4 w-4" /> Sign Out
           </Button>
         </div>
       </aside>
@@ -70,7 +81,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <div className="hidden lg:block" />
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon"><Bell className="h-4 w-4" /></Button>
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-primary-foreground">A</div>
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-primary-foreground">
+              {initials}
+            </div>
           </div>
         </header>
         <main className="p-4 lg:p-8">{children}</main>
