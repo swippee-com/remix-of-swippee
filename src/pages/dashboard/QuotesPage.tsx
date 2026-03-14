@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { useMemo } from "react";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 
