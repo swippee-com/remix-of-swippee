@@ -105,7 +105,7 @@ export default function TradeDetailPage() {
             <p><span className="font-medium">{t("tradeDetail.fee")}</span> {trade.fee_amount}</p>
             <p><span className="font-medium">{t("tradeDetail.netAmount")}</span> {trade.net_amount}</p>
             <p><span className="font-medium">{t("tradeDetail.rate")}</span> {Number(trade.quoted_rate).toLocaleString()} {trade.fiat_currency}</p>
-            <p><span className="font-medium">{t("tradeDetail.created")}</span> {format(new Date(trade.created_at), "PPp")}</p>
+            <p><span className="font-medium">{t("tradeDetail.created")}</span> {formatDate(trade.created_at, "PPp")}</p>
           </div>
           {trade.settlement_notes && (
             <div className="mt-2 rounded bg-muted/50 p-3 text-sm">
