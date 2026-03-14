@@ -1042,6 +1042,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_account_frozen: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       announcement_type: "info" | "warning" | "maintenance"
