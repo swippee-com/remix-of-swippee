@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { format, subDays, subMonths, startOfWeek, differenceInDays, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, startOfMonth } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 import {
