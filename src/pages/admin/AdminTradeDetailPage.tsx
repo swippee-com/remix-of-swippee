@@ -16,11 +16,19 @@ import type { Database } from "@/integrations/supabase/types";
 
 type TradeStatus = Database["public"]["Enums"]["trade_status"];
 
-const statusOptions: TradeStatus[] = [
+// BUY: user pays fiat, admin sends crypto
+const buyStatusFlow: TradeStatus[] = [
   "pending_settlement", "awaiting_fiat_payment", "payment_proof_uploaded",
-  "fiat_received", "awaiting_crypto_transfer", "crypto_received",
-  "ready_to_release", "completed", "disputed", "cancelled", "failed",
+  "fiat_received", "ready_to_release", "completed",
 ];
+
+// SELL: user sends crypto, admin pays fiat
+const sellStatusFlow: TradeStatus[] = [
+  "pending_settlement", "awaiting_crypto_transfer", "crypto_received",
+  "ready_to_release", "completed",
+];
+
+const commonStatuses: TradeStatus[] = ["disputed", "cancelled", "failed"];
 
 export default function AdminTradeDetailPage() {
   const { id } = useParams<{ id: string }>();
