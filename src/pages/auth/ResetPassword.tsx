@@ -62,9 +62,9 @@ export default function ResetPasswordPage() {
 
   if (!isRecovery) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/20 px-4">
+      <PublicLayout>
+      <div className="flex flex-1 items-center justify-center py-16 px-4">
         <div className="w-full max-w-sm text-center space-y-4">
-          <Link to="/" className="text-2xl font-bold tracking-tight">{BRAND.name}</Link>
           <p className="text-sm text-muted-foreground">
             This page is for resetting your password via the link sent to your email.
           </p>
@@ -73,6 +73,7 @@ export default function ResetPasswordPage() {
           </Link>
         </div>
       </div>
+      </PublicLayout>
     );
   }
 
