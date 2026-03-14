@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BRAND } from "@/config/brand";
 import { userNavItems } from "@/config/navigation";
 import { cn } from "@/lib/utils";
-import { LogOut, Menu, X, Sun, Moon, Globe } from "lucide-react";
+import { LogOut, Menu, X, Sun, Moon, Globe, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/shared/NotificationBell";
 import { useState } from "react";
@@ -113,6 +113,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <main className="p-4 lg:p-8">
+          {profile?.is_frozen && (
+            <div className="mb-4 flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+              <ShieldAlert className="h-5 w-5 shrink-0" />
+              <p className="font-medium">This account is currently frozen. You cannot perform any transactions.</p>
+            </div>
+          )}
           <AnnouncementBanner />
           {children}
         </main>

@@ -16,6 +16,7 @@ interface AuthContextType {
     country: string | null;
     avatar_url: string | null;
     is_2fa_enabled: boolean;
+    is_frozen: boolean;
   } | null;
   roles: AppRole[];
   isLoading: boolean;
@@ -37,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("id, full_name, email, phone, country, avatar_url, is_2fa_enabled")
+      .select("id, full_name, email, phone, country, avatar_url, is_2fa_enabled, is_frozen")
       .eq("id", userId)
       .single();
     setProfile(data);
