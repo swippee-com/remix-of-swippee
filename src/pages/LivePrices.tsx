@@ -158,16 +158,22 @@ export default function LivePrices() {
                   </CardContent>
                 </Card>
               ))
-            : filtered.length === 0 ? (
+            : isSearching ? (
+                <div className="col-span-full flex items-center justify-center gap-2 py-12 text-muted-foreground">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Searching for "{search}"…
+                </div>
+              )
+            : displayPrices.length === 0 && search.trim().length > 0 ? (
                 <div className="col-span-full py-12 text-center text-muted-foreground">
                   No coins match "{search}"
                 </div>
-              ) : filtered.map((p) => {
+              ) : displayPrices.map((p) => {
                 const positive = p.change24h >= 0;
                 const displayPrice = convertPrice(p.price, currency, nprData.rate);
                 const displayCap = convertPrice(p.marketCap, currency, nprData.rate);
                 return (
-                  <Card key={p.symbol}>
+                  <Card key={p.id}>
                     <CardHeader className="flex flex-row items-center gap-3 pb-2">
                       <img src={p.image} alt={p.asset} className="h-8 w-8 rounded-full" />
                       <div className="min-w-0">
