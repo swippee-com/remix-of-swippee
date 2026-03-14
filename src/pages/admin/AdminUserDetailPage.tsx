@@ -9,6 +9,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ArrowLeft, Eye, Mail, Phone, MapPin, Calendar, Shield, Wallet, CreditCard, ArrowLeftRight, FileText, MessageSquare } from "lucide-react";
+import { AdminUserActions } from "@/components/admin/AdminUserActions";
+import type { Database } from "@/integrations/supabase/types";
+
+type KycStatus = Database["public"]["Enums"]["kyc_status"];
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -171,6 +175,25 @@ export default function AdminUserDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Admin Actions Panel */}
+      <div className="mt-6">
+        <AdminUserActions
+          userId={id!}
+          roles={roles}
+          kycStatus={(kyc?.status as KycStatus) || null}
+          kycId={kyc?.id || null}
+          isFrozen={(profile as any)?.is_frozen || false}
+        />
+      </div>
+
+      {/* Frozen banner */}
+      {(profile as any)?.is_frozen && (
+        <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive flex items-center gap-2">
+          <Shield className="h-4 w-4" />
+          This account is currently frozen. The user cannot perform any transactions.
+        </div>
+      )}
 
       {/* Tabs */}
       <Tabs defaultValue="quotes" className="mt-8">
