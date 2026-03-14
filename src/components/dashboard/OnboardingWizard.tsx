@@ -6,7 +6,8 @@ import { Mail, Shield, CreditCard, FileText, CheckCircle, ChevronRight, PartyPop
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 
 interface OnboardingStep {
   key: string;
