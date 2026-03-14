@@ -3,6 +3,7 @@ import { BRAND } from "@/config/brand";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { UserPlus, Shield, FileText, ArrowLeftRight, CreditCard, CheckCircle } from "lucide-react";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const steps = [
   { icon: UserPlus, title: "1. Sign Up", description: "Create your account with email and password." },
