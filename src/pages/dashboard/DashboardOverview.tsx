@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { useMemo, useState, useCallback } from "react";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
+import { PriceTicker } from "@/components/shared/PriceTicker";
 
 export default function DashboardPage() {
   const { user } = useAuth();
