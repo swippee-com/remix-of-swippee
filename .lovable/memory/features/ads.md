@@ -1,10 +1,10 @@
 Advertising & Sponsored Listings system for monetizing site traffic
 
 ## Database
-- `ads` table: title, description, image_url, link_url, link_text, placement (enum), is_active, starts_at, ends_at, priority, impression_count, click_count, created_by
-- `ad_events` table: ad_id, event_type (impression/click), user_id (nullable)
-- Enums: ad_placement (dashboard_banner, sidebar, landing_sponsor, live_prices, public_footer), ad_event_type (impression, click)
-- RLS: admins manage all, anyone can read active ads, anyone can insert events
+- `promotions` table (renamed from `ads` to avoid ad blockers): title, description, image_url, link_url, link_text, placement (enum promotion_placement), is_active, starts_at, ends_at, priority, impression_count, click_count, created_by
+- `promotion_events` table (renamed from `ad_events`): ad_id, event_type (promotion_event_type: impression/click), user_id (nullable)
+- Storage bucket: `ad-images` for banner uploads
+- RLS: admins manage all, anyone can read active promotions, anyone can insert events
 
 ## Components
 - `src/hooks/use-ads.ts` — useAds(placement) + useAdTracking() hooks
