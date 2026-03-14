@@ -40,6 +40,7 @@ import PayoutAddressesPage from "./pages/dashboard/PayoutAddressesPage";
 import SupportDashboardPage from "./pages/dashboard/SupportDashboardPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import WalletPage from "./pages/dashboard/WalletPage";
+import PortfolioPage from "./pages/dashboard/PortfolioPage";
 
 // Admin
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -96,6 +97,7 @@ const App = () => (
             <Route path="/dashboard/quotes/:id" element={<ProtectedRoute><QuoteDetailPage /></ProtectedRoute>} />
             <Route path="/dashboard/trades" element={<ProtectedRoute><TradesPage /></ProtectedRoute>} />
             <Route path="/dashboard/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
+            <Route path="/dashboard/portfolio" element={<ProtectedRoute><PortfolioPage /></ProtectedRoute>} />
             <Route path="/dashboard/trades/:id" element={<ProtectedRoute><TradeDetailPage /></ProtectedRoute>} />
             <Route path="/dashboard/payment-methods" element={<ProtectedRoute><PaymentMethodsPage /></ProtectedRoute>} />
             <Route path="/dashboard/payout-addresses" element={<ProtectedRoute><PayoutAddressesPage /></ProtectedRoute>} />

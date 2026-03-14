@@ -1,12 +1,13 @@
 import {
   LayoutDashboard, Shield, CreditCard, Wallet, FileText, ArrowLeftRight,
   HeadphonesIcon, Settings, Users, ClipboardCheck, BookOpen, ScrollText,
-  Activity, BarChart3, WalletCards
+  Activity, BarChart3, WalletCards, PieChart
 } from "lucide-react";
 
 export const userNavItems = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { label: "Wallet", href: "/dashboard/wallet", icon: WalletCards },
+  { label: "Portfolio", href: "/dashboard/portfolio", icon: PieChart },
   { label: "KYC", href: "/dashboard/kyc", icon: Shield },
   { label: "Quote Requests", href: "/dashboard/quotes", icon: FileText },
   { label: "Trades", href: "/dashboard/trades", icon: ArrowLeftRight },
