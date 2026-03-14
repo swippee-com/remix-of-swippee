@@ -90,6 +90,7 @@ const App = () => (
           <BrowserRouter>
             <AuthProvider>
               <LanguageProvider>
+          <ScrollToTop />
           <LoginTrackerWrapper />
           <Routes>
             {/* Public */}
