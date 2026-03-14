@@ -1,9 +1,44 @@
 import { BRAND } from "@/config/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navigate } from "react-router-dom";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const { session, isLoading } = useAuth();
+
+  const from = (location.state as any)?.from?.pathname || "/dashboard";
+
+  if (!isLoading && session) {
+    return <Navigate to={from} replace />;
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      toast({ title: "Login failed", description: error.message, variant: "destructive" });
+      setLoading(false);
+      return;
+    }
+
+    toast({ title: "Welcome back!" });
+    navigate(from, { replace: true });
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/20 px-4">
       <div className="w-full max-w-sm">
@@ -11,19 +46,37 @@ export default function LoginPage() {
           <Link to="/" className="text-2xl font-bold tracking-tight">{BRAND.name}</Link>
           <p className="mt-2 text-sm text-muted-foreground">Sign in to your account</p>
         </div>
-        <form className="mt-8 space-y-4" onSubmit={(e) => e.preventDefault()}>
+        <form className="mt-8 space-y-4" onSubmit={handleLogin}>
           <div>
             <label className="text-sm font-medium">Email</label>
-            <Input className="mt-1" type="email" placeholder="your@email.com" />
+            <Input
+              className="mt-1"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
           <div>
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">Password</label>
-              <Link to="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">Forgot password?</Link>
+              <Link to="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">
+                Forgot password?
+              </Link>
             </div>
-            <Input className="mt-1" type="password" placeholder="••••••••" />
+            <Input
+              className="mt-1"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
-          <Button className="w-full" asChild><Link to="/dashboard">Sign In</Link></Button>
+          <Button className="w-full" type="submit" disabled={loading}>
+            {loading ? "Signing in…" : "Sign In"}
+          </Button>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
