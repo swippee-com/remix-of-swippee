@@ -35,6 +35,7 @@ import PaymentMethodsPage from "./pages/dashboard/PaymentMethodsPage";
 import PayoutAddressesPage from "./pages/dashboard/PayoutAddressesPage";
 import SupportDashboardPage from "./pages/dashboard/SupportDashboardPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
+import WalletPage from "./pages/dashboard/WalletPage";
 
 // Admin
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -49,6 +50,7 @@ import AdminLedgerPage from "./pages/admin/AdminLedgerPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 import AdminSupportPage from "./pages/admin/AdminSupportPage";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
+import AdminWalletPage from "./pages/admin/AdminWalletPage";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +89,7 @@ const App = () => (
             <Route path="/dashboard/quotes/new" element={<ProtectedRoute><NewQuotePage /></ProtectedRoute>} />
             <Route path="/dashboard/quotes/:id" element={<ProtectedRoute><QuoteDetailPage /></ProtectedRoute>} />
             <Route path="/dashboard/trades" element={<ProtectedRoute><TradesPage /></ProtectedRoute>} />
+            <Route path="/dashboard/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
             <Route path="/dashboard/trades/:id" element={<ProtectedRoute><TradeDetailPage /></ProtectedRoute>} />
             <Route path="/dashboard/payment-methods" element={<ProtectedRoute><PaymentMethodsPage /></ProtectedRoute>} />
             <Route path="/dashboard/payout-addresses" element={<ProtectedRoute><PayoutAddressesPage /></ProtectedRoute>} />
@@ -106,6 +109,7 @@ const App = () => (
             <Route path="/admin/audit-logs" element={<AdminRoute><AdminAuditLogsPage /></AdminRoute>} />
             <Route path="/admin/support" element={<AdminRoute><AdminSupportPage /></AdminRoute>} />
             <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
+            <Route path="/admin/wallets" element={<AdminRoute><AdminWalletPage /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

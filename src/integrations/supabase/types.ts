@@ -911,6 +911,83 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_transactions: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          balance_after: number | null
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          reference_type: string | null
+          status: Database["public"]["Enums"]["wallet_tx_status"]
+          type: Database["public"]["Enums"]["wallet_tx_type"]
+          user_id: string
+          wallet_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount: number
+          balance_after?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: Database["public"]["Enums"]["wallet_tx_status"]
+          type: Database["public"]["Enums"]["wallet_tx_type"]
+          user_id: string
+          wallet_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          balance_after?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: Database["public"]["Enums"]["wallet_tx_status"]
+          type?: Database["public"]["Enums"]["wallet_tx_type"]
+          user_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallets: {
+        Row: {
+          balance_npr: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance_npr?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance_npr?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -987,6 +1064,13 @@ export type Database = {
         | "disputed"
         | "cancelled"
         | "failed"
+      wallet_tx_status: "pending" | "completed" | "rejected"
+      wallet_tx_type:
+        | "deposit"
+        | "withdrawal"
+        | "trade_debit"
+        | "trade_credit"
+        | "adjustment"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1182,6 +1266,14 @@ export const Constants = {
         "disputed",
         "cancelled",
         "failed",
+      ],
+      wallet_tx_status: ["pending", "completed", "rejected"],
+      wallet_tx_type: [
+        "deposit",
+        "withdrawal",
+        "trade_debit",
+        "trade_credit",
+        "adjustment",
       ],
     },
   },

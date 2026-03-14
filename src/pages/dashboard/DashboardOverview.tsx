@@ -4,7 +4,7 @@ import { StatCard } from "@/components/shared/StatCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Shield, ArrowLeftRight, FileText, CreditCard, Plus } from "lucide-react";
+import { Shield, ArrowLeftRight, FileText, CreditCard, Plus, WalletCards } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -59,6 +59,19 @@ export default function DashboardPage() {
         .select("id", { count: "exact", head: true })
         .eq("user_id", user!.id);
       return count || 0;
+    },
+    enabled: !!user,
+  });
+
+  const { data: walletBalance } = useQuery({
+    queryKey: ["dashboard-wallet-balance", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("wallets")
+        .select("balance_npr")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data?.balance_npr ?? 0;
     },
     enabled: !!user,
   });
@@ -154,7 +167,8 @@ export default function DashboardPage() {
         <PriceTicker />
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <StatCard title="Wallet Balance" value={`NPR ${Number(walletBalance ?? 0).toLocaleString()}`} icon={WalletCards} description="Available balance" />
         <StatCard title="KYC Status" value={kycLabel} icon={Shield} description={kycStatus === "approved" ? "Identity verified" : undefined} />
         <StatCard title="Active Trades" value={String(tradeStats?.active ?? 0)} icon={ArrowLeftRight} description="In progress" />
         <StatCard title="Completed Trades" value={String(tradeStats?.completed ?? 0)} icon={FileText} />
