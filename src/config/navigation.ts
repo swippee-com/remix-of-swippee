@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Shield, CreditCard, Wallet, FileText, ArrowLeftRight,
   HeadphonesIcon, Settings, Users, ClipboardCheck, BookOpen, ScrollText,
-  Activity, BarChart3, WalletCards
+  Activity, BarChart3, WalletCards, PieChart
 } from "lucide-react";
 
 export const userNavItems = [
