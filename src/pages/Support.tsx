@@ -4,8 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MessageCircle } from "lucide-react";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 export default function SupportPage() {
+  usePageMeta(
+    "Support — Swippee Nepal OTC Crypto Desk",
+    "Get help with your Swippee account. Contact our Nepal-based support team for crypto trading assistance, KYC help, and settlement queries."
+  );
   return (
     <PublicLayout>
       <div className="container py-20">

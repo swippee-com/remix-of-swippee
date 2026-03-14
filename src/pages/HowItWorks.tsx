@@ -15,6 +15,10 @@ const steps = [
 ];
 
 export default function HowItWorksPage() {
+  usePageMeta(
+    "How It Works — Buy & Sell Crypto in Nepal | Swippee",
+    "Learn how to buy and sell crypto in Nepal with Swippee. Simple 6-step process: sign up, complete KYC, request a quote, and settle securely."
+  );
   return (
     <PublicLayout>
       <div className="container py-20">
