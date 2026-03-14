@@ -13,6 +13,7 @@ import { TwoFactorSetup } from "@/components/security/TwoFactorSetup";
 import { ActiveSessions } from "@/components/security/ActiveSessions";
 import { LoginHistory } from "@/components/security/LoginHistory";
 import { RateLimitIndicator } from "@/components/security/RateLimitIndicator";
+import { PhoneVerification } from "@/components/shared/PhoneVerification";
 import { useTheme, Theme } from "@/hooks/use-theme";
 import { Sun, Moon, Monitor, Globe } from "lucide-react";
 import type { Locale } from "@/i18n";
