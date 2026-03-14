@@ -62,6 +62,18 @@ export default function DashboardPage() {
     enabled: !!user,
   });
 
+  const { data: quoteCount } = useQuery({
+    queryKey: ["dashboard-quote-count", user?.id],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("quote_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id);
+      return count || 0;
+    },
+    enabled: !!user,
+  });
+
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["dashboard-activity", user?.id],
     queryFn: async () => {
