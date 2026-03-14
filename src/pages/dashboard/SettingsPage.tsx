@@ -74,127 +74,129 @@ export default function SettingsPage() {
   return (
     <DashboardLayout>
       <PageHeader title={t("settings.title")} description={t("settings.description")} />
-      <div className="mt-6 max-w-2xl space-y-8">
-        {/* Language Section */}
-        <section className="rounded-lg border bg-card p-6 shadow-card">
-          <h2 className="font-semibold">{t("settings.language")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t("settings.languageDesc")}</p>
-          <div className="mt-4 flex gap-2">
-            {([
-              { value: "en" as Locale, label: "English" },
-              { value: "ne" as Locale, label: "नेपाली" },
-            ]).map(({ value, label }) => (
-              <Button
-                key={value}
-                variant={locale === value ? "default" : "outline"}
-                size="sm"
-                onClick={() => setLocale(value)}
-                className="gap-2"
-              >
-                <Globe className="h-4 w-4" />
-                {label}
-              </Button>
-            ))}
-          </div>
-        </section>
+      <div className="mt-6 space-y-8">
+        {/* Top row: Language + Appearance side by side */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          {/* Language Section */}
+          <section className="rounded-lg border bg-card p-6 shadow-card">
+            <h2 className="font-semibold">{t("settings.language")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("settings.languageDesc")}</p>
+            <div className="mt-4 flex gap-2">
+              {([
+                { value: "en" as Locale, label: "English" },
+                { value: "ne" as Locale, label: "नेपाली" },
+              ]).map(({ value, label }) => (
+                <Button
+                  key={value}
+                  variant={locale === value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setLocale(value)}
+                  className="gap-2"
+                >
+                  <Globe className="h-4 w-4" />
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </section>
 
-        {/* Appearance Section */}
-        <section className="rounded-lg border bg-card p-6 shadow-card">
-          <h2 className="font-semibold">{t("settings.appearance")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t("settings.appearanceDesc")}</p>
-          <div className="mt-4 flex gap-2">
-            {([
-              { value: "light" as Theme, label: t("settings.light"), icon: Sun },
-              { value: "dark" as Theme, label: t("settings.dark"), icon: Moon },
-              { value: "system" as Theme, label: t("settings.system"), icon: Monitor },
-            ]).map(({ value, label, icon: Icon }) => (
-              <Button
-                key={value}
-                variant={theme === value ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTheme(value)}
-                className="gap-2"
-              >
-                <Icon className="h-4 w-4" />
-                {label}
-              </Button>
-            ))}
-          </div>
-        </section>
+          {/* Appearance Section */}
+          <section className="rounded-lg border bg-card p-6 shadow-card">
+            <h2 className="font-semibold">{t("settings.appearance")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("settings.appearanceDesc")}</p>
+            <div className="mt-4 flex gap-2">
+              {([
+                { value: "light" as Theme, label: t("settings.light"), icon: Sun },
+                { value: "dark" as Theme, label: t("settings.dark"), icon: Moon },
+                { value: "system" as Theme, label: t("settings.system"), icon: Monitor },
+              ]).map(({ value, label, icon: Icon }) => (
+                <Button
+                  key={value}
+                  variant={theme === value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setTheme(value)}
+                  className="gap-2"
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </section>
+        </div>
 
-        {/* Profile Section */}
-        <section className="rounded-lg border bg-card p-6 shadow-card">
-          <h2 className="font-semibold">{t("settings.profile")}</h2>
-          <form onSubmit={(e) => { e.preventDefault(); profileMutation.mutate(); }} className="mt-4 space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="text-sm font-medium">{t("settings.fullName")}</label>
-                <Input className="mt-1" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">{t("settings.email")}</label>
-                <Input className="mt-1" type="email" value={user?.email || ""} disabled />
-              </div>
-              <div>
-                <label className="text-sm font-medium">{t("settings.phone")}</label>
-                <div className="mt-1">
-                  <PhoneVerification
-                    phone={phone}
-                    onPhoneChange={setPhone}
-                    verified={profile?.phone_verified ?? false}
-                    onVerified={() => refreshProfile()}
-                  />
+        {/* Profile + Security side by side */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          {/* Profile Section */}
+          <section className="rounded-lg border bg-card p-6 shadow-card">
+            <h2 className="font-semibold">{t("settings.profile")}</h2>
+            <form onSubmit={(e) => { e.preventDefault(); profileMutation.mutate(); }} className="mt-4 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="text-sm font-medium">{t("settings.fullName")}</label>
+                  <Input className="mt-1" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">{t("settings.email")}</label>
+                  <Input className="mt-1" type="email" value={user?.email || ""} disabled />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">{t("settings.phone")}</label>
+                  <div className="mt-1">
+                    <PhoneVerification
+                      phone={phone}
+                      onPhoneChange={setPhone}
+                      verified={profile?.phone_verified ?? false}
+                      onVerified={() => refreshProfile()}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">{t("settings.country")}</label>
+                  <Input className="mt-1" value={country} onChange={(e) => setCountry(e.target.value)} />
                 </div>
               </div>
+              <Button type="submit" disabled={profileMutation.isPending}>
+                {profileMutation.isPending ? t("settings.saving") : t("settings.saveChanges")}
+              </Button>
+            </form>
+          </section>
+
+          {/* Security Section */}
+          <section className="rounded-lg border bg-card p-6 shadow-card">
+            <h2 className="font-semibold">{t("settings.security")}</h2>
+            <form onSubmit={(e) => { e.preventDefault(); passwordMutation.mutate(); }} className="mt-4 space-y-4">
               <div>
-                <label className="text-sm font-medium">{t("settings.country")}</label>
-                <Input className="mt-1" value={country} onChange={(e) => setCountry(e.target.value)} />
+                <label className="text-sm font-medium">{t("settings.newPassword")}</label>
+                <Input className="mt-1" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t("settings.minChars")} />
               </div>
-            </div>
-            <Button type="submit" disabled={profileMutation.isPending}>
-              {profileMutation.isPending ? t("settings.saving") : t("settings.saveChanges")}
-            </Button>
-          </form>
-        </section>
+              <div>
+                <label className="text-sm font-medium">{t("settings.confirmPassword")}</label>
+                <Input className="mt-1" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+              </div>
+              <Button type="submit" disabled={passwordMutation.isPending}>
+                {passwordMutation.isPending ? t("settings.updating") : t("settings.updatePassword")}
+              </Button>
+            </form>
+            <Separator className="my-6" />
+            <TwoFactorSetup />
+          </section>
+        </div>
 
-        {/* Security Section */}
-        <section className="rounded-lg border bg-card p-6 shadow-card">
-          <h2 className="font-semibold">{t("settings.security")}</h2>
+        {/* Sessions + Login History side by side */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          <section className="rounded-lg border bg-card p-6 shadow-card">
+            <h2 className="mb-4 font-semibold">{t("settings.activeSessions")}</h2>
+            <ActiveSessions />
+          </section>
 
-          {/* Password */}
-          <form onSubmit={(e) => { e.preventDefault(); passwordMutation.mutate(); }} className="mt-4 space-y-4">
-            <div>
-              <label className="text-sm font-medium">{t("settings.newPassword")}</label>
-              <Input className="mt-1" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t("settings.minChars")} />
-            </div>
-            <div>
-              <label className="text-sm font-medium">{t("settings.confirmPassword")}</label>
-              <Input className="mt-1" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-            </div>
-            <Button type="submit" disabled={passwordMutation.isPending}>
-              {passwordMutation.isPending ? t("settings.updating") : t("settings.updatePassword")}
-            </Button>
-          </form>
+          <section className="rounded-lg border bg-card p-6 shadow-card">
+            <h2 className="mb-4 font-semibold">{t("settings.loginHistory")}</h2>
+            <LoginHistory />
+          </section>
+        </div>
 
-          <Separator className="my-6" />
-
-          {/* Two-Factor Authentication */}
-          <TwoFactorSetup />
-        </section>
-
-        {/* Active Sessions */}
-        <section className="rounded-lg border bg-card p-6 shadow-card">
-          <h2 className="mb-4 font-semibold">{t("settings.activeSessions")}</h2>
-          <ActiveSessions />
-        </section>
-
-        {/* Login History */}
-        <section className="rounded-lg border bg-card p-6 shadow-card">
-          <h2 className="mb-4 font-semibold">{t("settings.loginHistory")}</h2>
-          <LoginHistory />
-        </section>
-
-        {/* Rate Limiting */}
+        {/* Rate Limiting - full width */}
         <section className="rounded-lg border bg-card p-6 shadow-card">
           <h2 className="mb-4 font-semibold">{t("settings.usage")}</h2>
           <RateLimitIndicator />
