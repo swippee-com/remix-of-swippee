@@ -28,6 +28,7 @@ import QuotesPage from "./pages/dashboard/QuotesPage";
 import NewQuotePage from "./pages/dashboard/NewQuotePage";
 import QuoteDetailPage from "./pages/dashboard/QuoteDetailPage";
 import TradesPage from "./pages/dashboard/TradesPage";
+import TradeDetailPage from "./pages/dashboard/TradeDetailPage";
 import PaymentMethodsPage from "./pages/dashboard/PaymentMethodsPage";
 import PayoutAddressesPage from "./pages/dashboard/PayoutAddressesPage";
 import SupportDashboardPage from "./pages/dashboard/SupportDashboardPage";
