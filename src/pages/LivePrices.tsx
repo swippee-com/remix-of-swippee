@@ -1,5 +1,5 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { useMarketPrices, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
+import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { PriceTicker } from "@/components/shared/PriceTicker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
