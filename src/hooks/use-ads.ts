@@ -21,7 +21,7 @@ export function useAds(placement: AdPlacement) {
     queryFn: async () => {
       const now = new Date().toISOString();
       const { data } = await supabase
-        .from("ads")
+        .from("promotions")
         .select("id, title, description, image_url, link_url, link_text, placement, priority")
         .eq("placement", placement)
         .eq("is_active", true)
