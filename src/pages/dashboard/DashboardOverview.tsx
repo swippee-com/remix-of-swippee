@@ -150,6 +150,10 @@ export default function DashboardPage() {
         </div>
       )}
 
+      <div className="mt-6">
+        <PriceTicker />
+      </div>
+
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="KYC Status" value={kycLabel} icon={Shield} description={kycStatus === "approved" ? "Identity verified" : undefined} />
         <StatCard title="Active Trades" value={String(tradeStats?.active ?? 0)} icon={ArrowLeftRight} description="In progress" />
