@@ -145,7 +145,7 @@ export default function AdminTradeDetailPage() {
 
         <div className="rounded-lg border bg-card p-6 shadow-card">
           <h3 className="font-semibold mb-3">Timeline</h3>
-          {timelineItems.length === 0 ? (
+          {timelineSteps.length === 0 ? (
             <p className="text-sm text-muted-foreground">No history yet.</p>
           ) : (
             <Timeline steps={timelineSteps} />
