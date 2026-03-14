@@ -6,6 +6,7 @@ import { ArrowRight, Shield, Clock, Wallet, CheckCircle, LayoutDashboard } from 
 import { motion } from "framer-motion";
 import { SponsorStrip } from "@/components/ads/SponsorStrip";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const features = [
   { icon: Shield, title: "KYC Verified", description: "All users are verified before trading. Your security is our priority." },
