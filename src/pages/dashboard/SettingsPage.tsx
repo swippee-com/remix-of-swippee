@@ -2,22 +2,23 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
+import { TwoFactorSetup } from "@/components/security/TwoFactorSetup";
+import { ActiveSessions } from "@/components/security/ActiveSessions";
+import { LoginHistory } from "@/components/security/LoginHistory";
+import { RateLimitIndicator } from "@/components/security/RateLimitIndicator";
 
 export default function SettingsPage() {
   const { profile, user, refreshProfile } = useAuth();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("");
-  const [timezone, setTimezone] = useState("");
 
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -56,7 +57,6 @@ export default function SettingsPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       toast({ title: "Password updated" });
@@ -68,6 +68,7 @@ export default function SettingsPage() {
     <DashboardLayout>
       <PageHeader title="Settings" description="Manage your account settings." />
       <div className="mt-6 max-w-2xl space-y-8">
+        {/* Profile Section */}
         <section className="rounded-lg border bg-card p-6 shadow-card">
           <h2 className="font-semibold">Profile</h2>
           <form onSubmit={(e) => { e.preventDefault(); profileMutation.mutate(); }} className="mt-4 space-y-4">
@@ -95,8 +96,11 @@ export default function SettingsPage() {
           </form>
         </section>
 
+        {/* Security Section */}
         <section className="rounded-lg border bg-card p-6 shadow-card">
           <h2 className="font-semibold">Security</h2>
+
+          {/* Password */}
           <form onSubmit={(e) => { e.preventDefault(); passwordMutation.mutate(); }} className="mt-4 space-y-4">
             <div>
               <label className="text-sm font-medium">New Password</label>
@@ -110,12 +114,29 @@ export default function SettingsPage() {
               {passwordMutation.isPending ? "Updating…" : "Update Password"}
             </Button>
           </form>
+
           <Separator className="my-6" />
-          <div>
-            <h3 className="font-medium">Two-Factor Authentication</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Add an extra layer of security to your account.</p>
-            <Button variant="outline" className="mt-3" disabled>Coming Soon</Button>
-          </div>
+
+          {/* Two-Factor Authentication */}
+          <TwoFactorSetup />
+        </section>
+
+        {/* Active Sessions */}
+        <section className="rounded-lg border bg-card p-6 shadow-card">
+          <h2 className="mb-4 font-semibold">Active Sessions</h2>
+          <ActiveSessions />
+        </section>
+
+        {/* Login History */}
+        <section className="rounded-lg border bg-card p-6 shadow-card">
+          <h2 className="mb-4 font-semibold">Login History</h2>
+          <LoginHistory />
+        </section>
+
+        {/* Rate Limiting */}
+        <section className="rounded-lg border bg-card p-6 shadow-card">
+          <h2 className="mb-4 font-semibold">Usage</h2>
+          <RateLimitIndicator />
         </section>
       </div>
     </DashboardLayout>

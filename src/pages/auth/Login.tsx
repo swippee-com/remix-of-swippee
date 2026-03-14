@@ -7,11 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { TotpVerifyModal } from "@/components/security/TotpVerifyModal";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [show2fa, setShow2fa] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -19,15 +21,24 @@ export default function LoginPage() {
 
   const from = (location.state as any)?.from?.pathname || "/dashboard";
 
-  if (!isLoading && session) {
+  if (!isLoading && session && !show2fa) {
     return <Navigate to={from} replace />;
   }
+
+  const completeLogin = () => {
+    // Track login via edge function
+    supabase.functions.invoke("track-login", {
+      body: { login_method: "password", session_id: session?.access_token?.slice(-12) || "" },
+    });
+    toast({ title: "Welcome back!" });
+    navigate(from, { replace: true });
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
@@ -35,8 +46,31 @@ export default function LoginPage() {
       return;
     }
 
+    // Check if 2FA is enabled
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("is_2fa_enabled")
+      .eq("id", data.user.id)
+      .single();
+
+    if ((profileData as any)?.is_2fa_enabled) {
+      setShow2fa(true);
+      setLoading(false);
+      return;
+    }
+
+    // No 2FA — complete login
+    supabase.functions.invoke("track-login", {
+      body: { login_method: "password", session_id: data.session?.access_token?.slice(-12) || "" },
+    });
     toast({ title: "Welcome back!" });
     navigate(from, { replace: true });
+  };
+
+  const handle2faCancel = async () => {
+    // Sign out since 2FA wasn't completed
+    await supabase.auth.signOut();
+    setShow2fa(false);
   };
 
   return (
@@ -83,6 +117,12 @@ export default function LoginPage() {
           <Link to="/auth/signup" className="font-medium text-foreground hover:underline">Sign up</Link>
         </p>
       </div>
+
+      <TotpVerifyModal
+        open={show2fa}
+        onVerified={completeLogin}
+        onCancel={handle2faCancel}
+      />
     </div>
   );
 }
