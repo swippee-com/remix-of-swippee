@@ -82,7 +82,7 @@ export default function PaymentMethodsPage() {
     setEditId(m.id); setModalOpen(true);
   };
 
-  const isWallet = ["esewa", "khalti", "ime_pay"].includes(form.payment_type);
+  const isWallet = ["esewa", "khalti"].includes(form.payment_type);
 
   return (
     <DashboardLayout>
