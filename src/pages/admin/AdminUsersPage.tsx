@@ -23,6 +23,7 @@ export default function AdminUsersPage() {
   const [kycFilter, setKycFilter] = useState("all");
   const [roleModal, setRoleModal] = useState<{ userId: string; name: string; currentRoles: AppRole[] } | null>(null);
   const [selectedRole, setSelectedRole] = useState<AppRole>("user");
+  const [payoutModal, setPayoutModal] = useState<{ userId: string; name: string } | null>(null);
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["admin-users"],
