@@ -115,11 +115,39 @@ export default function DashboardPage() {
 
   const kycLabel = kycStatus === "approved" ? "Approved" : kycStatus === "pending_review" ? "Pending" : kycStatus === "not_submitted" ? "Not Started" : kycStatus?.replace(/_/g, " ") || "—";
 
+  const emailVerified = !!user?.email_confirmed_at;
+  const DISMISS_KEY = "swippee_onboarding_dismissed";
+  const [wizardDismissed, setWizardDismissed] = useState(() => localStorage.getItem(DISMISS_KEY) === "true");
+  const handleDismiss = useCallback(() => {
+    localStorage.setItem(DISMISS_KEY, "true");
+    setWizardDismissed(true);
+  }, []);
+
+  const showWizard = !wizardDismissed || (
+    emailVerified &&
+    (kycStatus === "approved" || kycStatus === "pending_review") &&
+    (pmCount ?? 0) > 0 &&
+    (quoteCount ?? 0) > 0
+  ) ? !wizardDismissed : false;
+
   return (
     <DashboardLayout>
       <PageHeader title="Dashboard" description="Welcome back! Here's your account overview.">
         <Button asChild><Link to="/dashboard/quotes/new"><Plus className="mr-1 h-4 w-4" /> New Quote</Link></Button>
       </PageHeader>
+
+      {showWizard && (
+        <div className="mt-6">
+          <OnboardingWizard
+            emailVerified={emailVerified}
+            kycStatus={kycStatus || "not_submitted"}
+            paymentMethodCount={pmCount ?? 0}
+            quoteCount={quoteCount ?? 0}
+            dismissed={wizardDismissed}
+            onDismiss={handleDismiss}
+          />
+        </div>
+      )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="KYC Status" value={kycLabel} icon={Shield} description={kycStatus === "approved" ? "Identity verified" : undefined} />
