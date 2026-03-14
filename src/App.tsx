@@ -51,6 +51,7 @@ import AdminLedgerPage from "./pages/admin/AdminLedgerPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 import AdminSupportPage from "./pages/admin/AdminSupportPage";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
+import AdminWalletPage from "./pages/admin/AdminWalletPage";
 
 const queryClient = new QueryClient();
 
