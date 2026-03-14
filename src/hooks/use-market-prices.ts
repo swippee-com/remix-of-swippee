@@ -5,14 +5,20 @@ export type Currency = "usd" | "npr";
 
 const FALLBACK_NPR_RATE = 147.64;
 
-async function fetchNprRate(): Promise<number> {
+interface NprRateData {
+  rate: number;
+  sell: number;
+  date: string | null;
+}
+
+async function fetchNprRate(): Promise<NprRateData> {
   try {
     const { data, error } = await supabase.functions.invoke("forex-rate");
     if (error || !data?.success) throw new Error("Failed");
-    return data.buy as number;
+    return { rate: data.buy as number, sell: data.sell as number, date: data.date as string };
   } catch {
     console.warn("Using fallback NPR rate");
-    return FALLBACK_NPR_RATE;
+    return { rate: FALLBACK_NPR_RATE, sell: FALLBACK_NPR_RATE, date: null };
   }
 }
 
