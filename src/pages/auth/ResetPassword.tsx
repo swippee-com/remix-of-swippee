@@ -116,5 +116,6 @@ export default function ResetPasswordPage() {
         </form>
       </div>
     </div>
+    </PublicLayout>
   );
 }
