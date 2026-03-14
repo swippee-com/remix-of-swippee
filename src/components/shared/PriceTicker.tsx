@@ -1,4 +1,4 @@
-import { useMarketPrices, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
+import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
