@@ -118,8 +118,6 @@ export default function AdminTradeDetailPage() {
     active: i === history.length - 1,
   }));
 
-  const [proofUrls, setProofUrls] = useState<Record<string, string>>({});
-
   useEffect(() => {
     if (proofs.length === 0) return;
     const fetchUrls = async () => {
