@@ -2,8 +2,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BRAND } from "@/config/brand";
 import { userNavItems } from "@/config/navigation";
 import { cn } from "@/lib/utils";
-import { LogOut, Bell, Menu, X } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
