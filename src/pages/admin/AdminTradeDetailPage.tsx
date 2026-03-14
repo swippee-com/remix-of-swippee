@@ -201,7 +201,7 @@ export default function AdminTradeDetailPage() {
             {proofs.map((p) => (
               <div key={p.id} className="flex flex-col sm:flex-row sm:items-center justify-between rounded bg-muted/50 p-3 gap-2">
                 <div className="text-sm">
-                  <a href={getProofUrl(p.file_path)} target="_blank" rel="noopener noreferrer" className="font-medium underline">{p.file_name}</a>
+                  <a href={proofUrls[p.id] || "#"} target="_blank" rel="noopener noreferrer" className="font-medium underline">{p.file_name}</a>
                   <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{format(new Date(p.created_at), "PPp")}</p>
                   {p.notes && <p className="text-xs text-muted-foreground mt-1">{p.notes}</p>}
                 </div>
