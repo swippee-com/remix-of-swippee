@@ -16,7 +16,7 @@ import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { PriceTicker } from "@/components/shared/PriceTicker";
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { t } = useLanguage();
   const { formatDate } = useFormattedDate();
 
@@ -157,6 +157,7 @@ export default function DashboardPage() {
         <div className="mt-6">
           <OnboardingWizard
             emailVerified={emailVerified}
+            phoneVerified={profile?.phone_verified ?? false}
             kycStatus={kycStatus || "not_submitted"}
             paymentMethodCount={pmCount ?? 0}
             quoteCount={quoteCount ?? 0}

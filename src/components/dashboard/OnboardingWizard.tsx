@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Mail, Shield, CreditCard, FileText, CheckCircle, ChevronRight, PartyPopper, X } from "lucide-react";
+import { Mail, Phone, Shield, CreditCard, FileText, CheckCircle, ChevronRight, PartyPopper, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ interface OnboardingStep {
 
 interface OnboardingWizardProps {
   emailVerified: boolean;
+  phoneVerified: boolean;
   kycStatus: string;
   paymentMethodCount: number;
   quoteCount: number;
@@ -29,6 +30,7 @@ interface OnboardingWizardProps {
 
 export function OnboardingWizard({
   emailVerified,
+  phoneVerified,
   kycStatus,
   paymentMethodCount,
   quoteCount,
@@ -58,6 +60,14 @@ export function OnboardingWizard({
       icon: Mail,
       completed: emailVerified,
       cta: { label: "Resend email", action: handleResendEmail },
+    },
+    {
+      key: "phone",
+      label: "Verify your phone number",
+      description: "Enter your phone number and verify it with an OTP code.",
+      icon: Phone,
+      completed: phoneVerified,
+      cta: { label: "Verify phone", href: "/dashboard/settings" },
     },
     {
       key: "kyc",

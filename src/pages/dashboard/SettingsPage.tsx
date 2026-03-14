@@ -13,6 +13,7 @@ import { TwoFactorSetup } from "@/components/security/TwoFactorSetup";
 import { ActiveSessions } from "@/components/security/ActiveSessions";
 import { LoginHistory } from "@/components/security/LoginHistory";
 import { RateLimitIndicator } from "@/components/security/RateLimitIndicator";
+import { PhoneVerification } from "@/components/shared/PhoneVerification";
 import { useTheme, Theme } from "@/hooks/use-theme";
 import { Sun, Moon, Monitor, Globe } from "lucide-react";
 import type { Locale } from "@/i18n";
@@ -136,7 +137,14 @@ export default function SettingsPage() {
               </div>
               <div>
                 <label className="text-sm font-medium">{t("settings.phone")}</label>
-                <Input className="mt-1" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <div className="mt-1">
+                  <PhoneVerification
+                    phone={phone}
+                    onPhoneChange={setPhone}
+                    verified={profile?.phone_verified ?? false}
+                    onVerified={() => refreshProfile()}
+                  />
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium">{t("settings.country")}</label>
