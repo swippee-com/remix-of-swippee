@@ -112,7 +112,7 @@ export default function AdminAdsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("ads").delete().eq("id", id);
+      const { error } = await supabase.from("promotions").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
