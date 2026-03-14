@@ -44,9 +44,20 @@ export default function LandingPage() {
               {BRAND.description}
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Button variant="hero" asChild>
-                <Link to="/auth/signup">Get Started <ArrowRight className="ml-1 h-4 w-4" /></Link>
-              </Button>
+              {user ? (
+                <Button variant="hero" asChild>
+                  <Link to="/dashboard">Dashboard <LayoutDashboard className="ml-1 h-4 w-4" /></Link>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="hero" asChild>
+                    <Link to="/auth/signup">Get Started <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                  </Button>
+                  <Button variant="hero-outline" asChild>
+                    <Link to="/auth/login">Sign In</Link>
+                  </Button>
+                </>
+              )}
               <Button variant="hero-outline" asChild>
                 <Link to="/how-it-works">How It Works</Link>
               </Button>
