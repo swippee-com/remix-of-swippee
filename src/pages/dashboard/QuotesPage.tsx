@@ -16,6 +16,7 @@ import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 export default function QuotesPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const keys = useMemo(() => [["user-quote-requests"]], []);
   useRealtimeInvalidation("quote_requests", keys);
   useRealtimeInvalidation("quotes", keys);

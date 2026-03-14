@@ -18,6 +18,7 @@ import { PriceTicker } from "@/components/shared/PriceTicker";
 export default function DashboardPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
 
   const tradeKeys = useMemo(() => [["dashboard-trades", user?.id || ""], ["dashboard-activity", user?.id || ""]], [user?.id]);
   const quoteKeys = useMemo(() => [["dashboard-activity", user?.id || ""]], [user?.id]);

@@ -50,6 +50,7 @@ async function exportPDF(trades: any[]) {
 export default function TradesPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const keys = useMemo(() => [["user-trades"]], []);
   useRealtimeInvalidation("otc_trades", keys);
 

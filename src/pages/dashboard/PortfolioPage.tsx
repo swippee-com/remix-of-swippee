@@ -79,6 +79,7 @@ function computeHoldings(trades: OtcTrade[]): Holding[] {
 export default function PortfolioPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const [currency, setCurrency] = useState<Currency>("npr");
   const { prices, isLoading: pricesLoading } = useMarketPrices();
   const nprData = useNprRate();

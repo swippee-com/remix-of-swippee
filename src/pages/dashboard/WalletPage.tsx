@@ -18,6 +18,7 @@ import { WithdrawModal } from "@/components/dashboard/WithdrawModal";
 export default function WalletPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
 

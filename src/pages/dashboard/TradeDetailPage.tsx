@@ -20,6 +20,7 @@ export default function TradeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { formatDate } = useFormattedDate();
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [refNumber, setRefNumber] = useState("");
