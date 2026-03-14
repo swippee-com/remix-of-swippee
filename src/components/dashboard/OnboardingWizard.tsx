@@ -30,6 +30,7 @@ interface OnboardingWizardProps {
 
 export function OnboardingWizard({
   emailVerified,
+  phoneVerified,
   kycStatus,
   paymentMethodCount,
   quoteCount,
