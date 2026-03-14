@@ -95,7 +95,7 @@ export default function SupportDashboardPage() {
                 <div key={m.id} className={`px-6 py-4 ${m.sender_id === user!.id ? "" : "bg-muted/30"}`}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium">{m.sender_id === user!.id ? t("support.you") : t("support.supportTeam")}</span>
-                    <span className="text-xs text-muted-foreground">{format(new Date(m.created_at), "PPp")}</span>
+                    <span className="text-xs text-muted-foreground">{formatDate(m.created_at, "PPp")}</span>
                   </div>
                   <p className="text-sm whitespace-pre-wrap">{m.message}</p>
                 </div>
