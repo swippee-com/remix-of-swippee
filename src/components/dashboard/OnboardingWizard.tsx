@@ -20,6 +20,7 @@ interface OnboardingStep {
 
 interface OnboardingWizardProps {
   emailVerified: boolean;
+  phoneVerified: boolean;
   kycStatus: string;
   paymentMethodCount: number;
   quoteCount: number;
