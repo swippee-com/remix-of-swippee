@@ -4,8 +4,9 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, Wallet, ShieldCheck, ShieldOff } from "lucide-react";
+import { Search, Wallet, ShieldCheck, ShieldOff, Eye } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
@@ -160,8 +161,10 @@ export default function AdminUsersPage() {
             </tr></thead>
             <tbody className="divide-y">
               {filtered.map((u: any) => (
-                <tr key={u.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 font-medium">{u.full_name || "—"}</td>
+                <tr key={u.id} className="hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => window.location.href = `/admin/users/${u.id}`}>
+                  <td className="px-6 py-4 font-medium">
+                    <Link to={`/admin/users/${u.id}`} className="hover:underline">{u.full_name || "—"}</Link>
+                  </td>
                   <td className="px-6 py-4 text-muted-foreground">{u.email || "—"}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-1 flex-wrap">
@@ -174,7 +177,10 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4">{u.trades}</td>
                   <td className="px-6 py-4 text-muted-foreground">{format(new Date(u.created_at), "PP")}</td>
                   <td className="px-6 py-4">
-                    <div className="flex gap-1">
+                    <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to={`/admin/users/${u.id}`}><Eye className="h-3.5 w-3.5" /></Link>
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => setRoleModal({ userId: u.id, name: u.full_name || u.email || "User", currentRoles: u.roles })}>
                         Roles
                       </Button>
