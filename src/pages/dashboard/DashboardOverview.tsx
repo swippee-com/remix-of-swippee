@@ -4,7 +4,7 @@ import { StatCard } from "@/components/shared/StatCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Shield, ArrowLeftRight, FileText, CreditCard, Plus } from "lucide-react";
+import { Shield, ArrowLeftRight, FileText, CreditCard, Plus, WalletCards } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
