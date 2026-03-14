@@ -21,7 +21,7 @@ function formatMarketCap(n: number, currency: Currency): string {
 
 export default function LivePrices() {
   const { prices, isLoading, lastUpdated } = useMarketPrices();
-  const nprRate = useNprRate();
+  const nprData = useNprRate();
   const [currency, setCurrency] = useState<Currency>("usd");
   const [search, setSearch] = useState("");
   const sym = currencySymbol(currency);
@@ -86,6 +86,20 @@ export default function LivePrices() {
           </div>
         </div>
 
+        {currency === "npr" && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg border border-accent bg-accent/10 px-4 py-2.5 text-sm">
+            <span className="font-medium text-foreground">NRB Exchange Rate:</span>
+            <span className="text-muted-foreground">
+              1 USD = रू{nprData.rate.toFixed(2)} (Buy) / रू{nprData.sell.toFixed(2)} (Sell)
+            </span>
+            {nprData.date && (
+              <span className="ml-auto text-xs text-muted-foreground">
+                {format(new Date(nprData.date), "PPP")}
+              </span>
+            )}
+          </div>
+        )}
+
         {lastUpdated && (
           <p className="mt-3 text-xs text-muted-foreground">
             Last updated: {format(lastUpdated, "PPpp")}
@@ -112,8 +126,8 @@ export default function LivePrices() {
                 </div>
               ) : filtered.map((p) => {
                 const positive = p.change24h >= 0;
-                const displayPrice = convertPrice(p.price, currency, nprRate);
-                const displayCap = convertPrice(p.marketCap, currency, nprRate);
+                const displayPrice = convertPrice(p.price, currency, nprData.rate);
+                const displayCap = convertPrice(p.marketCap, currency, nprData.rate);
                 return (
                   <Card key={p.symbol}>
                     <CardHeader className="flex flex-row items-center gap-3 pb-2">
