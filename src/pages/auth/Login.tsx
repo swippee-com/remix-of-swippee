@@ -27,12 +27,29 @@ export default function LoginPage() {
     return <Navigate to={from} replace />;
   }
 
-  const completeLogin = () => {
+  const completeLogin = async () => {
     supabase.functions.invoke("track-login", {
       body: { login_method: "password", session_id: session?.access_token?.slice(-12) || "" },
     });
+
+    // Check if account is frozen
+    const { data: frozenCheck } = await supabase
+      .from("profiles")
+      .select("is_frozen")
+      .eq("id", session?.user?.id || "")
+      .single();
+
+    if (frozenCheck?.is_frozen) {
+      toast({
+        title: "Account Frozen",
+        description: "This account is currently frozen. You cannot perform any transactions.",
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Welcome back!" });
+    }
+
     setPendingLogin(false);
-    toast({ title: "Welcome back!" });
     navigate(from, { replace: true });
   };
 
