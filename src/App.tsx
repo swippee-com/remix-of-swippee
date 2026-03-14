@@ -36,6 +36,7 @@ import SettingsPage from "./pages/dashboard/SettingsPage";
 
 // Admin
 import AdminOverview from "./pages/admin/AdminOverview";
+import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminKycPage from "./pages/admin/AdminKycPage";
 import AdminQuotesPage from "./pages/admin/AdminQuotesPage";
@@ -85,6 +86,7 @@ const App = () => (
 
             {/* Admin — Protected + Admin Role */}
             <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />
+            <Route path="/admin/analytics" element={<AdminRoute><AdminAnalyticsPage /></AdminRoute>} />
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/kyc" element={<AdminRoute><AdminKycPage /></AdminRoute>} />
             <Route path="/admin/quotes" element={<AdminRoute><AdminQuotesPage /></AdminRoute>} />

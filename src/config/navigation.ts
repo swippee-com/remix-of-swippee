@@ -17,6 +17,7 @@ export const userNavItems = [
 
 export const adminNavItems = [
   { label: "Overview", href: "/admin", icon: BarChart3 },
+  { label: "Analytics", href: "/admin/analytics", icon: Activity },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "KYC Queue", href: "/admin/kyc", icon: ClipboardCheck },
   { label: "Quote Requests", href: "/admin/quotes", icon: FileText },
