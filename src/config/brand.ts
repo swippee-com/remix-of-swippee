@@ -11,9 +11,12 @@ export const BRAND = {
     { value: "bank_transfer", label: "Bank Transfer" },
     { value: "esewa", label: "eSewa" },
     { value: "khalti", label: "Khalti" },
-    { value: "ime_pay", label: "IME Pay" },
     { value: "other", label: "Other" },
   ] as const,
+  paymentLogos: {
+    esewa: "https://cdn.brandfetch.io/domain/esewa.com.np?c=1id01bgBTiGcf_p1fhi",
+    khalti: "https://cdn.brandfetch.io/domain/khalti.np?c=1id01bgBTiGcf_p1fhi",
+  } as Record<string, string>,
 } as const;
 
 export type SupportedAsset = typeof BRAND.supportedAssets[number];

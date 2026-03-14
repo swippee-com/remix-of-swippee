@@ -99,7 +99,14 @@ export default function PaymentMethodsPage() {
           {methods.map((m) => (
             <div key={m.id} className="rounded-lg border bg-card p-5 shadow-card">
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-muted-foreground" /><span className="font-medium text-sm">{m.label}</span></div>
+                <div className="flex items-center gap-2">
+                  {BRAND.paymentLogos[m.payment_type] ? (
+                    <img src={BRAND.paymentLogos[m.payment_type]} alt={m.payment_type} className="h-5 w-5 rounded object-contain" />
+                  ) : (
+                    <CreditCard className="h-5 w-5 text-muted-foreground" />
+                  )}
+                  <span className="font-medium text-sm">{m.label}</span>
+                </div>
                 {m.is_default && <Star className="h-4 w-4 text-warning fill-warning" />}
               </div>
               <div className="mt-3 space-y-1 text-sm text-muted-foreground">
