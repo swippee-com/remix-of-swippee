@@ -117,10 +117,22 @@ export default function AdminTradeDetailPage() {
     active: i === history.length - 1,
   }));
 
-  const getProofUrl = async (path: string) => {
-    const { data } = await supabase.storage.from("payment-proofs").createSignedUrl(path, 3600);
-    return data?.signedUrl || "#";
-  };
+  const [proofUrls, setProofUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (proofs.length === 0) return;
+    const fetchUrls = async () => {
+      const urls: Record<string, string> = {};
+      await Promise.all(
+        proofs.map(async (p) => {
+          const { data } = await supabase.storage.from("payment-proofs").createSignedUrl(p.file_path, 3600);
+          if (data?.signedUrl) urls[p.id] = data.signedUrl;
+        })
+      );
+      setProofUrls(urls);
+    };
+    fetchUrls();
+  }, [proofs]);
 
   return (
     <AdminLayout>
