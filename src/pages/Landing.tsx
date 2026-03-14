@@ -78,6 +78,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SponsorStrip />
+
       {/* Steps */}
       <section className="border-t">
         <div className="container py-20">

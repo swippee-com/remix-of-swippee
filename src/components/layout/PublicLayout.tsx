@@ -53,6 +53,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         )}
       </header>
       <main className="flex-1">{children}</main>
+      <AdBanner placement="public_footer" className="container py-4" />
       <footer className="border-t bg-muted/30">
         <div className="container py-8 text-center text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>

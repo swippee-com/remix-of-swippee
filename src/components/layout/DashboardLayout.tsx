@@ -135,6 +135,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
           )}
           <AnnouncementBanner />
+          <AdBanner placement="dashboard_banner" className="mb-4" />
           {children}
         </main>
       </div>
