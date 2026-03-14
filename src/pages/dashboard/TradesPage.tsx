@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeftRight, Eye, Download, FileText, FileSpreadsheet } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";

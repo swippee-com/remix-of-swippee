@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { PieChart, TrendingUp, TrendingDown, Wallet, BarChart3, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { useFormattedDate } from "@/hooks/use-formatted-date";
 
 interface OtcTrade {
   id: string;
