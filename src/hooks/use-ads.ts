@@ -21,7 +21,7 @@ export function useAds(placement: AdPlacement) {
     queryFn: async () => {
       const now = new Date().toISOString();
       const { data } = await supabase
-        .from("ads")
+        .from("promotions")
         .select("id, title, description, image_url, link_url, link_text, placement, priority")
         .eq("placement", placement)
         .eq("is_active", true)
@@ -43,11 +43,11 @@ export function useAdTracking() {
   const trackImpression = useCallback(async (adId: string) => {
     if (tracked.current.has(adId)) return;
     tracked.current.add(adId);
-    await supabase.from("ad_events").insert({ ad_id: adId, event_type: "impression" } as any);
+    await supabase.from("promotion_events").insert({ ad_id: adId, event_type: "impression" } as any);
   }, []);
 
   const trackClick = useCallback(async (adId: string) => {
-    await supabase.from("ad_events").insert({ ad_id: adId, event_type: "click" } as any);
+    await supabase.from("promotion_events").insert({ ad_id: adId, event_type: "click" } as any);
   }, []);
 
   return { trackImpression, trackClick };

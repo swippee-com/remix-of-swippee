@@ -62,7 +62,7 @@ export default function AdminAdsPage() {
     queryKey: ["admin-ads"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("ads")
+        .from("promotions")
         .select("*")
         .order("created_at", { ascending: false });
       return data || [];
@@ -84,11 +84,11 @@ export default function AdminAdsPage() {
       };
 
       if (editId) {
-        const { error } = await supabase.from("ads").update(payload).eq("id", editId);
+        const { error } = await supabase.from("promotions").update(payload).eq("id", editId);
         if (error) throw error;
       } else {
         payload.created_by = user!.id;
-        const { error } = await supabase.from("ads").insert(payload);
+        const { error } = await supabase.from("promotions").insert(payload);
         if (error) throw error;
       }
     },
@@ -104,7 +104,7 @@ export default function AdminAdsPage() {
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { error } = await supabase.from("ads").update({ is_active } as any).eq("id", id);
+      const { error } = await supabase.from("promotions").update({ is_active } as any).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-ads"] }),
@@ -112,7 +112,7 @@ export default function AdminAdsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("ads").delete().eq("id", id);
+      const { error } = await supabase.from("promotions").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
