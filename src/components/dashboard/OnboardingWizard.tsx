@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Mail, Shield, CreditCard, FileText, CheckCircle, ChevronRight, PartyPopper, X } from "lucide-react";
+import { Mail, Phone, Shield, CreditCard, FileText, CheckCircle, ChevronRight, PartyPopper, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
