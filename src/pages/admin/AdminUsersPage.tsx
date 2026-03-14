@@ -4,7 +4,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Wallet, ShieldCheck, ShieldOff } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,7 @@ export default function AdminUsersPage() {
   const [kycFilter, setKycFilter] = useState("all");
   const [roleModal, setRoleModal] = useState<{ userId: string; name: string; currentRoles: AppRole[] } | null>(null);
   const [selectedRole, setSelectedRole] = useState<AppRole>("user");
+  const [payoutModal, setPayoutModal] = useState<{ userId: string; name: string } | null>(null);
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["admin-users"],
@@ -173,9 +174,14 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4">{u.trades}</td>
                   <td className="px-6 py-4 text-muted-foreground">{format(new Date(u.created_at), "PP")}</td>
                   <td className="px-6 py-4">
-                    <Button variant="ghost" size="sm" onClick={() => setRoleModal({ userId: u.id, name: u.full_name || u.email || "User", currentRoles: u.roles })}>
-                      Manage Roles
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => setRoleModal({ userId: u.id, name: u.full_name || u.email || "User", currentRoles: u.roles })}>
+                        Roles
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => setPayoutModal({ userId: u.id, name: u.full_name || u.email || "User" })}>
+                        <Wallet className="mr-1 h-3.5 w-3.5" /> Payouts
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -232,6 +238,66 @@ export default function AdminUsersPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <PayoutAddressesModal userId={payoutModal?.userId} name={payoutModal?.name} open={!!payoutModal} onClose={() => setPayoutModal(null)} />
     </AdminLayout>
+  );
+}
+
+function PayoutAddressesModal({ userId, name, open, onClose }: { userId?: string; name?: string; open: boolean; onClose: () => void }) {
+  const { data: addresses = [], isLoading } = useQuery({
+    queryKey: ["admin-payout-addresses", userId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("payout_addresses")
+        .select("*")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false });
+      return data || [];
+    },
+    enabled: !!userId && open,
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader><DialogTitle>Payout Addresses — {name}</DialogTitle></DialogHeader>
+        {isLoading ? (
+          <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
+        ) : addresses.length === 0 ? (
+          <p className="py-6 text-center text-sm text-muted-foreground">No payout addresses found.</p>
+        ) : (
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {addresses.map((a: any) => (
+              <div key={a.id} className="rounded-md border bg-muted/30 p-3 text-sm space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{a.label}</span>
+                  <div className="flex items-center gap-1.5">
+                    {a.is_verified ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
+                        <ShieldCheck className="h-3 w-3" /> Verified
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+                        <ShieldOff className="h-3 w-3" /> Unverified
+                      </span>
+                    )}
+                    {a.is_whitelisted && (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Whitelisted</span>
+                    )}
+                  </div>
+                </div>
+                <p className="font-mono text-xs text-muted-foreground break-all">{a.address}</p>
+                <div className="flex gap-3 text-xs text-muted-foreground">
+                  <span>{a.asset}</span>
+                  <span>{a.network}</span>
+                  {a.destination_tag && <span>Tag: {a.destination_tag}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
