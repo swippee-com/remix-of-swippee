@@ -14,38 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      ad_events: {
-        Row: {
-          ad_id: string
-          created_at: string
-          event_type: Database["public"]["Enums"]["ad_event_type"]
-          id: string
-          user_id: string | null
-        }
-        Insert: {
-          ad_id: string
-          created_at?: string
-          event_type: Database["public"]["Enums"]["ad_event_type"]
-          id?: string
-          user_id?: string | null
-        }
-        Update: {
-          ad_id?: string
-          created_at?: string
-          event_type?: Database["public"]["Enums"]["ad_event_type"]
-          id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ad_events_ad_id_fkey"
-            columns: ["ad_id"]
-            isOneToOne: false
-            referencedRelation: "ads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       admin_notes: {
         Row: {
           created_at: string
@@ -70,60 +38,6 @@ export type Database = {
           note?: string
           target_id?: string
           target_type?: string
-        }
-        Relationships: []
-      }
-      ads: {
-        Row: {
-          click_count: number
-          created_at: string
-          created_by: string
-          description: string | null
-          ends_at: string | null
-          id: string
-          image_url: string | null
-          impression_count: number
-          is_active: boolean
-          link_text: string
-          link_url: string
-          placement: Database["public"]["Enums"]["ad_placement"]
-          priority: number
-          starts_at: string
-          title: string
-        }
-        Insert: {
-          click_count?: number
-          created_at?: string
-          created_by: string
-          description?: string | null
-          ends_at?: string | null
-          id?: string
-          image_url?: string | null
-          impression_count?: number
-          is_active?: boolean
-          link_text?: string
-          link_url: string
-          placement: Database["public"]["Enums"]["ad_placement"]
-          priority?: number
-          starts_at?: string
-          title: string
-        }
-        Update: {
-          click_count?: number
-          created_at?: string
-          created_by?: string
-          description?: string | null
-          ends_at?: string | null
-          id?: string
-          image_url?: string | null
-          impression_count?: number
-          is_active?: boolean
-          link_text?: string
-          link_url?: string
-          placement?: Database["public"]["Enums"]["ad_placement"]
-          priority?: number
-          starts_at?: string
-          title?: string
         }
         Relationships: []
       }
@@ -751,6 +665,92 @@ export type Database = {
         }
         Relationships: []
       }
+      promotion_events: {
+        Row: {
+          ad_id: string
+          created_at: string
+          event_type: Database["public"]["Enums"]["promotion_event_type"]
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          ad_id: string
+          created_at?: string
+          event_type: Database["public"]["Enums"]["promotion_event_type"]
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          ad_id?: string
+          created_at?: string
+          event_type?: Database["public"]["Enums"]["promotion_event_type"]
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_events_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "promotions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promotions: {
+        Row: {
+          click_count: number
+          created_at: string
+          created_by: string
+          description: string | null
+          ends_at: string | null
+          id: string
+          image_url: string | null
+          impression_count: number
+          is_active: boolean
+          link_text: string
+          link_url: string
+          placement: Database["public"]["Enums"]["promotion_placement"]
+          priority: number
+          starts_at: string
+          title: string
+        }
+        Insert: {
+          click_count?: number
+          created_at?: string
+          created_by: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          impression_count?: number
+          is_active?: boolean
+          link_text?: string
+          link_url: string
+          placement: Database["public"]["Enums"]["promotion_placement"]
+          priority?: number
+          starts_at?: string
+          title: string
+        }
+        Update: {
+          click_count?: number
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          impression_count?: number
+          is_active?: boolean
+          link_text?: string
+          link_url?: string
+          placement?: Database["public"]["Enums"]["promotion_placement"]
+          priority?: number
+          starts_at?: string
+          title?: string
+        }
+        Relationships: []
+      }
       quote_requests: {
         Row: {
           amount_crypto: number | null
@@ -1164,13 +1164,6 @@ export type Database = {
       is_account_frozen: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      ad_event_type: "impression" | "click"
-      ad_placement:
-        | "dashboard_banner"
-        | "sidebar"
-        | "landing_sponsor"
-        | "live_prices"
-        | "public_footer"
       announcement_type: "info" | "warning" | "maintenance"
       app_role: "user" | "admin" | "compliance"
       crypto_asset: "USDT" | "BTC" | "ETH" | "USDC"
@@ -1204,6 +1197,13 @@ export type Database = {
         | "khalti"
         | "ime_pay"
         | "other"
+      promotion_event_type: "impression" | "click"
+      promotion_placement:
+        | "dashboard_banner"
+        | "sidebar"
+        | "landing_sponsor"
+        | "live_prices"
+        | "public_footer"
       quote_request_status:
         | "draft"
         | "submitted"
@@ -1368,14 +1368,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      ad_event_type: ["impression", "click"],
-      ad_placement: [
-        "dashboard_banner",
-        "sidebar",
-        "landing_sponsor",
-        "live_prices",
-        "public_footer",
-      ],
       announcement_type: ["info", "warning", "maintenance"],
       app_role: ["user", "admin", "compliance"],
       crypto_asset: ["USDT", "BTC", "ETH", "USDC"],
@@ -1412,6 +1404,14 @@ export const Constants = {
         "khalti",
         "ime_pay",
         "other",
+      ],
+      promotion_event_type: ["impression", "click"],
+      promotion_placement: [
+        "dashboard_banner",
+        "sidebar",
+        "landing_sponsor",
+        "live_prices",
+        "public_footer",
       ],
       quote_request_status: [
         "draft",
