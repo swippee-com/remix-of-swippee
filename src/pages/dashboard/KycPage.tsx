@@ -4,16 +4,34 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, CheckCircle, AlertCircle, Clock } from "lucide-react";
-import { useState, useRef } from "react";
+import { Upload, CheckCircle, AlertCircle, Clock, Pencil } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 
+const emptyForm = {
+  full_legal_name: "",
+  date_of_birth: "",
+  country: "Nepal",
+  nationality: "Nepali",
+  phone: "",
+  occupation: "",
+  address_line_1: "",
+  address_line_2: "",
+  city: "",
+  postal_code: "",
+  source_of_funds: "",
+  expected_monthly_volume: "",
+  id_type: "",
+  id_number: "",
+};
+
 export default function KycPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [editing, setEditing] = useState(false);
 
   const { data: submission, isLoading } = useQuery({
     queryKey: ["kyc-submission", user?.id],
@@ -29,22 +47,29 @@ export default function KycPage() {
     enabled: !!user,
   });
 
-  const [form, setForm] = useState({
-    full_legal_name: "",
-    date_of_birth: "",
-    country: "Nepal",
-    nationality: "Nepali",
-    phone: "",
-    occupation: "",
-    address_line_1: "",
-    address_line_2: "",
-    city: "",
-    postal_code: "",
-    source_of_funds: "",
-    expected_monthly_volume: "",
-    id_type: "",
-    id_number: "",
-  });
+  const [form, setForm] = useState(emptyForm);
+
+  // Pre-fill form when editing an existing submission
+  useEffect(() => {
+    if (editing && submission) {
+      setForm({
+        full_legal_name: submission.full_legal_name || "",
+        date_of_birth: submission.date_of_birth || "",
+        country: submission.country || "Nepal",
+        nationality: submission.nationality || "Nepali",
+        phone: submission.phone || "",
+        occupation: submission.occupation || "",
+        address_line_1: submission.address_line_1 || "",
+        address_line_2: submission.address_line_2 || "",
+        city: submission.city || "",
+        postal_code: submission.postal_code || "",
+        source_of_funds: submission.source_of_funds || "",
+        expected_monthly_volume: submission.expected_monthly_volume || "",
+        id_type: submission.id_type || "",
+        id_number: submission.id_number || "",
+      });
+    }
+  }, [editing, submission]);
 
   const idFrontRef = useRef<HTMLInputElement>(null);
   const idBackRef = useRef<HTMLInputElement>(null);
@@ -71,6 +96,8 @@ export default function KycPage() {
     if (insertErr) throw insertErr;
   };
 
+  const isResubmit = editing && !!submission;
+
   const submitMutation = useMutation({
     mutationFn: async () => {
       const required = ["full_legal_name", "date_of_birth", "phone", "occupation", "address_line_1", "city", "source_of_funds", "id_type", "id_number"];
@@ -78,34 +105,62 @@ export default function KycPage() {
         if (!(form as any)[key]) throw new Error(`Please fill in all required fields.`);
       }
 
-      const idFront = idFrontRef.current?.files?.[0];
-      const idBack = idBackRef.current?.files?.[0];
-      const selfie = selfieRef.current?.files?.[0];
-      if (!idFront || !idBack || !selfie) throw new Error("Please upload all required documents.");
+      if (isResubmit) {
+        // Update existing submission and set status back to pending_review
+        const { error } = await supabase
+          .from("kyc_submissions")
+          .update({
+            ...form,
+            expected_monthly_volume: form.expected_monthly_volume || null,
+            address_line_2: form.address_line_2 || null,
+            postal_code: form.postal_code || null,
+            status: "pending_review" as any,
+          })
+          .eq("id", submission!.id);
+        if (error) throw error;
 
-      const { data, error } = await supabase
-        .from("kyc_submissions")
-        .insert({
-          user_id: user!.id,
-          ...form,
-          expected_monthly_volume: form.expected_monthly_volume || null,
-          address_line_2: form.address_line_2 || null,
-          postal_code: form.postal_code || null,
-        })
-        .select("id")
-        .single();
-      if (error) throw error;
+        // Upload any new documents if provided
+        const idFront = idFrontRef.current?.files?.[0];
+        const idBack = idBackRef.current?.files?.[0];
+        const selfie = selfieRef.current?.files?.[0];
+        const proofFile = proofRef.current?.files?.[0];
 
-      await uploadFile(idFront, data.id, "id_front");
-      await uploadFile(idBack, data.id, "id_back");
-      await uploadFile(selfie, data.id, "selfie");
+        if (idFront) await uploadFile(idFront, submission!.id, "id_front");
+        if (idBack) await uploadFile(idBack, submission!.id, "id_back");
+        if (selfie) await uploadFile(selfie, submission!.id, "selfie");
+        if (proofFile) await uploadFile(proofFile, submission!.id, "proof_of_address");
+      } else {
+        // New submission
+        const idFront = idFrontRef.current?.files?.[0];
+        const idBack = idBackRef.current?.files?.[0];
+        const selfie = selfieRef.current?.files?.[0];
+        if (!idFront || !idBack || !selfie) throw new Error("Please upload all required documents.");
 
-      const proofFile = proofRef.current?.files?.[0];
-      if (proofFile) await uploadFile(proofFile, data.id, "proof_of_address");
+        const { data, error } = await supabase
+          .from("kyc_submissions")
+          .insert({
+            user_id: user!.id,
+            ...form,
+            expected_monthly_volume: form.expected_monthly_volume || null,
+            address_line_2: form.address_line_2 || null,
+            postal_code: form.postal_code || null,
+          })
+          .select("id")
+          .single();
+        if (error) throw error;
+
+        await uploadFile(idFront, data.id, "id_front");
+        await uploadFile(idBack, data.id, "id_back");
+        await uploadFile(selfie, data.id, "selfie");
+
+        const proofFile = proofRef.current?.files?.[0];
+        if (proofFile) await uploadFile(proofFile, data.id, "proof_of_address");
+      }
     },
     onSuccess: () => {
+      setEditing(false);
       queryClient.invalidateQueries({ queryKey: ["kyc-submission"] });
-      toast({ title: "KYC submitted", description: "Your documents are under review." });
+      toast({ title: isResubmit ? "KYC resubmitted" : "KYC submitted", description: "Your documents are under review." });
     },
     onError: (err: any) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -122,7 +177,8 @@ export default function KycPage() {
     );
   }
 
-  if (submission) {
+  // Show status card when submission exists and NOT editing
+  if (submission && !editing) {
     const statusConfig: Record<string, { icon: React.ReactNode; title: string; desc: string }> = {
       approved: {
         icon: <CheckCircle className="h-12 w-12 text-success" />,
@@ -146,6 +202,7 @@ export default function KycPage() {
       },
     };
     const cfg = statusConfig[submission.status] || statusConfig.pending_review;
+    const canEdit = submission.status === "needs_more_info";
 
     return (
       <DashboardLayout>
@@ -155,14 +212,36 @@ export default function KycPage() {
           <h2 className="mt-4 text-xl font-semibold">{cfg.title}</h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-md">{cfg.desc}</p>
           <StatusBadge status={submission.status} className="mt-4" />
+          {canEdit && (
+            <Button
+              variant="hero"
+              className="mt-6"
+              onClick={() => setEditing(true)}
+            >
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit & Resubmit
+            </Button>
+          )}
         </div>
       </DashboardLayout>
     );
   }
 
+  // Form — for new submissions OR editing an existing needs_more_info submission
   return (
     <DashboardLayout>
-      <PageHeader title="KYC Verification" description="Complete identity verification to start trading." />
+      <PageHeader
+        title="KYC Verification"
+        description={isResubmit ? "Update your information and resubmit for review." : "Complete identity verification to start trading."}
+      />
+
+      {isResubmit && submission?.admin_notes && (
+        <div className="mt-4 rounded-lg border border-warning/30 bg-warning/5 p-4">
+          <p className="text-sm font-medium text-warning">Admin feedback:</p>
+          <p className="mt-1 text-sm text-muted-foreground">{submission.admin_notes}</p>
+        </div>
+      )}
+
       <form className="mt-6 space-y-8" onSubmit={(e) => { e.preventDefault(); submitMutation.mutate(); }}>
         <section className="rounded-lg border bg-card p-6 shadow-card">
           <h2 className="font-semibold">Personal Information</h2>
@@ -237,19 +316,19 @@ export default function KycPage() {
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="rounded-lg border-2 border-dashed bg-muted/30 p-6 text-center">
               <Upload className="mx-auto h-6 w-6 text-muted-foreground" />
-              <p className="mt-2 text-sm font-medium">ID Front *</p>
+              <p className="mt-2 text-sm font-medium">ID Front {isResubmit ? "(optional)" : "*"}</p>
               <p className="text-xs text-muted-foreground">JPG, PNG, PDF up to 5MB</p>
               <input ref={idFrontRef} type="file" className="mt-2 text-xs" accept="image/*,.pdf" />
             </div>
             <div className="rounded-lg border-2 border-dashed bg-muted/30 p-6 text-center">
               <Upload className="mx-auto h-6 w-6 text-muted-foreground" />
-              <p className="mt-2 text-sm font-medium">ID Back *</p>
+              <p className="mt-2 text-sm font-medium">ID Back {isResubmit ? "(optional)" : "*"}</p>
               <p className="text-xs text-muted-foreground">JPG, PNG, PDF up to 5MB</p>
               <input ref={idBackRef} type="file" className="mt-2 text-xs" accept="image/*,.pdf" />
             </div>
             <div className="rounded-lg border-2 border-dashed bg-muted/30 p-6 text-center">
               <Upload className="mx-auto h-6 w-6 text-muted-foreground" />
-              <p className="mt-2 text-sm font-medium">Selfie with ID *</p>
+              <p className="mt-2 text-sm font-medium">Selfie with ID {isResubmit ? "(optional)" : "*"}</p>
               <p className="text-xs text-muted-foreground">Hold your ID next to your face</p>
               <input ref={selfieRef} type="file" className="mt-2 text-xs" accept="image/*" />
             </div>
@@ -262,9 +341,14 @@ export default function KycPage() {
           </div>
         </section>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          {isResubmit && (
+            <Button type="button" variant="outline" onClick={() => setEditing(false)}>
+              Cancel
+            </Button>
+          )}
           <Button type="submit" variant="hero" disabled={submitMutation.isPending}>
-            {submitMutation.isPending ? "Submitting…" : "Submit KYC"}
+            {submitMutation.isPending ? "Submitting…" : isResubmit ? "Resubmit KYC" : "Submit KYC"}
           </Button>
         </div>
       </form>
