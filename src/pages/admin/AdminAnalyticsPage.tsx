@@ -33,6 +33,28 @@ const PRESETS = [
   { label: "1y", days: 365 },
 ] as const;
 
+function exportCsv(filename: string, headers: string[], rows: Record<string, any>[], keys: string[]) {
+  const csvContent = [
+    headers.join(","),
+    ...rows.map((r) => keys.map((k) => `"${r[k] ?? ""}"`).join(",")),
+  ].join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function ExportButton({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) {
+  return (
+    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClick} disabled={disabled} title="Export CSV">
+      <Download className="h-3.5 w-3.5" />
+    </Button>
+  );
+}
+
 export default function AdminAnalyticsPage() {
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subDays(new Date(), 30),
