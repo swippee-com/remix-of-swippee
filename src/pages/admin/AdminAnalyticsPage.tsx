@@ -252,8 +252,9 @@ export default function AdminAnalyticsPage() {
 
         {/* Revenue */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium">Revenue & Trades</CardTitle>
+            <ExportButton disabled={!revenueData?.length} onClick={() => exportCsv("revenue-trades", ["Month", "Revenue (NPR)", "Trades"], revenueData || [], ["month", "revenue", "trades"])} />
           </CardHeader>
           <CardContent>
             {revLoading ? (
