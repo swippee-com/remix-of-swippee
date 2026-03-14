@@ -21,20 +21,21 @@ Swippee OTC Crypto Desk - design system, brand config, architecture decisions
 - Types: src/types/index.ts
 - Shared components: src/components/shared/ (StatusBadge, StatCard, PageHeader, EmptyState, Timeline)
 - Layouts: PublicLayout, DashboardLayout, AdminLayout
-- Supabase client: src/integrations/supabase/client.ts
-- Supabase types: src/integrations/supabase/types.ts
+- Timeline component uses `steps` prop with `completed`, `active`, `timestamp` fields
 
-## Backend (Lovable Cloud / Supabase)
-- Enabled and connected
-- 16 tables: profiles, user_roles, kyc_submissions, kyc_documents, payment_methods, payout_addresses, quote_requests, quotes, otc_trades, trade_status_history, payment_proofs, ledger_entries, audit_logs, notifications, support_tickets, support_messages, admin_notes, app_settings
-- Roles: user, admin, compliance (stored in user_roles table, NOT profiles)
-- has_role() security definer function for RLS
-- Auto-create profile + user role on signup via triggers
-- 4 storage buckets: kyc-documents, payment-proofs, support-attachments, avatars
-- All tables have RLS enabled with proper policies
-- Linter: zero issues
+## Implemented (live Supabase data)
+- Auth (login, signup, forgot/reset password, role-based routing)
+- Quote requests list + detail + accept/decline (user + admin)
+- Admin quote creation modal with pricing calculator
+- New Quote Request form with payment method/payout address selection
+- KYC submission with file uploads to kyc-documents bucket
+- Admin KYC queue with approve/reject/request-info + audit logs
+- Payment Methods CRUD (add/edit/delete/set-default)
+- Payout Addresses CRUD (add/edit/delete)
+- Dashboard Overview with real stats + recent activity
+- Trades list (user + admin) from otc_trades
+- Trade detail pages (user: payment proof upload; admin: status management + proof review)
 
-## Next Steps
-- Wire up real auth flow (login, signup, password reset)
-- Connect pages to real data via Supabase queries
-- Build quote/trade detail pages
+## Remaining for MVP
+- Phase 2: Admin Users, Admin Overview stats, Ledger, Audit Logs
+- Phase 3: Support tickets, Settings profile/password, Notifications
