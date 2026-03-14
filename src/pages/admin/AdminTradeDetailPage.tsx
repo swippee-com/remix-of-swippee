@@ -117,9 +117,9 @@ export default function AdminTradeDetailPage() {
     active: i === history.length - 1,
   }));
 
-  const getProofUrl = (path: string) => {
-    const { data } = supabase.storage.from("payment-proofs").getPublicUrl(path);
-    return data.publicUrl;
+  const getProofUrl = async (path: string) => {
+    const { data } = await supabase.storage.from("payment-proofs").createSignedUrl(path, 3600);
+    return data?.signedUrl || "#";
   };
 
   return (
