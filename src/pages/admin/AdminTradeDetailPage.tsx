@@ -199,22 +199,25 @@ export default function AdminTradeDetailPage() {
         {proofs.length === 0 ? (
           <p className="text-sm text-muted-foreground">No proofs uploaded yet.</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {proofs.map((p) => (
-              <div key={p.id} className="flex flex-col sm:flex-row sm:items-center justify-between rounded bg-muted/50 p-3 gap-2">
-                <div className="text-sm">
-                  <a href={proofUrls[p.id] || "#"} target="_blank" rel="noopener noreferrer" className="font-medium underline">{p.file_name}</a>
-                  <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{format(new Date(p.created_at), "PPp")}</p>
-                  {p.notes && <p className="text-xs text-muted-foreground mt-1">{p.notes}</p>}
-                </div>
-                <div className="flex items-center gap-2">
-                  <StatusBadge status={p.status} />
-                  {p.status === "pending" && (
-                    <>
-                      <Button size="sm" variant="success" onClick={() => reviewProofMutation.mutate({ proofId: p.id, status: "approved" })}>Approve</Button>
-                      <Button size="sm" variant="destructive" onClick={() => reviewProofMutation.mutate({ proofId: p.id, status: "rejected" })}>Reject</Button>
-                    </>
-                  )}
+              <div key={p.id} className="rounded border bg-muted/30 p-4 space-y-3">
+                <ProofImage filePath={p.file_path} fileName={p.file_name} />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <p className="font-medium">{p.file_name}</p>
+                    <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{format(new Date(p.created_at), "PPp")}</p>
+                    {p.notes && <p className="text-xs text-muted-foreground mt-1">{p.notes}</p>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={p.status} />
+                    {p.status === "pending" && (
+                      <>
+                        <Button size="sm" variant="success" onClick={() => reviewProofMutation.mutate({ proofId: p.id, status: "approved" })}>Approve</Button>
+                        <Button size="sm" variant="destructive" onClick={() => reviewProofMutation.mutate({ proofId: p.id, status: "rejected" })}>Reject</Button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
