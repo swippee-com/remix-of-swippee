@@ -1,6 +1,7 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { ProofImage } from "@/components/shared/ProofImage";
 import { Timeline } from "@/components/shared/Timeline";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -151,14 +152,17 @@ export default function TradeDetailPage() {
       <div className="mt-6 rounded-lg border bg-card p-6 shadow-card">
         <h3 className="font-semibold mb-3">Payment Proofs</h3>
         {proofs.length > 0 && (
-          <div className="space-y-2 mb-4">
+          <div className="space-y-4 mb-4">
             {proofs.map((p) => (
-              <div key={p.id} className="flex items-center justify-between rounded bg-muted/50 p-3 text-sm">
-                <div>
-                  <p className="font-medium">{p.file_name}</p>
-                  <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{format(new Date(p.created_at), "PPp")}</p>
+              <div key={p.id} className="rounded border bg-muted/30 p-4 space-y-3">
+                <ProofImage filePath={p.file_path} fileName={p.file_name} />
+                <div className="flex items-center justify-between">
+                  <div className="text-sm">
+                    <p className="font-medium">{p.file_name}</p>
+                    <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{format(new Date(p.created_at), "PPp")}</p>
+                  </div>
+                  <StatusBadge status={p.status} />
                 </div>
-                <StatusBadge status={p.status} />
               </div>
             ))}
           </div>
