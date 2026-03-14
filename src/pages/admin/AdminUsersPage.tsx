@@ -161,8 +161,10 @@ export default function AdminUsersPage() {
             </tr></thead>
             <tbody className="divide-y">
               {filtered.map((u: any) => (
-                <tr key={u.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 font-medium">{u.full_name || "—"}</td>
+                <tr key={u.id} className="hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => window.location.href = `/admin/users/${u.id}`}>
+                  <td className="px-6 py-4 font-medium">
+                    <Link to={`/admin/users/${u.id}`} className="hover:underline">{u.full_name || "—"}</Link>
+                  </td>
                   <td className="px-6 py-4 text-muted-foreground">{u.email || "—"}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-1 flex-wrap">
