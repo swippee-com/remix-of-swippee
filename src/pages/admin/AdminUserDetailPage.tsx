@@ -193,7 +193,7 @@ export default function AdminUserDetailPage() {
       {(profile as any)?.is_frozen && (
         <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive flex items-center gap-2">
           <Shield className="h-4 w-4" />
-          This account is currently frozen. The user cannot perform any transactions.
+          This account is currently frozen. The user cannot perform any transactions. Please contact support.
         </div>
       )}
 

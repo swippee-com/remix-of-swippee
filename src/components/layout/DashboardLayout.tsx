@@ -116,7 +116,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {profile?.is_frozen && (
             <div className="mb-4 flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
               <ShieldAlert className="h-5 w-5 shrink-0" />
-              <p className="font-medium">This account is currently frozen. You cannot perform any transactions.</p>
+              <p className="font-medium">This account is currently frozen. You cannot perform any transactions. Please contact support.</p>
             </div>
           )}
           <AnnouncementBanner />
