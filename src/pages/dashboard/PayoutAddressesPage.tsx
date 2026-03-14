@@ -66,6 +66,7 @@ export default function PayoutAddressesPage() {
         network: form.network as CryptoNetwork,
         address: form.address,
         destination_tag: form.destination_tag || null,
+        ...(editId ? { is_verified: false } : {}),
       };
       if (editId) {
         const { error } = await supabase.from("payout_addresses").update(payload).eq("id", editId);
