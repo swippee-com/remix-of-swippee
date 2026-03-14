@@ -44,14 +44,8 @@ interface CoinGeckoMarket {
   market_cap_rank: number;
 }
 
-async function fetchPrices(): Promise<MarketPrice[]> {
-  const res = await fetch(
-    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h"
-  );
-  if (!res.ok) throw new Error("Failed to fetch prices");
-  const data: CoinGeckoMarket[] = await res.json();
-
-  return data.map((coin) => ({
+function mapCoinData(coin: CoinGeckoMarket): MarketPrice {
+  return {
     id: coin.id,
     asset: coin.name,
     symbol: coin.symbol.toUpperCase(),
@@ -60,7 +54,34 @@ async function fetchPrices(): Promise<MarketPrice[]> {
     change24h: coin.price_change_percentage_24h ?? 0,
     marketCap: coin.market_cap ?? 0,
     rank: coin.market_cap_rank ?? 0,
-  }));
+  };
+}
+
+async function fetchPrices(): Promise<MarketPrice[]> {
+  const res = await fetch(
+    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h"
+  );
+  if (!res.ok) throw new Error("Failed to fetch prices");
+  const data: CoinGeckoMarket[] = await res.json();
+  return data.map(mapCoinData);
+}
+
+export async function searchCoins(query: string): Promise<MarketPrice[]> {
+  const searchRes = await fetch(
+    `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`
+  );
+  if (!searchRes.ok) return [];
+  const searchData = await searchRes.json();
+  const coins = searchData.coins?.slice(0, 10) ?? [];
+  if (coins.length === 0) return [];
+
+  const ids = coins.map((c: { id: string }) => c.id).join(",");
+  const marketRes = await fetch(
+    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&sparkline=false&price_change_percentage=24h`
+  );
+  if (!marketRes.ok) return [];
+  const marketData: CoinGeckoMarket[] = await marketRes.json();
+  return marketData.map(mapCoinData);
 }
 
 export function convertPrice(usdPrice: number, currency: Currency, nprRate: number): number {

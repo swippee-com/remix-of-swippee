@@ -1,15 +1,15 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { useMarketPrices, useNprRate, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
+import { useMarketPrices, useNprRate, convertPrice, currencySymbol, searchCoins, type Currency, type MarketPrice } from "@/hooks/use-market-prices";
 import { PriceTicker } from "@/components/shared/PriceTicker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import { TrendingUp, TrendingDown, ArrowRight, Search } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowRight, Search, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { AdBanner } from "@/components/ads/AdBanner";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
