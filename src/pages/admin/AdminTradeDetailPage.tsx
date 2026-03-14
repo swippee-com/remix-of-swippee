@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -29,6 +29,7 @@ export default function AdminTradeDetailPage() {
   const [newStatus, setNewStatus] = useState<TradeStatus | "">("");
   const [statusNote, setStatusNote] = useState("");
   const [settlementNotes, setSettlementNotes] = useState("");
+  const [proofUrls, setProofUrls] = useState<Record<string, string>>({});
 
   const { data: trade, isLoading } = useQuery({
     queryKey: ["admin-trade-detail", id],
@@ -101,6 +102,21 @@ export default function AdminTradeDetailPage() {
     },
   });
 
+  useEffect(() => {
+    if (proofs.length === 0) return;
+    const fetchUrls = async () => {
+      const urls: Record<string, string> = {};
+      await Promise.all(
+        proofs.map(async (p) => {
+          const { data } = await supabase.storage.from("payment-proofs").createSignedUrl(p.file_path, 3600);
+          if (data?.signedUrl) urls[p.id] = data.signedUrl;
+        })
+      );
+      setProofUrls(urls);
+    };
+    fetchUrls();
+  }, [proofs]);
+
   if (isLoading) {
     return <AdminLayout><div className="flex justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div></AdminLayout>;
   }
@@ -116,11 +132,6 @@ export default function AdminTradeDetailPage() {
     completed: true,
     active: i === history.length - 1,
   }));
-
-  const getProofUrl = (path: string) => {
-    const { data } = supabase.storage.from("payment-proofs").getPublicUrl(path);
-    return data.publicUrl;
-  };
 
   return (
     <AdminLayout>
@@ -190,7 +201,7 @@ export default function AdminTradeDetailPage() {
             {proofs.map((p) => (
               <div key={p.id} className="flex flex-col sm:flex-row sm:items-center justify-between rounded bg-muted/50 p-3 gap-2">
                 <div className="text-sm">
-                  <a href={getProofUrl(p.file_path)} target="_blank" rel="noopener noreferrer" className="font-medium underline">{p.file_name}</a>
+                  <a href={proofUrls[p.id] || "#"} target="_blank" rel="noopener noreferrer" className="font-medium underline">{p.file_name}</a>
                   <p className="text-xs text-muted-foreground">{p.reference_number && `Ref: ${p.reference_number} • `}{format(new Date(p.created_at), "PPp")}</p>
                   {p.notes && <p className="text-xs text-muted-foreground mt-1">{p.notes}</p>}
                 </div>
