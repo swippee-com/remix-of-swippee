@@ -73,9 +73,9 @@ export default function LoginPage() {
   };
 
   const handle2faCancel = async () => {
-    // Sign out since 2FA wasn't completed
     await supabase.auth.signOut();
     setShow2fa(false);
+    setPendingLogin(false);
   };
 
   return (
