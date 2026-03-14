@@ -17,6 +17,7 @@ import { Sun, Moon, Monitor } from "lucide-react";
 
 export default function SettingsPage() {
   const { profile, user, refreshProfile } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("");
