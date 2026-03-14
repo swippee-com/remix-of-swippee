@@ -12,6 +12,8 @@ import { TwoFactorSetup } from "@/components/security/TwoFactorSetup";
 import { ActiveSessions } from "@/components/security/ActiveSessions";
 import { LoginHistory } from "@/components/security/LoginHistory";
 import { RateLimitIndicator } from "@/components/security/RateLimitIndicator";
+import { useTheme, Theme } from "@/hooks/use-theme";
+import { Sun, Moon, Monitor } from "lucide-react";
 
 export default function SettingsPage() {
   const { profile, user, refreshProfile } = useAuth();
