@@ -59,7 +59,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
+          <LoginTrackerWrapper />
             {/* Public */}
             <Route path="/" element={<Landing />} />
             <Route path="/about" element={<About />} />
