@@ -104,9 +104,16 @@ export default function AdminKycPage() {
 
   const filtered = kycQueue.filter((k) => statusFilter === "all" || k.status === statusFilter);
 
-  const getDocUrl = (filePath: string) => {
-    const { data } = supabase.storage.from("kyc-documents").getPublicUrl(filePath);
-    return data.publicUrl;
+  const openDoc = async (filePath: string, fileName: string) => {
+    const { data, error } = await supabase.storage
+      .from("kyc-documents")
+      .createSignedUrl(filePath, 300); // 5 min expiry
+    if (error || !data?.signedUrl) {
+      toast({ title: "Error", description: "Could not load document.", variant: "destructive" });
+      return;
+    }
+    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName);
+    setViewingDoc({ url: data.signedUrl, name: fileName, type: isImage ? "image" : "other" });
   };
 
   return (
