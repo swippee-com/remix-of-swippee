@@ -84,7 +84,7 @@ export default function AdminAdsPage() {
       };
 
       if (editId) {
-        const { error } = await supabase.from("ads").update(payload).eq("id", editId);
+        const { error } = await supabase.from("promotions").update(payload).eq("id", editId);
         if (error) throw error;
       } else {
         payload.created_by = user!.id;
