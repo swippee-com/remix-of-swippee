@@ -21,6 +21,7 @@ const steps = [
 ];
 
 export default function LandingPage() {
+  const { user } = useAuth();
   return (
     <PublicLayout>
       {/* Hero */}
