@@ -277,8 +277,9 @@ export default function AdminAnalyticsPage() {
 
         {/* User Growth */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium">User Growth</CardTitle>
+            <ExportButton disabled={!growthData?.length} onClick={() => exportCsv("user-growth", ["Week", "Total Users"], growthData || [], ["week", "users"])} />
           </CardHeader>
           <CardContent>
             {growthLoading ? (
