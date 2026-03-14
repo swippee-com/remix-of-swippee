@@ -165,5 +165,6 @@ export default function LoginPage() {
         onCancel={handle2faCancel}
       />
     </div>
+    </PublicLayout>
   );
 }
