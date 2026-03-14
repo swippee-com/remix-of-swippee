@@ -32,8 +32,21 @@ export function TotpVerifyModal({ open, onVerified, onCancel }: TotpVerifyModalP
         body: { token },
       });
 
-      if (fnError) throw fnError;
-      if (data?.error) throw new Error(data.error);
+      if (fnError) {
+        // Edge function returned non-2xx status
+        const errorMessage = fnError.message || "";
+        if (errorMessage.includes("400") || errorMessage.includes("Invalid")) {
+          setError("Invalid code. Please try again.");
+        } else {
+          setError("Verification failed. Please try again.");
+        }
+        return;
+      }
+
+      if (data?.error) {
+        setError(data.error === "Invalid code" ? "Invalid code. Please try again." : data.error);
+        return;
+      }
 
       if (data?.valid) {
         onVerified();
@@ -41,7 +54,12 @@ export function TotpVerifyModal({ open, onVerified, onCancel }: TotpVerifyModalP
         setError("Invalid code. Please try again.");
       }
     } catch (err: any) {
-      setError(err.message || "Verification failed");
+      const errorMessage = err.message || "";
+      if (errorMessage.includes("400") || errorMessage.includes("Invalid")) {
+        setError("Invalid code. Please try again.");
+      } else {
+        setError("Verification failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
