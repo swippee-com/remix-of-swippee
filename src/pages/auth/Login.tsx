@@ -67,8 +67,25 @@ export default function LoginPage() {
     supabase.functions.invoke("track-login", {
       body: { login_method: "password", session_id: data.session?.access_token?.slice(-12) || "" },
     });
+
+    // Check if account is frozen
+    const { data: frozenCheck } = await supabase
+      .from("profiles")
+      .select("is_frozen")
+      .eq("id", data.user.id)
+      .single();
+
+    if (frozenCheck?.is_frozen) {
+      toast({
+        title: "Account Frozen",
+        description: "This account is currently frozen. You cannot perform any transactions.",
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Welcome back!" });
+    }
+
     setPendingLogin(false);
-    toast({ title: "Welcome back!" });
     navigate(from, { replace: true });
   };
 
