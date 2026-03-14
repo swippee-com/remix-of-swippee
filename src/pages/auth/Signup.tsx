@@ -7,10 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { PhoneVerification } from "@/components/shared/PhoneVerification";
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [phoneVerified, setPhoneVerified] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,6 +27,11 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!phoneVerified) {
+      toast({ title: "Please verify your phone number first", variant: "destructive" });
+      return;
+    }
 
     if (password !== confirmPassword) {
       toast({ title: "Passwords don't match", variant: "destructive" });
@@ -41,7 +49,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, phone },
         emailRedirectTo: window.location.origin,
       },
     });
@@ -89,6 +97,17 @@ export default function SignupPage() {
             />
           </div>
           <div>
+            <label className="text-sm font-medium">Phone Number</label>
+            <div className="mt-1">
+              <PhoneVerification
+                phone={phone}
+                onPhoneChange={setPhone}
+                verified={phoneVerified}
+                onVerified={() => setPhoneVerified(true)}
+              />
+            </div>
+          </div>
+          <div>
             <label className="text-sm font-medium">Password</label>
             <Input
               className="mt-1"
@@ -112,7 +131,7 @@ export default function SignupPage() {
               minLength={6}
             />
           </div>
-          <Button className="w-full" type="submit" disabled={loading}>
+          <Button className="w-full" type="submit" disabled={loading || !phoneVerified}>
             {loading ? "Creating account…" : "Create Account"}
           </Button>
         </form>

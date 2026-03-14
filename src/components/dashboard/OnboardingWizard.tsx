@@ -62,6 +62,14 @@ export function OnboardingWizard({
       cta: { label: "Resend email", action: handleResendEmail },
     },
     {
+      key: "phone",
+      label: "Verify your phone number",
+      description: "Enter your phone number and verify it with an OTP code.",
+      icon: Phone,
+      completed: phoneVerified,
+      cta: { label: "Verify phone", href: "/dashboard/settings" },
+    },
+    {
       key: "kyc",
       label: "Complete KYC verification",
       description: "Submit your identity documents so we can verify your account.",

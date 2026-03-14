@@ -137,7 +137,14 @@ export default function SettingsPage() {
               </div>
               <div>
                 <label className="text-sm font-medium">{t("settings.phone")}</label>
-                <Input className="mt-1" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <div className="mt-1">
+                  <PhoneVerification
+                    phone={phone}
+                    onPhoneChange={setPhone}
+                    verified={profile?.phone_verified ?? false}
+                    onVerified={() => refreshProfile()}
+                  />
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium">{t("settings.country")}</label>
