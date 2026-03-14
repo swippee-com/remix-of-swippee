@@ -69,7 +69,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/20 px-4">
+    <PublicLayout>
+    <div className="flex flex-1 items-center justify-center py-16 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center">
           <Link to="/" className="text-2xl font-bold tracking-tight">{BRAND.name}</Link>
