@@ -10,6 +10,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
+import { AdBanner } from "@/components/ads/AdBanner";
+import { SidebarAd } from "@/components/ads/SidebarAd";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
