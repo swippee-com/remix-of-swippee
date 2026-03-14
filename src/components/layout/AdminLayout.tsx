@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/shared/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -87,7 +88,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-        <main className="p-4 lg:p-8">{children}</main>
+        <main className="p-4 lg:p-8">
+          <AnnouncementBanner />
+          {children}
+        </main>
       </div>
     </div>
   );

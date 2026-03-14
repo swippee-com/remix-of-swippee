@@ -8,6 +8,7 @@ import { NotificationBell } from "@/components/shared/NotificationBell";
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/contexts/AuthContext";
+import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -99,7 +100,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-        <main className="p-4 lg:p-8">{children}</main>
+        <main className="p-4 lg:p-8">
+          <AnnouncementBanner />
+          {children}
+        </main>
       </div>
     </div>
   );

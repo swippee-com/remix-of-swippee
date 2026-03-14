@@ -41,6 +41,42 @@ export type Database = {
         }
         Relationships: []
       }
+      announcements: {
+        Row: {
+          created_at: string
+          created_by: string
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          message: string
+          starts_at: string
+          title: string
+          type: Database["public"]["Enums"]["announcement_type"]
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          message: string
+          starts_at?: string
+          title: string
+          type?: Database["public"]["Enums"]["announcement_type"]
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          message?: string
+          starts_at?: string
+          title?: string
+          type?: Database["public"]["Enums"]["announcement_type"]
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           id: string
@@ -1005,6 +1041,7 @@ export type Database = {
       }
     }
     Enums: {
+      announcement_type: "info" | "warning" | "maintenance"
       app_role: "user" | "admin" | "compliance"
       crypto_asset: "USDT" | "BTC" | "ETH" | "USDC"
       crypto_network: "TRC20" | "ERC20" | "BEP20" | "Polygon"
@@ -1201,6 +1238,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      announcement_type: ["info", "warning", "maintenance"],
       app_role: ["user", "admin", "compliance"],
       crypto_asset: ["USDT", "BTC", "ETH", "USDC"],
       crypto_network: ["TRC20", "ERC20", "BEP20", "Polygon"],
