@@ -4,7 +4,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, CheckCircle, XCircle, MessageSquare } from "lucide-react";
+import { Eye, CheckCircle, XCircle, MessageSquare, ArrowLeft, FileText, Image as ImageIcon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Database } from "@/integrations/supabase/types";
 
 type KycStatus = Database["public"]["Enums"]["kyc_status"];
@@ -21,6 +22,7 @@ export default function AdminKycPage() {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedKyc, setSelectedKyc] = useState<any>(null);
+  const [viewingDoc, setViewingDoc] = useState<{ url: string; name: string; type: string } | null>(null);
   const [actionType, setActionType] = useState<"approve" | "reject" | "request_info" | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
 
@@ -102,9 +104,16 @@ export default function AdminKycPage() {
 
   const filtered = kycQueue.filter((k) => statusFilter === "all" || k.status === statusFilter);
 
-  const getDocUrl = (filePath: string) => {
-    const { data } = supabase.storage.from("kyc-documents").getPublicUrl(filePath);
-    return data.publicUrl;
+  const openDoc = async (filePath: string, fileName: string) => {
+    const { data, error } = await supabase.storage
+      .from("kyc-documents")
+      .createSignedUrl(filePath, 300); // 5 min expiry
+    if (error || !data?.signedUrl) {
+      toast({ title: "Error", description: "Could not load document.", variant: "destructive" });
+      return;
+    }
+    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName);
+    setViewingDoc({ url: data.signedUrl, name: fileName, type: isImage ? "image" : "other" });
   };
 
   return (
@@ -194,22 +203,37 @@ export default function AdminKycPage() {
                   <h4 className="font-medium mb-2">Documents</h4>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {kycDocs.map((doc) => (
-                      <a
+                      <button
                         key={doc.id}
-                        href={getDocUrl(doc.file_path)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-lg border p-3 hover:bg-muted/50 transition-colors"
+                        onClick={() => openDoc(doc.file_path, doc.file_name)}
+                        className="rounded-lg border p-3 hover:bg-muted/50 transition-colors text-left"
                       >
                         <p className="font-medium text-xs capitalize">{doc.document_type.replace(/_/g, " ")}</p>
                         <p className="text-xs text-muted-foreground truncate">{doc.file_name}</p>
-                      </a>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+
+      {/* Document Viewer Dialog */}
+      <Dialog open={!!viewingDoc} onOpenChange={(open) => { if (!open) setViewingDoc(null); }}>
+        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="truncate">{viewingDoc?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 overflow-auto flex items-center justify-center bg-muted/30 rounded-lg">
+            {viewingDoc?.type === "image" ? (
+              <img src={viewingDoc.url} alt={viewingDoc.name} className="max-w-full max-h-[65vh] object-contain" />
+            ) : (
+              <iframe src={viewingDoc?.url} title={viewingDoc?.name} className="w-full h-[65vh] rounded" />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
