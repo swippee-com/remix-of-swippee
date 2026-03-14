@@ -9,9 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 
 export default function TradesPage() {
   const { user } = useAuth();
+  const keys = useMemo(() => [["user-trades"]], []);
+  useRealtimeInvalidation("otc_trades", keys);
 
   const { data: trades = [], isLoading } = useQuery({
     queryKey: ["user-trades"],

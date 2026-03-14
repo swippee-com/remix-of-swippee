@@ -15,6 +15,11 @@ import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 export default function DashboardPage() {
   const { user } = useAuth();
 
+  const tradeKeys = useMemo(() => [["dashboard-trades", user?.id || ""], ["dashboard-activity", user?.id || ""]], [user?.id]);
+  const quoteKeys = useMemo(() => [["dashboard-activity", user?.id || ""]], [user?.id]);
+  useRealtimeInvalidation("otc_trades", tradeKeys);
+  useRealtimeInvalidation("quote_requests", quoteKeys);
+
   const { data: kycStatus } = useQuery({
     queryKey: ["dashboard-kyc", user?.id],
     queryFn: async () => {
