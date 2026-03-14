@@ -100,7 +100,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-        <main className="p-4 lg:p-8">{children}</main>
+        <main className="p-4 lg:p-8">
+          <AnnouncementBanner />
+          {children}
+        </main>
       </div>
     </div>
   );
