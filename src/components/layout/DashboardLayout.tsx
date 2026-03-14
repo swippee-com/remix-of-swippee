@@ -73,6 +73,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <Link to="/dashboard" className="text-lg font-bold tracking-tight">{BRAND.name}</Link>
         </div>
         <NavContent />
+        <SidebarAd />
         <div className="border-t p-3">
           <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground" onClick={handleSignOut}>
             <LogOut className="h-4 w-4" /> {t("nav.signOut")}
