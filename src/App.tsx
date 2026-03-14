@@ -13,6 +13,7 @@ import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Fees from "./pages/Fees";
 import Support from "./pages/Support";
+import LivePrices from "./pages/LivePrices";
 import NotFound from "./pages/NotFound";
 
 // Auth
