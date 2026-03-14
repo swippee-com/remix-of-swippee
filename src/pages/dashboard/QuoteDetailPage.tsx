@@ -71,12 +71,8 @@ export default function QuoteDetailPage() {
         .eq("id", quote.id);
       if (quoteError) throw quoteError;
 
-      // Update quote request status
-      const { error: qrError } = await supabase
-        .from("quote_requests")
-        .update({ status: "accepted" as any })
-        .eq("id", quoteRequest.id);
-      if (qrError) throw qrError;
+      // Trade is auto-created by database trigger when is_accepted = true
+      // Quote request status is also updated to 'converted_to_trade' by the trigger
     },
     onSuccess: () => {
       toast({ title: "Quote accepted!", description: "Your trade will be processed shortly." });
