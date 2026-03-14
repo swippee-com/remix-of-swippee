@@ -9,7 +9,7 @@ interface PriceTickerProps {
 
 export function PriceTicker({ currency = "usd" }: PriceTickerProps) {
   const { prices, isLoading } = useMarketPrices();
-  const nprRate = useNprRate();
+  const nprData = useNprRate();
   const sym = currencySymbol(currency);
 
   if (isLoading) {
