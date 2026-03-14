@@ -63,6 +63,19 @@ export default function DashboardPage() {
     enabled: !!user,
   });
 
+  const { data: walletBalance } = useQuery({
+    queryKey: ["dashboard-wallet-balance", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("wallets")
+        .select("balance_npr")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data?.balance_npr ?? 0;
+    },
+    enabled: !!user,
+  });
+
   const { data: quoteCount } = useQuery({
     queryKey: ["dashboard-quote-count", user?.id],
     queryFn: async () => {
