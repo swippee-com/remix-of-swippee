@@ -36,6 +36,7 @@ import SettingsPage from "./pages/dashboard/SettingsPage";
 
 // Admin
 import AdminOverview from "./pages/admin/AdminOverview";
+import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminKycPage from "./pages/admin/AdminKycPage";
 import AdminQuotesPage from "./pages/admin/AdminQuotesPage";
