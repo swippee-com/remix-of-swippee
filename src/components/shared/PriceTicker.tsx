@@ -1,10 +1,15 @@
-import { useMarketPrices } from "@/hooks/use-market-prices";
+import { useMarketPrices, convertPrice, currencySymbol, type Currency } from "@/hooks/use-market-prices";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
-export function PriceTicker() {
+interface PriceTickerProps {
+  currency?: Currency;
+}
+
+export function PriceTicker({ currency = "usd" }: PriceTickerProps) {
   const { prices, isLoading } = useMarketPrices();
+  const sym = currencySymbol(currency);
 
   if (isLoading) {
     return (
@@ -16,10 +21,14 @@ export function PriceTicker() {
     );
   }
 
+  // Show top 4 in the ticker strip
+  const top = prices.slice(0, 4);
+
   return (
     <div className="flex gap-3 overflow-x-auto pb-1">
-      {prices.map((p) => {
+      {top.map((p) => {
         const positive = p.change24h >= 0;
+        const displayPrice = convertPrice(p.price, currency);
         return (
           <div
             key={p.symbol}
@@ -27,7 +36,7 @@ export function PriceTicker() {
           >
             <span className="font-semibold text-foreground">{p.symbol}</span>
             <span className="text-muted-foreground">
-              ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {sym}{displayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span
               className={cn(
