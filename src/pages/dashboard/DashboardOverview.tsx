@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Shield, ArrowLeftRight, FileText, CreditCard, Plus, WalletCards } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -16,6 +17,7 @@ import { PriceTicker } from "@/components/shared/PriceTicker";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const tradeKeys = useMemo(() => [["dashboard-trades", user?.id || ""], ["dashboard-activity", user?.id || ""]], [user?.id]);
   const quoteKeys = useMemo(() => [["dashboard-activity", user?.id || ""]], [user?.id]);
@@ -106,7 +108,7 @@ export default function DashboardPage() {
       const items = [
         ...(quotes || []).map((q) => ({
           id: q.id,
-          type: "Quote Request",
+          type: "quote" as const,
           asset: q.asset,
           amount: q.amount_crypto ? String(q.amount_crypto) : String(q.amount_fiat),
           status: q.status,
@@ -114,7 +116,7 @@ export default function DashboardPage() {
         })),
         ...(trades || []).map((t) => ({
           id: t.id,
-          type: "Trade",
+          type: "trade" as const,
           asset: t.asset,
           amount: String(t.gross_amount),
           status: t.status,
@@ -146,8 +148,8 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <PageHeader title="Dashboard" description="Welcome back! Here's your account overview.">
-        <Button asChild><Link to="/dashboard/quotes/new"><Plus className="mr-1 h-4 w-4" /> New Quote</Link></Button>
+      <PageHeader title={t("dashboard.title")} description={t("dashboard.welcome")}>
+        <Button asChild><Link to="/dashboard/quotes/new"><Plus className="mr-1 h-4 w-4" /> {t("dashboard.newQuote")}</Link></Button>
       </PageHeader>
 
       {showWizard && (
@@ -168,24 +170,24 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard title="Wallet Balance" value={`NPR ${Number(walletBalance ?? 0).toLocaleString()}`} icon={WalletCards} description="Available balance" />
-        <StatCard title="KYC Status" value={kycLabel} icon={Shield} description={kycStatus === "approved" ? "Identity verified" : undefined} />
-        <StatCard title="Active Trades" value={String(tradeStats?.active ?? 0)} icon={ArrowLeftRight} description="In progress" />
-        <StatCard title="Completed Trades" value={String(tradeStats?.completed ?? 0)} icon={FileText} />
-        <StatCard title="Payment Methods" value={String(pmCount ?? 0)} icon={CreditCard} />
+        <StatCard title={t("dashboard.walletBalance")} value={`NPR ${Number(walletBalance ?? 0).toLocaleString()}`} icon={WalletCards} description={t("dashboard.availableBalance")} />
+        <StatCard title={t("dashboard.kycStatus")} value={kycLabel} icon={Shield} description={kycStatus === "approved" ? t("dashboard.identityVerified") : undefined} />
+        <StatCard title={t("dashboard.activeTrades")} value={String(tradeStats?.active ?? 0)} icon={ArrowLeftRight} description={t("dashboard.inProgress")} />
+        <StatCard title={t("dashboard.completedTrades")} value={String(tradeStats?.completed ?? 0)} icon={FileText} />
+        <StatCard title={t("dashboard.paymentMethods")} value={String(pmCount ?? 0)} icon={CreditCard} />
       </div>
 
       <div className="mt-8">
-        <h2 className="text-lg font-semibold">Recent Activity</h2>
+        <h2 className="text-lg font-semibold">{t("dashboard.recentActivity")}</h2>
         <div className="mt-4 rounded-lg border bg-card shadow-card">
           {recentActivity.length === 0 ? (
-            <p className="px-6 py-8 text-center text-sm text-muted-foreground">No recent activity yet.</p>
+            <p className="px-6 py-8 text-center text-sm text-muted-foreground">{t("dashboard.noActivity")}</p>
           ) : (
             <div className="divide-y">
               {recentActivity.map((item) => (
                 <div key={item.id} className="flex items-center justify-between px-6 py-4">
                   <div>
-                    <p className="text-sm font-medium">{item.type} — {item.amount} {item.asset}</p>
+                    <p className="text-sm font-medium">{item.type === "quote" ? t("dashboard.quoteRequest") : t("dashboard.trade")} — {item.amount} {item.asset}</p>
                     <p className="text-xs text-muted-foreground">{format(new Date(item.date), "PPp")}</p>
                   </div>
                   <StatusBadge status={item.status} />

@@ -2,11 +2,11 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,6 +78,7 @@ function computeHoldings(trades: OtcTrade[]): Holding[] {
 
 export default function PortfolioPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [currency, setCurrency] = useState<Currency>("npr");
   const { prices, isLoading: pricesLoading } = useMarketPrices();
   const nprData = useNprRate();
@@ -138,43 +139,25 @@ export default function PortfolioPage() {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Portfolio"
-        description="Track your crypto holdings and performance from completed trades."
+        title={t("portfolio.title")}
+        description={t("portfolio.description")}
       />
 
       {/* Currency toggle */}
       <div className="mb-6 flex items-center gap-2">
-        <Button
-          size="sm"
-          variant={currency === "npr" ? "default" : "outline"}
-          onClick={() => setCurrency("npr")}
-        >
-          NPR
-        </Button>
-        <Button
-          size="sm"
-          variant={currency === "usd" ? "default" : "outline"}
-          onClick={() => setCurrency("usd")}
-        >
-          USD
-        </Button>
+        <Button size="sm" variant={currency === "npr" ? "default" : "outline"} onClick={() => setCurrency("npr")}>NPR</Button>
+        <Button size="sm" variant={currency === "usd" ? "default" : "outline"} onClick={() => setCurrency("usd")}>USD</Button>
       </div>
 
       {/* Summary cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {isLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 rounded-lg" />
-          ))
+          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-lg" />)
         ) : (
           <>
+            <StatCard title={t("portfolio.totalValue")} value={fmt(portfolioValue)} icon={PieChart} />
             <StatCard
-              title="Total Portfolio Value"
-              value={fmt(portfolioValue)}
-              icon={PieChart}
-            />
-            <StatCard
-              title="Total P&L"
+              title={t("portfolio.totalPL")}
               value={fmt(totalPL)}
               icon={totalPL >= 0 ? TrendingUp : TrendingDown}
               trend={portfolioValue > 0 ? {
@@ -183,31 +166,27 @@ export default function PortfolioPage() {
               } : undefined}
             />
             <StatCard
-              title="Assets Held"
+              title={t("portfolio.assetsHeld")}
               value={holdings.length}
               icon={Wallet}
-              description={holdings.map(h => h.asset).join(", ") || "None"}
+              description={holdings.map(h => h.asset).join(", ") || t("portfolio.none")}
             />
-            <StatCard
-              title="Completed Trades"
-              value={trades.length}
-              icon={BarChart3}
-            />
+            <StatCard title={t("portfolio.completedTrades")} value={trades.length} icon={BarChart3} />
           </>
         )}
       </div>
 
       <Tabs defaultValue="holdings" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="holdings">Holdings</TabsTrigger>
-          <TabsTrigger value="history">Trade History</TabsTrigger>
+          <TabsTrigger value="holdings">{t("portfolio.holdings")}</TabsTrigger>
+          <TabsTrigger value="history">{t("portfolio.tradeHistory")}</TabsTrigger>
         </TabsList>
 
         {/* Holdings table */}
         <TabsContent value="holdings">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Your Holdings</CardTitle>
+              <CardTitle className="text-lg">{t("portfolio.yourHoldings")}</CardTitle>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -216,21 +195,21 @@ export default function PortfolioPage() {
                 </div>
               ) : holdings.length === 0 ? (
                 <EmptyState
-                  title="No holdings yet"
-                  description="Complete a buy trade to see your portfolio here."
+                  title={t("portfolio.noHoldings")}
+                  description={t("portfolio.noHoldingsDesc")}
                   icon={<PieChart className="h-10 w-10" />}
                 />
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Asset</TableHead>
-                      <TableHead className="text-right">Quantity</TableHead>
-                      <TableHead className="text-right">Avg Cost</TableHead>
-                      <TableHead className="text-right">Current Price</TableHead>
-                      <TableHead className="text-right">Value</TableHead>
-                      <TableHead className="text-right">24h</TableHead>
-                      <TableHead className="text-right">P&L</TableHead>
+                      <TableHead>{t("portfolio.asset")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.quantity")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.avgCost")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.currentPrice")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.value")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.24h")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.pl")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -294,7 +273,7 @@ export default function PortfolioPage() {
         <TabsContent value="history">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Completed Trades</CardTitle>
+              <CardTitle className="text-lg">{t("portfolio.completedTradesTitle")}</CardTitle>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -303,48 +282,44 @@ export default function PortfolioPage() {
                 </div>
               ) : trades.length === 0 ? (
                 <EmptyState
-                  title="No completed trades"
-                  description="Your completed trades will appear here."
+                  title={t("portfolio.noTrades")}
+                  description={t("portfolio.noTradesDesc")}
                   icon={<BarChart3 className="h-10 w-10" />}
                 />
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Asset</TableHead>
-                      <TableHead>Network</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead className="text-right">Rate</TableHead>
-                      <TableHead className="text-right">Total</TableHead>
+                      <TableHead>{t("portfolio.date")}</TableHead>
+                      <TableHead>{t("portfolio.type")}</TableHead>
+                      <TableHead>{t("portfolio.asset")}</TableHead>
+                      <TableHead>{t("portfolio.network")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.amount")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.rate")}</TableHead>
+                      <TableHead className="text-right">{t("portfolio.total")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {trades.map((t) => (
-                      <TableRow key={t.id}>
+                    {trades.map((trade) => (
+                      <TableRow key={trade.id}>
                         <TableCell className="text-muted-foreground">
-                          {format(new Date(t.created_at), "MMM d, yyyy")}
+                          {format(new Date(trade.created_at), "MMM d, yyyy")}
                         </TableCell>
                         <TableCell>
                           <span className={cn(
                             "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-                            t.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                            trade.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
                           )}>
-                            {t.side.toUpperCase()}
+                            {trade.side.toUpperCase()}
                           </span>
                         </TableCell>
-                        <TableCell className="font-medium">{t.asset}</TableCell>
-                        <TableCell className="text-muted-foreground">{t.network}</TableCell>
+                        <TableCell className="font-medium">{trade.asset}</TableCell>
+                        <TableCell className="text-muted-foreground">{trade.network}</TableCell>
                         <TableCell className="text-right font-mono">
-                          {Number(t.net_amount).toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                          {Number(trade.net_amount).toLocaleString(undefined, { maximumFractionDigits: 8 })}
                         </TableCell>
-                        <TableCell className="text-right">
-                          {fmt(Number(t.quoted_rate))}
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          {fmt(Number(t.gross_amount))}
-                        </TableCell>
+                        <TableCell className="text-right">{fmt(Number(trade.quoted_rate))}</TableCell>
+                        <TableCell className="text-right font-medium">{fmt(Number(trade.gross_amount))}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
