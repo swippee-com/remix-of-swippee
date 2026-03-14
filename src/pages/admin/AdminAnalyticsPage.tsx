@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { format, subDays, subMonths, startOfWeek, differenceInDays, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, startOfMonth } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 import {
@@ -32,6 +32,28 @@ const PRESETS = [
   { label: "6m", days: 180 },
   { label: "1y", days: 365 },
 ] as const;
+
+function exportCsv(filename: string, headers: string[], rows: Record<string, any>[], keys: string[]) {
+  const csvContent = [
+    headers.join(","),
+    ...rows.map((r) => keys.map((k) => `"${r[k] ?? ""}"`).join(",")),
+  ].join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function ExportButton({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) {
+  return (
+    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClick} disabled={disabled} title="Export CSV">
+      <Download className="h-3.5 w-3.5" />
+    </Button>
+  );
+}
 
 export default function AdminAnalyticsPage() {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -207,8 +229,9 @@ export default function AdminAnalyticsPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Trade Volume */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium">Trade Volume Over Time</CardTitle>
+            <ExportButton disabled={!volumeData?.length} onClick={() => exportCsv("trade-volume", ["Date", "Volume (NPR)"], volumeData || [], ["date", "volume"])} />
           </CardHeader>
           <CardContent>
             {volumeLoading ? (
@@ -229,8 +252,9 @@ export default function AdminAnalyticsPage() {
 
         {/* Revenue */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium">Revenue & Trades</CardTitle>
+            <ExportButton disabled={!revenueData?.length} onClick={() => exportCsv("revenue-trades", ["Month", "Revenue (NPR)", "Trades"], revenueData || [], ["month", "revenue", "trades"])} />
           </CardHeader>
           <CardContent>
             {revLoading ? (
@@ -253,8 +277,9 @@ export default function AdminAnalyticsPage() {
 
         {/* User Growth */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium">User Growth</CardTitle>
+            <ExportButton disabled={!growthData?.length} onClick={() => exportCsv("user-growth", ["Week", "Total Users"], growthData || [], ["week", "users"])} />
           </CardHeader>
           <CardContent>
             {growthLoading ? (
@@ -275,8 +300,9 @@ export default function AdminAnalyticsPage() {
 
         {/* Asset Distribution */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium">Asset Distribution</CardTitle>
+            <ExportButton disabled={!assetData?.length} onClick={() => exportCsv("asset-distribution", ["Asset", "Volume (NPR)", "Percent"], assetData || [], ["asset", "value", "percent"])} />
           </CardHeader>
           <CardContent>
             {assetLoading ? (
