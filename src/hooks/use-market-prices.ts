@@ -57,12 +57,22 @@ async function fetchPrices(): Promise<MarketPrice[]> {
   }));
 }
 
-export function convertPrice(usdPrice: number, currency: Currency): number {
-  return currency === "npr" ? usdPrice * NPR_RATE : usdPrice;
+export function convertPrice(usdPrice: number, currency: Currency, nprRate: number): number {
+  return currency === "npr" ? usdPrice * nprRate : usdPrice;
 }
 
 export function currencySymbol(currency: Currency): string {
   return currency === "npr" ? "रू" : "$";
+}
+
+export function useNprRate() {
+  const { data: rate = FALLBACK_NPR_RATE } = useQuery({
+    queryKey: ["npr-rate"],
+    queryFn: fetchNprRate,
+    refetchInterval: 300000, // refresh every 5 min
+    staleTime: 120000,
+  });
+  return rate;
 }
 
 export function useMarketPrices() {
