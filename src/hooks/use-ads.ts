@@ -43,7 +43,7 @@ export function useAdTracking() {
   const trackImpression = useCallback(async (adId: string) => {
     if (tracked.current.has(adId)) return;
     tracked.current.add(adId);
-    await supabase.from("ad_events").insert({ ad_id: adId, event_type: "impression" } as any);
+    await supabase.from("promotion_events").insert({ ad_id: adId, event_type: "impression" } as any);
   }, []);
 
   const trackClick = useCallback(async (adId: string) => {
