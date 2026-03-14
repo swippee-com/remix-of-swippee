@@ -26,6 +26,7 @@ import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import KycPage from "./pages/dashboard/KycPage";
 import QuotesPage from "./pages/dashboard/QuotesPage";
 import NewQuotePage from "./pages/dashboard/NewQuotePage";
+import QuoteDetailPage from "./pages/dashboard/QuoteDetailPage";
 import TradesPage from "./pages/dashboard/TradesPage";
 import PaymentMethodsPage from "./pages/dashboard/PaymentMethodsPage";
 import PayoutAddressesPage from "./pages/dashboard/PayoutAddressesPage";
@@ -37,6 +38,7 @@ import AdminOverview from "./pages/admin/AdminOverview";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminKycPage from "./pages/admin/AdminKycPage";
 import AdminQuotesPage from "./pages/admin/AdminQuotesPage";
+import AdminQuoteDetailPage from "./pages/admin/AdminQuoteDetailPage";
 import AdminTradesPage from "./pages/admin/AdminTradesPage";
 import AdminLedgerPage from "./pages/admin/AdminLedgerPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
@@ -71,6 +73,7 @@ const App = () => (
             <Route path="/dashboard/kyc" element={<ProtectedRoute><KycPage /></ProtectedRoute>} />
             <Route path="/dashboard/quotes" element={<ProtectedRoute><QuotesPage /></ProtectedRoute>} />
             <Route path="/dashboard/quotes/new" element={<ProtectedRoute><NewQuotePage /></ProtectedRoute>} />
+            <Route path="/dashboard/quotes/:id" element={<ProtectedRoute><QuoteDetailPage /></ProtectedRoute>} />
             <Route path="/dashboard/trades" element={<ProtectedRoute><TradesPage /></ProtectedRoute>} />
             <Route path="/dashboard/payment-methods" element={<ProtectedRoute><PaymentMethodsPage /></ProtectedRoute>} />
             <Route path="/dashboard/payout-addresses" element={<ProtectedRoute><PayoutAddressesPage /></ProtectedRoute>} />
@@ -82,6 +85,7 @@ const App = () => (
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/kyc" element={<AdminRoute><AdminKycPage /></AdminRoute>} />
             <Route path="/admin/quotes" element={<AdminRoute><AdminQuotesPage /></AdminRoute>} />
+            <Route path="/admin/quotes/:id" element={<AdminRoute><AdminQuoteDetailPage /></AdminRoute>} />
             <Route path="/admin/trades" element={<AdminRoute><AdminTradesPage /></AdminRoute>} />
             <Route path="/admin/ledger" element={<AdminRoute><AdminLedgerPage /></AdminRoute>} />
             <Route path="/admin/audit-logs" element={<AdminRoute><AdminAuditLogsPage /></AdminRoute>} />
