@@ -20,6 +20,10 @@ import HowItWorks from "./pages/HowItWorks";
 import Fees from "./pages/Fees";
 import Support from "./pages/Support";
 import LivePrices from "./pages/LivePrices";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
+import AmlPolicy from "./pages/AmlPolicy";
 import NotFound from "./pages/NotFound";
 
 // Auth
