@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ArrowLeft, Eye, Mail, Phone, MapPin, Calendar, Shield, Wallet, CreditCard, ArrowLeftRight, FileText, MessageSquare } from "lucide-react";
 import { AdminUserActions } from "@/components/admin/AdminUserActions";
+import { AdminNotes } from "@/components/admin/AdminNotes";
 import type { Database } from "@/integrations/supabase/types";
 
 type KycStatus = Database["public"]["Enums"]["kyc_status"];
