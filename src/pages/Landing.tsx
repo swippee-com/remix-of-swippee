@@ -54,14 +54,9 @@ export default function LandingPage() {
                   <Link to="/dashboard">Dashboard <LayoutDashboard className="ml-1 h-4 w-4" /></Link>
                 </Button>
               ) : (
-                <>
-                  <Button variant="hero" asChild>
-                    <Link to="/auth/signup">Get Started <ArrowRight className="ml-1 h-4 w-4" /></Link>
-                  </Button>
-                  <Button variant="hero-outline" asChild>
-                    <Link to="/auth/login">Sign In</Link>
-                  </Button>
-                </>
+                <Button variant="hero" asChild>
+                  <Link to="/auth/signup">Get Started <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                </Button>
               )}
               <Button variant="hero-outline" asChild>
                 <Link to="/how-it-works">How It Works</Link>
