@@ -212,9 +212,14 @@ export function LiveChatWidget() {
               <MessageCircle className="h-5 w-5 text-primary" />
               <span className="font-semibold text-sm">Live Chat</span>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setOpen(false)}>
-              <X className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleMute} aria-label={muted ? "Unmute" : "Mute"}>
+                {muted ? <VolumeX className="h-4 w-4 text-muted-foreground" /> : <Volume2 className="h-4 w-4 text-muted-foreground" />}
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setOpen(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           {activeTicket ? (
