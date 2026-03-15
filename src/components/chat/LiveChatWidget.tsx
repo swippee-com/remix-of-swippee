@@ -99,7 +99,15 @@ export function LiveChatWidget() {
       }
     }
     prevMessageCountRef.current = messages.length;
-  }, [messages, userId]);
+  }, [messages, userId, muted]);
+
+  const toggleMute = () => {
+    setMuted((prev) => {
+      const next = !prev;
+      localStorage.setItem("chat-muted", String(next));
+      return next;
+    });
+  };
 
   // Auto-scroll on new messages
   useEffect(() => {
