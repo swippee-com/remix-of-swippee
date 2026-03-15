@@ -82,7 +82,7 @@ export function LiveChatWidget() {
   useEffect(() => {
     if (messages.length > prevMessageCountRef.current && prevMessageCountRef.current > 0) {
       const latest = messages[messages.length - 1];
-      if (latest && latest.sender_id !== userId) {
+      if (latest && latest.sender_id !== userId && !muted) {
         try {
           const ctx = new AudioContext();
           const osc = ctx.createOscillator();
