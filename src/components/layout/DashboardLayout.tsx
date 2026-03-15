@@ -139,6 +139,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <AdBanner placement="dashboard_banner" className="mb-4" />
           {children}
         </main>
+        <LiveChatWidget />
       </div>
     </div>
   );

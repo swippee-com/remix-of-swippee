@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { MessageCircle, X, Send, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,53 +22,59 @@ export function LiveChatWidget() {
   const [newMessage, setNewMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Hide on the full support page
-  if (location.pathname.startsWith("/dashboard/support")) return null;
-  if (!user) return null;
+  const isOnSupportPage = location.pathname.startsWith("/dashboard/support");
+  const userId = user?.id;
 
   // Fetch user's most recent open/pending ticket
   const { data: activeTicket } = useQuery({
-    queryKey: ["chat-active-ticket", user.id],
+    queryKey: ["chat-active-ticket", userId],
     queryFn: async () => {
       const { data } = await supabase
         .from("support_tickets")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId!)
         .in("status", ["open", "pending_user", "pending_admin"])
         .order("updated_at", { ascending: false })
         .limit(1)
         .maybeSingle();
       return data;
     },
-    enabled: !!user.id,
+    enabled: !!userId,
   });
+
+  const activeTicketId = activeTicket?.id;
 
   // Fetch messages for active ticket
   const { data: messages = [] } = useQuery({
-    queryKey: ["chat-messages", activeTicket?.id],
+    queryKey: ["chat-messages", activeTicketId],
     queryFn: async () => {
-      if (!activeTicket) return [];
+      if (!activeTicketId) return [];
       const { data } = await supabase
         .from("support_messages")
         .select("*")
-        .eq("ticket_id", activeTicket.id)
+        .eq("ticket_id", activeTicketId)
         .eq("is_internal", false)
         .order("created_at", { ascending: true });
       return data ?? [];
     },
-    enabled: !!activeTicket?.id,
+    enabled: !!activeTicketId,
   });
 
-  // Realtime for messages
+  // Realtime keys — stable reference
+  const realtimeKeys = useMemo(
+    () => [["chat-messages", activeTicketId ?? ""], ["chat-active-ticket", userId ?? ""]],
+    [activeTicketId, userId]
+  );
+
   useRealtimeInvalidation(
     "support_messages",
-    [["chat-messages", activeTicket?.id ?? ""], ["chat-active-ticket", user.id]],
-    activeTicket ? `ticket_id=eq.${activeTicket.id}` : undefined
+    realtimeKeys,
+    activeTicketId ? `ticket_id=eq.${activeTicketId}` : undefined
   );
 
   // Unread: last message not from user
   const hasUnread =
-    messages.length > 0 && messages[messages.length - 1].sender_id !== user.id;
+    messages.length > 0 && messages[messages.length - 1].sender_id !== userId;
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -80,10 +86,10 @@ export function LiveChatWidget() {
   // Send message mutation
   const sendMutation = useMutation({
     mutationFn: async (msg: string) => {
-      if (!activeTicket) throw new Error("No active ticket");
+      if (!activeTicketId || !userId) throw new Error("No active ticket");
       const { error } = await supabase.from("support_messages").insert({
-        ticket_id: activeTicket.id,
-        sender_id: user.id,
+        ticket_id: activeTicketId,
+        sender_id: userId,
         message: msg,
         is_internal: false,
       });
@@ -99,16 +105,17 @@ export function LiveChatWidget() {
   // Create ticket mutation
   const createMutation = useMutation({
     mutationFn: async ({ subject, msg }: { subject: string; msg: string }) => {
+      if (!userId) throw new Error("Not authenticated");
       const { data: ticket, error: tErr } = await supabase
         .from("support_tickets")
-        .insert({ user_id: user.id, subject, category: "general" })
+        .insert({ user_id: userId, subject, category: "general" })
         .select("id")
         .single();
       if (tErr || !ticket) throw tErr;
 
       const { error: mErr } = await supabase.from("support_messages").insert({
         ticket_id: ticket.id,
-        sender_id: user.id,
+        sender_id: userId,
         message: msg,
         is_internal: false,
       });
@@ -137,6 +144,9 @@ export function LiveChatWidget() {
     createMutation.mutate({ subject: sub, msg });
   };
 
+  // Don't render on support page or if not logged in
+  if (isOnSupportPage || !userId) return null;
+
   return (
     <>
       {/* Floating button */}
@@ -145,7 +155,7 @@ export function LiveChatWidget() {
         className={cn(
           "fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all",
           "bg-primary text-primary-foreground hover:bg-primary/90",
-          open && "scale-0 opacity-0"
+          open && "scale-0 opacity-0 pointer-events-none"
         )}
         aria-label="Open live chat"
       >
@@ -183,7 +193,7 @@ export function LiveChatWidget() {
                 </p>
                 <div className="space-y-2">
                   {messages.map((m) => {
-                    const isUser = m.sender_id === user.id;
+                    const isUser = m.sender_id === userId;
                     return (
                       <div
                         key={m.id}
