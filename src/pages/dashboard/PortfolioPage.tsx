@@ -290,6 +290,7 @@ export default function PortfolioPage() {
                   icon={<BarChart3 className="h-10 w-10" />}
                 />
               ) : (
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
