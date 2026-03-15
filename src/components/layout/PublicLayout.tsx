@@ -7,6 +7,7 @@ import { Menu, X, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { AdBanner } from "@/components/ads/AdBanner";
 import { useAuth } from "@/contexts/AuthContext";
+import { BackToTop } from "@/components/shared/BackToTop";
 
 const footerLinks = {
   product: [
