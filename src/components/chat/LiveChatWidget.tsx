@@ -17,6 +17,7 @@ export function LiveChatWidget() {
   const location = useLocation();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [muted, setMuted] = useState(() => localStorage.getItem("chat-muted") === "true");
   const [message, setMessage] = useState("");
   const [newSubject, setNewSubject] = useState("");
   const [newMessage, setNewMessage] = useState("");
