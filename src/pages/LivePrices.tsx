@@ -72,7 +72,7 @@ export default function LivePrices() {
 
   return (
     <PublicLayout>
-      <div className="container py-12">
+      <div className="container px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-2">
           <h1 className="text-3xl font-semibold tracking-tight">Live Market Prices</h1>
           <p className="mt-1 text-sm text-muted-foreground">
