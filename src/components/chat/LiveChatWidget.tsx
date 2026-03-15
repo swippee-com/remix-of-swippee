@@ -77,6 +77,29 @@ export function LiveChatWidget() {
   const hasUnread =
     messages.length > 0 && messages[messages.length - 1].sender_id !== userId;
 
+  // Play sound on new admin message
+  useEffect(() => {
+    if (messages.length > prevMessageCountRef.current && prevMessageCountRef.current > 0) {
+      const latest = messages[messages.length - 1];
+      if (latest && latest.sender_id !== userId) {
+        try {
+          const ctx = new AudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.3);
+        } catch {}
+      }
+    }
+    prevMessageCountRef.current = messages.length;
+  }, [messages, userId]);
+
   // Auto-scroll on new messages
   useEffect(() => {
     if (open && scrollRef.current) {
