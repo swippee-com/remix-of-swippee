@@ -144,7 +144,7 @@ export default function LivePrices() {
 
         <AdBanner placement="live_prices" className="mt-6" />
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {isLoading
             ? Array.from({ length: 12 }).map((_, i) => (
                 <Card key={i}>
