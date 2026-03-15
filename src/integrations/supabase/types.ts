@@ -689,7 +689,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "ad_events_ad_id_fkey"
+            foreignKeyName: "promotion_events_ad_id_fkey"
             columns: ["ad_id"]
             isOneToOne: false
             referencedRelation: "promotions"
