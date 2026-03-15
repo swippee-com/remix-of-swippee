@@ -201,6 +201,7 @@ export default function PortfolioPage() {
                   icon={<PieChart className="h-10 w-10" />}
                 />
               ) : (
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
