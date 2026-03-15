@@ -201,6 +201,7 @@ export default function PortfolioPage() {
                   icon={<PieChart className="h-10 w-10" />}
                 />
               ) : (
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -265,6 +266,7 @@ export default function PortfolioPage() {
                     })}
                   </TableBody>
                 </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -288,6 +290,7 @@ export default function PortfolioPage() {
                   icon={<BarChart3 className="h-10 w-10" />}
                 />
               ) : (
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -325,6 +328,7 @@ export default function PortfolioPage() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               )}
             </CardContent>
           </Card>
