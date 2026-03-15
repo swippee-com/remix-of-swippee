@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MessageCircle, X, Send, ArrowRight } from "lucide-react";
+import { MessageCircle, X, Send, ArrowRight, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +17,7 @@ export function LiveChatWidget() {
   const location = useLocation();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [muted, setMuted] = useState(() => localStorage.getItem("chat-muted") === "true");
   const [message, setMessage] = useState("");
   const [newSubject, setNewSubject] = useState("");
   const [newMessage, setNewMessage] = useState("");
@@ -81,7 +82,7 @@ export function LiveChatWidget() {
   useEffect(() => {
     if (messages.length > prevMessageCountRef.current && prevMessageCountRef.current > 0) {
       const latest = messages[messages.length - 1];
-      if (latest && latest.sender_id !== userId) {
+      if (latest && latest.sender_id !== userId && !muted) {
         try {
           const ctx = new AudioContext();
           const osc = ctx.createOscillator();
@@ -98,7 +99,15 @@ export function LiveChatWidget() {
       }
     }
     prevMessageCountRef.current = messages.length;
-  }, [messages, userId]);
+  }, [messages, userId, muted]);
+
+  const toggleMute = () => {
+    setMuted((prev) => {
+      const next = !prev;
+      localStorage.setItem("chat-muted", String(next));
+      return next;
+    });
+  };
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -203,9 +212,14 @@ export function LiveChatWidget() {
               <MessageCircle className="h-5 w-5 text-primary" />
               <span className="font-semibold text-sm">Live Chat</span>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setOpen(false)}>
-              <X className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleMute} aria-label={muted ? "Unmute" : "Mute"}>
+                {muted ? <VolumeX className="h-4 w-4 text-muted-foreground" /> : <Volume2 className="h-4 w-4 text-muted-foreground" />}
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setOpen(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           {activeTicket ? (
