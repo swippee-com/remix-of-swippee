@@ -72,7 +72,7 @@ export default function LivePrices() {
 
   return (
     <PublicLayout>
-      <div className="container py-12">
+      <div className="container px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-2">
           <h1 className="text-3xl font-semibold tracking-tight">Live Market Prices</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -86,7 +86,7 @@ export default function LivePrices() {
 
         {/* Controls row */}
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative max-w-xs flex-1">
+          <div className="relative w-full sm:max-w-xs sm:flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search coins…"
@@ -144,7 +144,7 @@ export default function LivePrices() {
 
         <AdBanner placement="live_prices" className="mt-6" />
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {isLoading
             ? Array.from({ length: 12 }).map((_, i) => (
                 <Card key={i}>
