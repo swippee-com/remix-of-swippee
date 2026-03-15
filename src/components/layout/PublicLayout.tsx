@@ -140,6 +140,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </footer>
+      <BackToTop />
     </div>
   );
 }
