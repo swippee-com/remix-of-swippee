@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MessageCircle, X, Send, ArrowRight } from "lucide-react";
+import { MessageCircle, X, Send, ArrowRight, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
