@@ -12,6 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { AnnouncementBanner } from "@/components/shared/AnnouncementBanner";
 import { AdBanner } from "@/components/ads/AdBanner";
 import { SidebarAd } from "@/components/ads/SidebarAd";
+import { LiveChatWidget } from "@/components/chat/LiveChatWidget";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
