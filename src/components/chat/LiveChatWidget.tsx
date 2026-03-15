@@ -21,6 +21,7 @@ export function LiveChatWidget() {
   const [newSubject, setNewSubject] = useState("");
   const [newMessage, setNewMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const prevMessageCountRef = useRef(0);
 
   const isOnSupportPage = location.pathname.startsWith("/dashboard/support");
   const userId = user?.id;
