@@ -6,6 +6,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const normalizePhone = (phone: string) => {
+  let digits = phone.replace(/\D/g, "").replace(/^0+/, "");
+
+  if (digits.startsWith("977") && digits.length > 10) {
+    digits = digits.slice(-10);
+  }
+
+  return digits;
+};
+
+const isValidPhone = (phone: string) => /^9\d{9}$/.test(phone);
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -21,14 +33,20 @@ Deno.serve(async (req) => {
       );
     }
 
-    const cleanPhone = phone.replace(/\D/g, "").replace(/^0+/, "");
+    const cleanPhone = normalizePhone(phone);
+
+    if (!isValidPhone(cleanPhone)) {
+      return new Response(
+        JSON.stringify({ error: "Enter a valid phone number" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Get the auth user from the JWT
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
 
@@ -37,13 +55,35 @@ Deno.serve(async (req) => {
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_ANON_KEY")!
       );
-      const { data: { user } } = await anonClient.auth.getUser(
-        authHeader.replace("Bearer ", "")
-      );
+      const {
+        data: { user },
+      } = await anonClient.auth.getUser(authHeader.replace("Bearer ", ""));
       userId = user?.id ?? null;
     }
 
-    // Find valid, unexpired, unverified code
+    const { data: existingVerifiedPhone, error: existingPhoneError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("phone", cleanPhone)
+      .eq("phone_verified", true)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingPhoneError) {
+      console.error("Existing phone check error:", existingPhoneError);
+      return new Response(
+        JSON.stringify({ error: "Unable to verify phone availability" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (existingVerifiedPhone && (!userId || existingVerifiedPhone.id !== userId)) {
+      return new Response(
+        JSON.stringify({ error: "This phone number is already linked to another account" }),
+        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { data: match, error: matchError } = await supabase
       .from("phone_verification_codes")
       .select("*")
@@ -62,32 +102,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check if this phone is already verified by another user
-    if (userId) {
-      const { data: existing } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("phone", cleanPhone)
-        .eq("phone_verified", true)
-        .neq("id", userId)
-        .limit(1)
-        .maybeSingle();
-
-      if (existing) {
-        return new Response(
-          JSON.stringify({ error: "This phone number is already linked to another account" }),
-          { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-    }
-
-    // Mark code as verified
     await supabase
       .from("phone_verification_codes")
       .update({ verified: true, user_id: userId })
       .eq("id", match.id);
 
-    // Update profile if user is authenticated
     if (userId) {
       await supabase
         .from("profiles")

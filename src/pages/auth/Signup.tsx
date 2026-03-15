@@ -22,6 +22,16 @@ export default function SignupPage() {
   const { toast } = useToast();
   const { session, isLoading } = useAuth();
 
+  const normalizePhone = (value: string) => {
+    let digits = value.replace(/\D/g, "").replace(/^0+/, "");
+
+    if (digits.startsWith("977") && digits.length > 10) {
+      digits = digits.slice(-10);
+    }
+
+    return digits;
+  };
+
   if (!isLoading && session) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -50,7 +60,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName, phone: phone.replace(/\D/g, "").replace(/^0+/, ""), phone_verified: true },
+        data: { full_name: fullName, phone: normalizePhone(phone), phone_verified: true },
         emailRedirectTo: window.location.origin,
       },
     });

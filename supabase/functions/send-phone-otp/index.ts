@@ -6,6 +6,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const normalizePhone = (phone: string) => {
+  let digits = phone.replace(/\D/g, "").replace(/^0+/, "");
+
+  if (digits.startsWith("977") && digits.length > 10) {
+    digits = digits.slice(-10);
+  }
+
+  return digits;
+};
+
+const isValidPhone = (phone: string) => /^9\d{9}$/.test(phone);
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -14,33 +26,58 @@ Deno.serve(async (req) => {
   try {
     const { phone } = await req.json();
 
-    if (!phone || typeof phone !== "string" || phone.length < 10) {
+    if (!phone || typeof phone !== "string") {
       return new Response(
         JSON.stringify({ error: "Valid phone number is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Clean phone number — strip leading + or 0, keep digits only
-    const cleanPhone = phone.replace(/\D/g, "").replace(/^0+/, "");
+    const cleanPhone = normalizePhone(phone);
 
-    // Generate 6-digit code
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    if (!isValidPhone(cleanPhone)) {
+      return new Response(
+        JSON.stringify({ error: "Enter a valid phone number" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    // Store in DB using service role
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Invalidate previous codes for this phone
+    const { data: existingVerifiedPhone, error: existingPhoneError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("phone", cleanPhone)
+      .eq("phone_verified", true)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingPhoneError) {
+      console.error("Existing phone check error:", existingPhoneError);
+      return new Response(
+        JSON.stringify({ error: "Unable to verify phone availability" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (existingVerifiedPhone) {
+      return new Response(
+        JSON.stringify({ error: "This phone number is already linked to an account" }),
+        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+
     await supabase
       .from("phone_verification_codes")
       .update({ verified: true })
       .eq("phone", cleanPhone)
       .eq("verified", false);
 
-    // Insert new code
     const { error: insertError } = await supabase
       .from("phone_verification_codes")
       .insert({ phone: cleanPhone, code });
@@ -53,7 +90,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Send SMS via SMSBit API
     const apiKey = Deno.env.get("SMSBIT_API_KEY");
     if (!apiKey) {
       console.error("SMSBIT_API_KEY not configured");
