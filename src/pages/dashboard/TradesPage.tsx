@@ -94,7 +94,7 @@ export default function TradesPage() {
       </PageHeader>
 
       {trades.length > 0 && (
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <label className="text-xs text-muted-foreground">{t("trades.from")}</label>
             <Input type="date" className="h-8 w-auto text-xs" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />

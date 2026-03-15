@@ -171,8 +171,10 @@ export default function DashboardPage() {
         <PriceTicker />
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard title={t("dashboard.walletBalance")} value={`NPR ${Number(walletBalance ?? 0).toLocaleString()}`} icon={WalletCards} description={t("dashboard.availableBalance")} />
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
+        <div className="col-span-2 lg:col-span-1">
+          <StatCard title={t("dashboard.walletBalance")} value={`NPR ${Number(walletBalance ?? 0).toLocaleString()}`} icon={WalletCards} description={t("dashboard.availableBalance")} />
+        </div>
         <StatCard title={t("dashboard.kycStatus")} value={kycLabel} icon={Shield} description={kycStatus === "approved" ? t("dashboard.identityVerified") : undefined} />
         <StatCard title={t("dashboard.activeTrades")} value={String(tradeStats?.active ?? 0)} icon={ArrowLeftRight} description={t("dashboard.inProgress")} />
         <StatCard title={t("dashboard.completedTrades")} value={String(tradeStats?.completed ?? 0)} icon={FileText} />

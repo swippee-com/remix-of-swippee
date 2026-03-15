@@ -123,13 +123,13 @@ export default function LivePrices() {
         </div>
 
         {currency === "npr" && (
-          <div className="mt-3 flex items-center gap-2 rounded-lg border border-accent bg-accent/10 px-4 py-2.5 text-sm">
+          <div className="mt-3 flex flex-col gap-1 rounded-lg border border-accent bg-accent/10 px-4 py-2.5 text-sm sm:flex-row sm:items-center sm:gap-2">
             <span className="font-medium text-foreground">NRB Exchange Rate:</span>
             <span className="text-muted-foreground">
               1 USD = रू{nprData.rate.toFixed(2)} (Buy) / रू{nprData.sell.toFixed(2)} (Sell)
             </span>
             {nprData.date && (
-              <span className="ml-auto text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground sm:ml-auto">
                 {format(new Date(nprData.date), "PPP")}
               </span>
             )}

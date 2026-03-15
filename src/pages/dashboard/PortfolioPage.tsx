@@ -328,6 +328,7 @@ export default function PortfolioPage() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               )}
             </CardContent>
           </Card>
