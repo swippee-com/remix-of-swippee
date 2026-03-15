@@ -62,6 +62,25 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Check if this phone is already verified by another user
+    if (userId) {
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("phone", cleanPhone)
+        .eq("phone_verified", true)
+        .neq("id", userId)
+        .limit(1)
+        .maybeSingle();
+
+      if (existing) {
+        return new Response(
+          JSON.stringify({ error: "This phone number is already linked to another account" }),
+          { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     // Mark code as verified
     await supabase
       .from("phone_verification_codes")
