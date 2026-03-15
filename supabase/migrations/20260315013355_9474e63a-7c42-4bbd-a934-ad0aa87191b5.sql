@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX unique_verified_phone ON public.profiles (phone) WHERE phone IS NOT NULL AND phone_verified = true;
