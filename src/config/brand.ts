@@ -1,6 +1,6 @@
 export const BRAND = {
   name: "Swippee",
-  tagline: "Your Trusted OTC Crypto Desk",
+  tagline: "Buy & Sell Crypto in Nepal",
   description: "Secure, quote-based crypto trading with manual settlement. Buy and sell crypto with confidence through our OTC desk.",
   supportEmail: "support@swippee.com",
   supportedAssets: ["USDT", "BTC", "ETH", "USDC"] as const,

@@ -24,7 +24,7 @@ const steps = [
 export default function LandingPage() {
   const { user } = useAuth();
   usePageMeta(
-    "Swippee — Buy & Sell Crypto in Nepal | OTC Crypto Desk",
+    "Swippee - Buy & Sell Crypto in Nepal",
     "Nepal's trusted OTC crypto desk. Buy and sell USDT, BTC, ETH, USDC securely with KYC-verified trading and manual settlement in NPR."
   );
   return (
