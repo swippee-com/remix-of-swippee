@@ -126,13 +126,16 @@ export function PhoneVerification({
         <Input
           placeholder="98XXXXXXXX"
           value={phone}
-          onChange={(e) => onPhoneChange(e.target.value)}
-          className="flex-1"
+          onChange={(e) => { onPhoneChange(e.target.value); setPhoneError(null); }}
+          className={cn("flex-1", phoneError && "border-destructive")}
         />
         <Button size="sm" onClick={handleSendOtp} disabled={sending || !phone}>
           {sending ? "Sending…" : "Send OTP"}
         </Button>
       </div>
+      {phoneError && (
+        <p className="text-xs text-destructive font-medium">{phoneError}</p>
+      )}
     </div>
   );
 }
