@@ -27,19 +27,26 @@ export function PhoneVerification({
   const [otpCode, setOtpCode] = useState("");
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const handleSendOtp = async () => {
     if (!phone || phone.replace(/\D/g, "").length < 10) {
       toast.error("Enter a valid phone number");
       return;
     }
+    setPhoneError(null);
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke("send-phone-otp", {
         body: { phone },
       });
       if (error || data?.error) {
-        toast.error(data?.error || "Failed to send OTP");
+        const msg = data?.error || "Failed to send OTP";
+        if (msg.toLowerCase().includes("already linked") || msg.toLowerCase().includes("too many attempts")) {
+          setPhoneError(msg);
+        } else {
+          toast.error(msg);
+        }
       } else {
         toast.success("Verification code sent!");
         setStep("otp");
@@ -119,13 +126,16 @@ export function PhoneVerification({
         <Input
           placeholder="98XXXXXXXX"
           value={phone}
-          onChange={(e) => onPhoneChange(e.target.value)}
-          className="flex-1"
+          onChange={(e) => { onPhoneChange(e.target.value); setPhoneError(null); }}
+          className={cn("flex-1", phoneError && "border-destructive")}
         />
         <Button size="sm" onClick={handleSendOtp} disabled={sending || !phone}>
           {sending ? "Sending…" : "Send OTP"}
         </Button>
       </div>
+      {phoneError && (
+        <p className="text-xs text-destructive font-medium">{phoneError}</p>
+      )}
     </div>
   );
 }

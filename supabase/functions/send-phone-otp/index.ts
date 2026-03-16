@@ -47,6 +47,26 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Rate limit: max 3 OTP sends per phone per 10 minutes
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { count: recentCount, error: countError } = await supabase
+      .from("phone_verification_codes")
+      .select("id", { count: "exact", head: true })
+      .eq("phone", cleanPhone)
+      .gte("created_at", tenMinutesAgo);
+
+    if (countError) {
+      console.error("Rate limit check error:", countError);
+    }
+
+    if ((recentCount ?? 0) >= 3) {
+      return new Response(
+        JSON.stringify({ error: "Too many attempts. Please wait 10 minutes before trying again." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Check if phone is already verified by another user
     const { data: existingVerifiedPhone, error: existingPhoneError } = await supabase
       .from("profiles")
       .select("id")
