@@ -134,6 +134,39 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_balances: {
+        Row: {
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          available_amount: number
+          id: string
+          is_enabled: boolean
+          low_threshold: number
+          network: Database["public"]["Enums"]["crypto_network"]
+          reserved_amount: number
+          updated_at: string
+        }
+        Insert: {
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          available_amount?: number
+          id?: string
+          is_enabled?: boolean
+          low_threshold?: number
+          network: Database["public"]["Enums"]["crypto_network"]
+          reserved_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          asset?: Database["public"]["Enums"]["crypto_asset"]
+          available_amount?: number
+          id?: string
+          is_enabled?: boolean
+          low_threshold?: number
+          network?: Database["public"]["Enums"]["crypto_network"]
+          reserved_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       kyc_documents: {
         Row: {
           created_at: string
@@ -339,6 +372,36 @@ export type Database = {
         }
         Relationships: []
       }
+      market_price_snapshots: {
+        Row: {
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          crypto_usd_price: number
+          fetched_at: string
+          id: string
+          source_crypto: string
+          source_fx: string
+          usd_npr_rate: number
+        }
+        Insert: {
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          crypto_usd_price: number
+          fetched_at?: string
+          id?: string
+          source_crypto?: string
+          source_fx?: string
+          usd_npr_rate: number
+        }
+        Update: {
+          asset?: Database["public"]["Enums"]["crypto_asset"]
+          crypto_usd_price?: number
+          fetched_at?: string
+          id?: string
+          source_crypto?: string
+          source_fx?: string
+          usd_npr_rate?: number
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -371,6 +434,138 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      order_status_history: {
+        Row: {
+          actor_id: string | null
+          actor_role: string | null
+          created_at: string
+          id: string
+          new_status: Database["public"]["Enums"]["order_status"]
+          note: string | null
+          old_status: Database["public"]["Enums"]["order_status"] | null
+          order_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          new_status: Database["public"]["Enums"]["order_status"]
+          note?: string | null
+          old_status?: Database["public"]["Enums"]["order_status"] | null
+          order_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          new_status?: Database["public"]["Enums"]["order_status"]
+          note?: string | null
+          old_status?: Database["public"]["Enums"]["order_status"] | null
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          created_at: string
+          fee_total_npr: number
+          final_rate_npr: number
+          id: string
+          input_amount_crypto: number | null
+          input_amount_npr: number | null
+          network: Database["public"]["Enums"]["crypto_network"]
+          order_type: string
+          payment_method_id: string | null
+          payout_address_id: string | null
+          rate_lock_id: string | null
+          requires_manual_review: boolean
+          risk_score: number | null
+          side: Database["public"]["Enums"]["trade_side"]
+          status: Database["public"]["Enums"]["order_status"]
+          total_pay_npr: number
+          total_receive_crypto: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          created_at?: string
+          fee_total_npr?: number
+          final_rate_npr: number
+          id?: string
+          input_amount_crypto?: number | null
+          input_amount_npr?: number | null
+          network: Database["public"]["Enums"]["crypto_network"]
+          order_type?: string
+          payment_method_id?: string | null
+          payout_address_id?: string | null
+          rate_lock_id?: string | null
+          requires_manual_review?: boolean
+          risk_score?: number | null
+          side: Database["public"]["Enums"]["trade_side"]
+          status?: Database["public"]["Enums"]["order_status"]
+          total_pay_npr: number
+          total_receive_crypto: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asset?: Database["public"]["Enums"]["crypto_asset"]
+          created_at?: string
+          fee_total_npr?: number
+          final_rate_npr?: number
+          id?: string
+          input_amount_crypto?: number | null
+          input_amount_npr?: number | null
+          network?: Database["public"]["Enums"]["crypto_network"]
+          order_type?: string
+          payment_method_id?: string | null
+          payout_address_id?: string | null
+          rate_lock_id?: string | null
+          requires_manual_review?: boolean
+          risk_score?: number | null
+          side?: Database["public"]["Enums"]["trade_side"]
+          status?: Database["public"]["Enums"]["order_status"]
+          total_pay_npr?: number
+          total_receive_crypto?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_payout_address_id_fkey"
+            columns: ["payout_address_id"]
+            isOneToOne: false
+            referencedRelation: "payout_addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_rate_lock_id_fkey"
+            columns: ["rate_lock_id"]
+            isOneToOne: false
+            referencedRelation: "rate_locks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       otc_trades: {
         Row: {
@@ -617,6 +812,54 @@ export type Database = {
           phone?: string
           user_id?: string | null
           verified?: boolean
+        }
+        Relationships: []
+      }
+      pricing_configs: {
+        Row: {
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          created_at: string
+          fixed_markup_npr: number | null
+          id: string
+          is_active: boolean
+          max_auto_order_npr: number
+          min_order_npr: number
+          network: Database["public"]["Enums"]["crypto_network"] | null
+          network_fee_npr: number
+          payment_adjustments: Json
+          percent_spread: number | null
+          side: Database["public"]["Enums"]["trade_side"] | null
+          updated_at: string
+        }
+        Insert: {
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          created_at?: string
+          fixed_markup_npr?: number | null
+          id?: string
+          is_active?: boolean
+          max_auto_order_npr?: number
+          min_order_npr?: number
+          network?: Database["public"]["Enums"]["crypto_network"] | null
+          network_fee_npr?: number
+          payment_adjustments?: Json
+          percent_spread?: number | null
+          side?: Database["public"]["Enums"]["trade_side"] | null
+          updated_at?: string
+        }
+        Update: {
+          asset?: Database["public"]["Enums"]["crypto_asset"]
+          created_at?: string
+          fixed_markup_npr?: number | null
+          id?: string
+          is_active?: boolean
+          max_auto_order_npr?: number
+          min_order_npr?: number
+          network?: Database["public"]["Enums"]["crypto_network"] | null
+          network_fee_npr?: number
+          payment_adjustments?: Json
+          percent_spread?: number | null
+          side?: Database["public"]["Enums"]["trade_side"] | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -872,6 +1115,86 @@ export type Database = {
             columns: ["quote_request_id"]
             isOneToOne: false
             referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rate_locks: {
+        Row: {
+          amount_input_type: string
+          amount_input_value: number
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          base_npr_price: number
+          created_at: string
+          crypto_usd_price: number
+          expires_at: string
+          fees_npr: number
+          final_rate_npr: number
+          id: string
+          network: Database["public"]["Enums"]["crypto_network"]
+          payment_method:
+            | Database["public"]["Enums"]["payment_method_type"]
+            | null
+          pricing_config_id: string | null
+          side: Database["public"]["Enums"]["trade_side"]
+          status: string
+          total_pay: number
+          total_receive: number
+          usd_npr_rate: number
+          user_id: string
+        }
+        Insert: {
+          amount_input_type: string
+          amount_input_value: number
+          asset: Database["public"]["Enums"]["crypto_asset"]
+          base_npr_price: number
+          created_at?: string
+          crypto_usd_price: number
+          expires_at: string
+          fees_npr?: number
+          final_rate_npr: number
+          id?: string
+          network: Database["public"]["Enums"]["crypto_network"]
+          payment_method?:
+            | Database["public"]["Enums"]["payment_method_type"]
+            | null
+          pricing_config_id?: string | null
+          side: Database["public"]["Enums"]["trade_side"]
+          status?: string
+          total_pay: number
+          total_receive: number
+          usd_npr_rate: number
+          user_id: string
+        }
+        Update: {
+          amount_input_type?: string
+          amount_input_value?: number
+          asset?: Database["public"]["Enums"]["crypto_asset"]
+          base_npr_price?: number
+          created_at?: string
+          crypto_usd_price?: number
+          expires_at?: string
+          fees_npr?: number
+          final_rate_npr?: number
+          id?: string
+          network?: Database["public"]["Enums"]["crypto_network"]
+          payment_method?:
+            | Database["public"]["Enums"]["payment_method_type"]
+            | null
+          pricing_config_id?: string | null
+          side?: Database["public"]["Enums"]["trade_side"]
+          status?: string
+          total_pay?: number
+          total_receive?: number
+          usd_npr_rate?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rate_locks_pricing_config_id_fkey"
+            columns: ["pricing_config_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_configs"
             referencedColumns: ["id"]
           },
         ]
@@ -1191,6 +1514,19 @@ export type Database = {
         | "payment_update"
         | "support_update"
         | "system"
+      order_status:
+        | "draft"
+        | "rate_locked"
+        | "awaiting_payment"
+        | "payment_proof_uploaded"
+        | "under_review"
+        | "manual_review"
+        | "approved_for_settlement"
+        | "settlement_in_progress"
+        | "completed"
+        | "expired"
+        | "cancelled"
+        | "rejected"
       payment_method_type:
         | "bank_transfer"
         | "esewa"
@@ -1397,6 +1733,20 @@ export const Constants = {
         "payment_update",
         "support_update",
         "system",
+      ],
+      order_status: [
+        "draft",
+        "rate_locked",
+        "awaiting_payment",
+        "payment_proof_uploaded",
+        "under_review",
+        "manual_review",
+        "approved_for_settlement",
+        "settlement_in_progress",
+        "completed",
+        "expired",
+        "cancelled",
+        "rejected",
       ],
       payment_method_type: [
         "bank_transfer",
