@@ -42,7 +42,7 @@ export function PhoneVerification({
       });
       if (error || data?.error) {
         const msg = data?.error || "Failed to send OTP";
-        if (msg.toLowerCase().includes("already linked") || msg.toLowerCase().includes("already registered")) {
+        if (msg.toLowerCase().includes("already linked") || msg.toLowerCase().includes("too many attempts")) {
           setPhoneError(msg);
         } else {
           toast.error(msg);
