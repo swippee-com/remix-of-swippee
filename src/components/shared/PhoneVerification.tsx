@@ -27,19 +27,26 @@ export function PhoneVerification({
   const [otpCode, setOtpCode] = useState("");
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const handleSendOtp = async () => {
     if (!phone || phone.replace(/\D/g, "").length < 10) {
       toast.error("Enter a valid phone number");
       return;
     }
+    setPhoneError(null);
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke("send-phone-otp", {
         body: { phone },
       });
       if (error || data?.error) {
-        toast.error(data?.error || "Failed to send OTP");
+        const msg = data?.error || "Failed to send OTP";
+        if (msg.toLowerCase().includes("already linked") || msg.toLowerCase().includes("already registered")) {
+          setPhoneError(msg);
+        } else {
+          toast.error(msg);
+        }
       } else {
         toast.success("Verification code sent!");
         setStep("otp");
