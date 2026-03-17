@@ -218,10 +218,10 @@ export default function LivePrices() {
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-muted-foreground">Ready to trade at competitive OTC rates?</p>
+          <p className="text-muted-foreground">Ready to trade with live rates?</p>
           <Button className="mt-4" size="lg" asChild>
-            <Link to="/auth/signup">
-              Start Trading <ArrowRight className="ml-1 h-4 w-4" />
+            <Link to="/trade">
+              Trade Now <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
         </div>

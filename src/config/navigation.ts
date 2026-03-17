@@ -35,6 +35,7 @@ export const adminNavItems = [
 
 export const publicNavItems = [
   { label: "Home", href: "/" },
+  { label: "Trade", href: "/trade" },
   { label: "About", href: "/about" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "Fees", href: "/fees" },

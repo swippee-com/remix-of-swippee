@@ -96,6 +96,7 @@ const App = () => (
           <Routes>
             {/* Public */}
             <Route path="/" element={<Landing />} />
+            <Route path="/trade" element={<Trade />} />
             <Route path="/about" element={<About />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/fees" element={<Fees />} />
