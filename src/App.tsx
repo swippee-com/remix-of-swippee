@@ -16,6 +16,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 
 // Public
 import Landing from "./pages/Landing";
+import Trade from "./pages/Trade";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Fees from "./pages/Fees";
