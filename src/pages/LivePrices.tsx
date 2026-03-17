@@ -201,6 +201,16 @@ export default function LivePrices() {
                       <p className="text-xs text-muted-foreground">
                         Market Cap: {formatMarketCap(displayCap, currency)}
                       </p>
+                      {["USDT", "BTC", "ETH", "USDC"].includes(p.symbol.toUpperCase()) && (
+                        <div className="mt-3 flex gap-2">
+                          <Button size="sm" variant="default" className="h-7 text-xs flex-1" asChild>
+                            <Link to={`/trade?asset=${p.symbol.toUpperCase()}&side=buy`}>Buy</Link>
+                          </Button>
+                          <Button size="sm" variant="outline" className="h-7 text-xs flex-1" asChild>
+                            <Link to={`/trade?asset=${p.symbol.toUpperCase()}&side=sell`}>Sell</Link>
+                          </Button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
@@ -208,10 +218,10 @@ export default function LivePrices() {
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-muted-foreground">Ready to trade at competitive OTC rates?</p>
+          <p className="text-muted-foreground">Ready to trade with live rates?</p>
           <Button className="mt-4" size="lg" asChild>
-            <Link to="/auth/signup">
-              Start Trading <ArrowRight className="ml-1 h-4 w-4" />
+            <Link to="/trade">
+              Trade Now <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
         </div>

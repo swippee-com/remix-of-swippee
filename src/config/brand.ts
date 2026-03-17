@@ -1,7 +1,7 @@
 export const BRAND = {
   name: "Swippee",
   tagline: "Buy & Sell Crypto in Nepal",
-  description: "Secure, quote-based crypto trading with manual settlement. Buy and sell crypto with confidence through our OTC desk.",
+  description: "Buy and sell crypto in Nepal with live rates, local payment methods, and fast settlement. Instant pricing for USDT, BTC, ETH, and USDC.",
   supportEmail: "support@swippee.com",
   supportedAssets: ["USDT", "BTC", "ETH", "USDC"] as const,
   supportedNetworks: ["TRC20", "ERC20", "BEP20", "Polygon"] as const,

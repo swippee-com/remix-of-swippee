@@ -16,6 +16,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 
 // Public
 import Landing from "./pages/Landing";
+import Trade from "./pages/Trade";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Fees from "./pages/Fees";
@@ -95,6 +96,7 @@ const App = () => (
           <Routes>
             {/* Public */}
             <Route path="/" element={<Landing />} />
+            <Route path="/trade" element={<Trade />} />
             <Route path="/about" element={<About />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/fees" element={<Fees />} />
