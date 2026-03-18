@@ -11,6 +11,7 @@ import { useTradePricing, type TradeSide, type AmountType } from "@/hooks/use-tr
 import { RateLockTimer } from "./RateLockTimer";
 import { ReadinessGate } from "./ReadinessGate";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTradeReadiness } from "@/hooks/use-trade-readiness";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
