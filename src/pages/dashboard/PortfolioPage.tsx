@@ -253,9 +253,9 @@ export default function PortfolioPage() {
                           <TableCell className="text-right font-mono">
                             {h.quantity.toLocaleString(undefined, { maximumFractionDigits: 8 })}
                           </TableCell>
-                          <TableCell className="text-right">{fmt(h.avgCostBasis)}</TableCell>
-                          <TableCell className="text-right">{fmt(currentPrice)}</TableCell>
-                          <TableCell className="text-right font-medium">{fmt(currentValue)}</TableCell>
+                          <TableCell className="text-right">{fmtNpr(h.avgCostBasis)}</TableCell>
+                          <TableCell className="text-right">{fmtNpr(currentPriceNpr)}</TableCell>
+                          <TableCell className="text-right font-medium">{fmtNpr(currentValueNpr)}</TableCell>
                           <TableCell className="text-right">
                             <span className={cn("inline-flex items-center gap-0.5 text-sm font-medium", change24h >= 0 ? "text-success" : "text-destructive")}>
                               {change24h >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
