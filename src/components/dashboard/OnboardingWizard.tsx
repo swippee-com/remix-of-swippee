@@ -33,7 +33,7 @@ export function OnboardingWizard({
   phoneVerified,
   kycStatus,
   paymentMethodCount,
-  quoteCount,
+  orderCount,
   dismissed,
   onDismiss,
 }: OnboardingWizardProps) {
