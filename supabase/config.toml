@@ -1,16 +1,1 @@
-project_id = "psizpngqmgzhqvxnlehk"
-
-[functions.send-phone-otp]
-verify_jwt = false
-
-[functions.verify-phone-otp]
-verify_jwt = false
-
-[functions.calculate-price]
-verify_jwt = false
-
-[functions.lock-rate]
-verify_jwt = false
-
-[functions.place-order]
-verify_jwt = false
+project_id = "iixmahggyemurhpkfwtd"
