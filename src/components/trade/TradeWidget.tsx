@@ -68,7 +68,9 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
     setAmountStr("");
   };
 
-  const { allReady } = useTradeReadiness(side);
+  const { allReady, steps, isLoading: readinessLoading } = useTradeReadiness(side);
+  const incompleteSteps = steps.filter((s) => !s.passed);
+  const completedCount = steps.filter((s) => s.passed).length;
 
   const handleCTA = async () => {
     if (!user || !allReady) {
