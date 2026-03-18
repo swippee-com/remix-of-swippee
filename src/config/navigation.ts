@@ -1,7 +1,8 @@
 import {
   LayoutDashboard, Shield, CreditCard, Wallet, FileText, ArrowLeftRight,
   HeadphonesIcon, Settings, Users, ClipboardCheck, BookOpen, ScrollText,
-  Activity, BarChart3, WalletCards, PieChart, Megaphone, ShoppingCart
+  Activity, BarChart3, WalletCards, PieChart, Megaphone, ShoppingCart,
+  DollarSign, Package
 } from "lucide-react";
 import type { TranslationKey } from "@/i18n/en";
 
@@ -22,11 +23,14 @@ export const userNavItems: { labelKey: TranslationKey; href: string; icon: typeo
 export const adminNavItems = [
   { label: "Overview", href: "/admin", icon: BarChart3 },
   { label: "Analytics", href: "/admin/analytics", icon: Activity },
+  { label: "Pricing", href: "/admin/pricing", icon: DollarSign },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "KYC Queue", href: "/admin/kyc", icon: ClipboardCheck },
+  { label: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { label: "Quote Requests", href: "/admin/quotes", icon: FileText },
   { label: "Trades", href: "/admin/trades", icon: ArrowLeftRight },
   { label: "Wallets", href: "/admin/wallets", icon: WalletCards },
+  { label: "Inventory", href: "/admin/inventory", icon: Package },
   { label: "Ledger", href: "/admin/ledger", icon: BookOpen },
   { label: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText },
   { label: "Ads", href: "/admin/ads", icon: Megaphone },

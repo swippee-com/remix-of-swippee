@@ -22,6 +22,7 @@ const statusStyles: Record<string, string> = {
   // Order
   rate_locked: "bg-primary/10 text-primary",
   awaiting_payment: "bg-warning/10 text-warning",
+  payment_proof_uploaded: "bg-primary/10 text-primary",
   under_review: "bg-warning/10 text-warning",
   manual_review: "bg-destructive/10 text-destructive",
   approved_for_settlement: "bg-success/10 text-success",
@@ -29,7 +30,6 @@ const statusStyles: Record<string, string> = {
   // Trade
   pending_settlement: "bg-warning/10 text-warning",
   awaiting_fiat_payment: "bg-warning/10 text-warning",
-  payment_proof_uploaded: "bg-primary/10 text-primary",
   fiat_received: "bg-success/10 text-success",
   awaiting_crypto_transfer: "bg-warning/10 text-warning",
   crypto_received: "bg-success/10 text-success",
