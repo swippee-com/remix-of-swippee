@@ -266,6 +266,15 @@ export default function OrderDetailPage() {
         </CardContent>
       </Card>
 
+      {/* Pricing Explainer */}
+      {rateLock && (
+        <Card className="mt-6">
+          <CardContent className="pt-6">
+            <PricingExplainer />
+          </CardContent>
+        </Card>
+      )}
+
       {/* Payment Proofs */}
       <Card className="mt-6">
         <CardHeader>
