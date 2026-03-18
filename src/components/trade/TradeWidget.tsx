@@ -127,7 +127,11 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
             return (
               <button
                 key={s}
-                onClick={() => setSide(s)}
+                onClick={() => {
+                  setSide(s);
+                  setAmountType(s === "buy" ? "npr" : "crypto");
+                  setAmountStr("");
+                }}
                 className={cn(
                   "flex-1 rounded-md text-sm font-semibold transition-all relative",
                   isMobile ? "py-3" : "py-2",
@@ -164,9 +168,14 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
             <Select value={asset} onValueChange={handleAssetChange}>
               <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {BRAND.supportedAssets.map((a) => (
-                  <SelectItem key={a} value={a}>{a}</SelectItem>
-                ))}
+                {BRAND.supportedAssets.map((a) => {
+                  const assetAvail = isAvailable(a, side);
+                  return (
+                    <SelectItem key={a} value={a} disabled={!assetAvail && !availLoading}>
+                      {a}{!assetAvail && !availLoading ? " (Paused)" : ""}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
