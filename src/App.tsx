@@ -67,6 +67,10 @@ import AdminSupportPage from "./pages/admin/AdminSupportPage";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
 import AdminWalletPage from "./pages/admin/AdminWalletPage";
 import AdminAdsPage from "./pages/admin/AdminAdsPage";
+import AdminPricingPage from "./pages/admin/AdminPricingPage";
+import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
+import AdminOrderDetailPage from "./pages/admin/AdminOrderDetailPage";
+import AdminInventoryPage from "./pages/admin/AdminInventoryPage";
 
 const queryClient = new QueryClient();
 
