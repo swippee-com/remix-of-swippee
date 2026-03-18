@@ -96,12 +96,13 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
   };
 
   const ctaLabel = useMemo(() => {
+    if (placing) return "Placing Order…";
     if (state === "calculating" || state === "locking") return "Calculating…";
     if (state === "expired") return "Refresh Rate";
     if (state === "locked") return `Confirm ${side === "buy" ? "Buy" : "Sell"} ${asset}`;
     if (state === "error") return "Try Again";
     return `${side === "buy" ? "Buy" : "Sell"} ${asset}`;
-  }, [state, side, asset]);
+  }, [state, side, asset, placing]);
 
   const isCompact = variant === "compact";
 
