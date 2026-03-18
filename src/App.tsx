@@ -89,6 +89,7 @@ const App = () => (
           <BrowserRouter>
             <AuthProvider>
               <LanguageProvider>
+          <ErrorBoundary>
           <ScrollToTop />
           <LoginTrackerWrapper />
           <Routes>
