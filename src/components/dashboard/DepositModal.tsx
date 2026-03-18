@@ -24,6 +24,8 @@ export function DepositModal({ open, onOpenChange, walletId }: DepositModalProps
     mutationFn: async () => {
       const numAmount = parseFloat(amount);
       if (!numAmount || numAmount <= 0) throw new Error("Enter a valid amount.");
+      if (numAmount < 100) throw new Error("Minimum deposit is NPR 100.");
+      if (numAmount > 10000000) throw new Error("Maximum deposit is NPR 1,00,00,000.");
       const { error } = await supabase.from("wallet_transactions").insert({
         wallet_id: walletId,
         user_id: user!.id,

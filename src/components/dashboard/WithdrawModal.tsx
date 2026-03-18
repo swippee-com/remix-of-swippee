@@ -57,7 +57,9 @@ export function WithdrawModal({ open, onOpenChange, walletId, balance }: Withdra
   const mutation = useMutation({
     mutationFn: async () => {
       if (!numAmount || numAmount <= 0) throw new Error("Enter a valid amount.");
+      if (numAmount < 100) throw new Error("Minimum withdrawal is NPR 100.");
       if (numAmount > balance) throw new Error("Insufficient balance.");
+      if (numAmount > 10000000) throw new Error("Maximum withdrawal is NPR 1,00,00,000.");
       if (!paymentMethodId) throw new Error("Select a payment method.");
 
       const pm = paymentMethods.find((p) => p.id === paymentMethodId);

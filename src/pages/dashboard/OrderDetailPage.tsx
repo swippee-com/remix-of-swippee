@@ -129,18 +129,7 @@ export default function OrderDetailPage() {
       });
       if (error) throw error;
 
-      // Auto-transition: awaiting_payment or rate_locked → payment_proof_uploaded
-      if (order && ["awaiting_payment", "rate_locked"].includes(order.status)) {
-        await supabase.from("orders").update({ status: "payment_proof_uploaded" as any }).eq("id", id!);
-        await supabase.from("order_status_history").insert({
-          order_id: id!,
-          old_status: order.status,
-          new_status: "payment_proof_uploaded" as any,
-          actor_id: user!.id,
-          actor_role: "user",
-          note: "Payment proof uploaded by user",
-        });
-      }
+      // Order status transition is now handled by a database trigger on payment_proofs insert
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["order-proofs", id] });

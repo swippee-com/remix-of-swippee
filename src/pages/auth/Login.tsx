@@ -81,30 +81,8 @@ export default function LoginPage() {
       return;
     }
 
-    // No 2FA — complete login
-    supabase.functions.invoke("track-login", {
-      body: { login_method: "password", session_id: data.session?.access_token?.slice(-12) || "" },
-    });
-
-    // Check if account is frozen
-    const { data: frozenCheck } = await supabase
-      .from("profiles")
-      .select("is_frozen")
-      .eq("id", data.user.id)
-      .single();
-
-    if (frozenCheck?.is_frozen) {
-      toast({
-        title: "Account Frozen",
-        description: "This account is currently frozen. You cannot perform any transactions. Please contact support.",
-        variant: "destructive",
-      });
-    } else {
-      toast({ title: "Welcome back!" });
-    }
-
-    setPendingLogin(false);
-    navigate(from, { replace: true });
+    // No 2FA — complete login directly
+    await completeLogin();
   };
 
   const handle2faCancel = async () => {

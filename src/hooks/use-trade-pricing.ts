@@ -17,7 +17,6 @@ export interface PricingData {
   total_pay_npr: number;
   total_receive_crypto: number;
   requires_manual_review: boolean;
-  pricing_config_id: string;
   min_order_npr: number;
   max_auto_order_npr: number;
 }
