@@ -60,9 +60,21 @@ export default function OrdersPage() {
     enabled: !!user,
   });
 
-  const filtered = activeTab === "all"
-    ? orders
-    : orders.filter((o) => TAB_FILTERS[activeTab].includes(o.status));
+  const filtered = useMemo(() => {
+    let result = activeTab === "all"
+      ? orders
+      : orders.filter((o) => TAB_FILTERS[activeTab].includes(o.status));
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((o) =>
+        o.asset.toLowerCase().includes(q) ||
+        o.side.toLowerCase().includes(q) ||
+        o.id.toLowerCase().includes(q) ||
+        o.status.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [orders, activeTab, searchQuery]);
 
   return (
     <DashboardLayout>
