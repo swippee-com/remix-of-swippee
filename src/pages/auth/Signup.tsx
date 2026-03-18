@@ -133,8 +133,9 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
             />
+            <p className="mt-1 text-xs text-muted-foreground">Min 8 chars with uppercase, number & special character</p>
           </div>
           <div>
             <label className="text-sm font-medium">Confirm Password</label>
@@ -145,7 +146,7 @@ export default function SignupPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
             />
           </div>
           <Button className="w-full" type="submit" disabled={loading || !phoneVerified}>
