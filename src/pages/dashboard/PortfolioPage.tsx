@@ -115,26 +115,35 @@ export default function PortfolioPage() {
   const rate = nprData.rate;
   const sym = currencySymbol(currency);
 
+  // portfolioValue: current value in NPR (market USD price × NPR rate × qty)
   const portfolioValue = useMemo(() => {
     return holdings.reduce((sum, h) => {
       const usdPrice = priceMap[h.asset]?.price ?? 0;
-      return sum + h.quantity * usdPrice;
+      return sum + h.quantity * usdPrice * rate;
     }, 0);
-  }, [holdings, priceMap]);
+  }, [holdings, priceMap, rate]);
 
+  // totalPL: current NPR value minus cost basis (already in NPR)
   const totalPL = useMemo(() => {
     return holdings.reduce((sum, h) => {
       const usdPrice = priceMap[h.asset]?.price ?? 0;
-      const currentVal = h.quantity * usdPrice;
-      const costVal = h.avgCostBasis > 0 ? h.quantity * h.avgCostBasis : 0;
-      return sum + (currentVal - costVal);
+      const currentValNpr = h.quantity * usdPrice * rate;
+      const costValNpr = h.totalInvested; // already in NPR
+      return sum + (currentValNpr - costValNpr);
     }, 0);
-  }, [holdings, priceMap]);
+  }, [holdings, priceMap, rate]);
 
   const isLoading = ordersLoading || pricesLoading;
 
-  const fmt = (usd: number) => {
+  // Format a USD value into the selected currency
+  const fmtUsd = (usd: number) => {
     const val = convertPrice(usd, currency, rate);
+    return `${sym}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  // Format an NPR value into the selected currency
+  const fmtNpr = (npr: number) => {
+    const val = currency === "npr" ? npr : npr / rate;
     return `${sym}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
@@ -157,10 +166,10 @@ export default function PortfolioPage() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-lg" />)
         ) : (
           <>
-            <StatCard title={t("portfolio.totalValue")} value={fmt(portfolioValue)} icon={PieChart} />
+            <StatCard title={t("portfolio.totalValue")} value={fmtNpr(portfolioValue)} icon={PieChart} />
             <StatCard
               title={t("portfolio.totalPL")}
-              value={fmt(totalPL)}
+              value={fmtNpr(totalPL)}
               icon={totalPL >= 0 ? TrendingUp : TrendingDown}
               trend={portfolioValue > 0 ? {
                 value: Math.round((totalPL / (portfolioValue - totalPL || 1)) * 10000) / 100,
@@ -218,11 +227,12 @@ export default function PortfolioPage() {
                   <TableBody>
                     {holdings.map((h) => {
                       const mp = priceMap[h.asset];
-                      const currentPrice = mp?.price ?? 0;
+                      const currentPriceUsd = mp?.price ?? 0;
+                      const currentPriceNpr = currentPriceUsd * rate;
                       const change24h = mp?.change24h ?? 0;
-                      const currentValue = h.quantity * currentPrice;
-                      const pl = currentValue - h.quantity * h.avgCostBasis;
-                      const plPct = h.avgCostBasis > 0 ? ((currentPrice - h.avgCostBasis) / h.avgCostBasis) * 100 : 0;
+                      const currentValueNpr = h.quantity * currentPriceNpr;
+                      const pl = currentValueNpr - h.totalInvested;
+                      const plPct = h.totalInvested > 0 ? (pl / h.totalInvested) * 100 : 0;
                       const meta = ASSET_META[h.asset];
 
                       return (
@@ -243,9 +253,9 @@ export default function PortfolioPage() {
                           <TableCell className="text-right font-mono">
                             {h.quantity.toLocaleString(undefined, { maximumFractionDigits: 8 })}
                           </TableCell>
-                          <TableCell className="text-right">{fmt(h.avgCostBasis)}</TableCell>
-                          <TableCell className="text-right">{fmt(currentPrice)}</TableCell>
-                          <TableCell className="text-right font-medium">{fmt(currentValue)}</TableCell>
+                          <TableCell className="text-right">{fmtNpr(h.avgCostBasis)}</TableCell>
+                          <TableCell className="text-right">{fmtNpr(currentPriceNpr)}</TableCell>
+                          <TableCell className="text-right font-medium">{fmtNpr(currentValueNpr)}</TableCell>
                           <TableCell className="text-right">
                             <span className={cn("inline-flex items-center gap-0.5 text-sm font-medium", change24h >= 0 ? "text-success" : "text-destructive")}>
                               {change24h >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
@@ -255,7 +265,7 @@ export default function PortfolioPage() {
                           <TableCell className="text-right">
                             <div>
                               <span className={cn("font-medium", pl >= 0 ? "text-success" : "text-destructive")}>
-                                {pl >= 0 ? "+" : ""}{fmt(pl)}
+                                {pl >= 0 ? "+" : ""}{fmtNpr(pl)}
                               </span>
                               <p className={cn("text-xs", plPct >= 0 ? "text-success" : "text-destructive")}>
                                 {plPct >= 0 ? "+" : ""}{plPct.toFixed(2)}%
@@ -323,8 +333,8 @@ export default function PortfolioPage() {
                         <TableCell className="text-right font-mono">
                           {Number(order.total_receive_crypto).toLocaleString(undefined, { maximumFractionDigits: 8 })}
                         </TableCell>
-                        <TableCell className="text-right">{fmt(Number(order.final_rate_npr))}</TableCell>
-                        <TableCell className="text-right font-medium">{fmt(Number(order.total_pay_npr))}</TableCell>
+                        <TableCell className="text-right">{fmtNpr(Number(order.final_rate_npr))}</TableCell>
+                        <TableCell className="text-right font-medium">{fmtNpr(Number(order.total_pay_npr))}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
