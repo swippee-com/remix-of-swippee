@@ -12,8 +12,8 @@ export function useTradeAvailability() {
   const { data: configs = [], isLoading } = useQuery({
     queryKey: ["trade-availability"],
     queryFn: async () => {
-      // RLS only returns rows where is_active = true for authenticated users.
-      // So if a config is paused, it won't appear here at all.
+      // Fetch ALL configs (admins see all, users only see active via RLS)
+      // We'll filter by is_active in JS to handle both cases
       const { data, error } = await supabase
         .from("pricing_configs")
         .select("asset, side, network, is_active");
@@ -23,14 +23,13 @@ export function useTradeAvailability() {
     staleTime: 30_000,
   });
 
-  // A side is available if there's at least one active config for that asset+side.
-  // Since RLS filters out inactive rows, presence = active.
+  // Check if any active config exists for this asset+side
   const isAvailable = (asset: string, side: "buy" | "sell"): boolean => {
     const matching = configs.filter(
       (c) => c.asset === asset && (c.side === side || c.side === null)
     );
-    // If no configs returned for this asset+side, trading is disabled
-    return matching.length > 0;
+    if (matching.length === 0) return true; // No configs at all = assume available
+    return matching.some((c) => c.is_active);
   };
 
   // Check if a specific network is available
@@ -38,7 +37,8 @@ export function useTradeAvailability() {
     const matching = configs.filter(
       (c) => c.asset === asset && (c.side === side || c.side === null) && (c.network === network || c.network === null)
     );
-    return matching.length > 0;
+    if (matching.length === 0) return true; // No configs = assume available
+    return matching.some((c) => c.is_active);
   };
 
   return { isAvailable, isNetworkAvailable, isLoading, configs };
