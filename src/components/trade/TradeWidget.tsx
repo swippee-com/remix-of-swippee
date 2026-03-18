@@ -290,7 +290,7 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
           <Button
             variant={side === "buy" ? "default" : "destructive"}
             className={cn("w-full", isCompact ? "h-11" : "h-12 text-base font-semibold")}
-            disabled={state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
+            disabled={placing || state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
             onClick={handleCTA}
           >
             {(state === "calculating" || state === "locking") && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
