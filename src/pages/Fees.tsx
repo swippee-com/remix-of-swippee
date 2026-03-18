@@ -231,7 +231,7 @@ export default function FeesPage() {
             <div className="mt-6 flex justify-end">
               <Button asChild variant="hero">
                 <Link to="/auth/signup">
-                  Get a Quote <ArrowRight className="ml-1 h-4 w-4" />
+                  Start Trading <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
             </div>

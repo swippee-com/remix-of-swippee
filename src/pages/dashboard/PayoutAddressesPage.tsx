@@ -76,7 +76,7 @@ export default function PayoutAddressesPage() {
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("payout_addresses").delete().eq("id", id);
       if (error) {
-        if (error.code === "23503" || error.message?.includes("violates foreign key")) throw new Error("This address has been used in a quote or trade and cannot be deleted.");
+        if (error.code === "23503" || error.message?.includes("violates foreign key")) throw new Error("if (error.code === "23503" || error.message?.includes("violates foreign key")) throw new Error("This address has been used in an order and cannot be deleted.");");
         throw error;
       }
     },
