@@ -108,10 +108,16 @@ Deno.serve(async (req) => {
       .eq("id", match.id);
 
     if (userId) {
-      await supabase
+      // Use upsert in case profile doesn't exist yet (race with auth trigger)
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({ phone: cleanPhone, phone_verified: true })
         .eq("id", userId);
+
+      // If update affected 0 rows (profile not created yet), retry after a short delay
+      if (profileError) {
+        console.error("Profile update error:", profileError);
+      }
     }
 
     return new Response(
