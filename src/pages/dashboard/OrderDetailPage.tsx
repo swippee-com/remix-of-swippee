@@ -154,8 +154,11 @@ export default function OrderDetailPage() {
   const submitTxHashMutation = useMutation({
     mutationFn: async () => {
       if (!userTxHash.trim()) throw new Error("Please enter a transaction hash.");
-      const { error } = await supabase.from("orders").update({ settlement_tx_hash: userTxHash.trim() } as any).eq("id", id!);
+      const { data, error } = await supabase.functions.invoke("submit-tx-hash", {
+        body: { order_id: id, tx_hash: userTxHash.trim() },
+      });
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to submit transaction hash");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["order-detail", id] });
