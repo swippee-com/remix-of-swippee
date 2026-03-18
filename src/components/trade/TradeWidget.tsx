@@ -13,6 +13,8 @@ import { ReadinessGate } from "./ReadinessGate";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const ASSET_NETWORKS: Record<string, SupportedNetwork[]> = {
   USDT: ["TRC20", "ERC20", "BEP20", "Polygon"],
@@ -39,6 +41,7 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
   const [amountStr, setAmountStr] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [gateOpen, setGateOpen] = useState(false);
+  const [placing, setPlacing] = useState(false);
 
   const amount = parseFloat(amountStr) || 0;
   const networks = ASSET_NETWORKS[asset] || ["TRC20"];
@@ -73,19 +76,33 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
     if (state === "priced") {
       await lockRate();
     } else if (state === "locked" && rateLock) {
-      navigate(`/dashboard/orders?lock=${rateLock.id}`);
+      setPlacing(true);
+      try {
+        const { data, error: fnError } = await supabase.functions.invoke("place-order", {
+          body: { rate_lock_id: rateLock.id },
+        });
+        if (fnError || !data?.success) {
+          toast({ title: "Order failed", description: data?.error || fnError?.message || "Failed to place order", variant: "destructive" });
+          return;
+        }
+        toast({ title: "Order placed!", description: `Your ${side} order for ${asset} has been created.` });
+        navigate(`/dashboard/orders/${data.order.id}`);
+      } finally {
+        setPlacing(false);
+      }
     } else if (state === "expired") {
       refreshRate();
     }
   };
 
   const ctaLabel = useMemo(() => {
+    if (placing) return "Placing Order…";
     if (state === "calculating" || state === "locking") return "Calculating…";
     if (state === "expired") return "Refresh Rate";
     if (state === "locked") return `Confirm ${side === "buy" ? "Buy" : "Sell"} ${asset}`;
     if (state === "error") return "Try Again";
     return `${side === "buy" ? "Buy" : "Sell"} ${asset}`;
-  }, [state, side, asset]);
+  }, [state, side, asset, placing]);
 
   const isCompact = variant === "compact";
 
@@ -273,7 +290,7 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
           <Button
             variant={side === "buy" ? "default" : "destructive"}
             className={cn("w-full", isCompact ? "h-11" : "h-12 text-base font-semibold")}
-            disabled={state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
+            disabled={placing || state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
             onClick={handleCTA}
           >
             {(state === "calculating" || state === "locking") && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
