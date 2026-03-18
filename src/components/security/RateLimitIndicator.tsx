@@ -16,7 +16,7 @@ export function RateLimitIndicator() {
       const { data: settings } = await supabase
         .from("app_settings")
         .select("value")
-        .eq("key", "daily_quote_limit")
+        .eq("key", "daily_order_limit")
         .maybeSingle();
 
       const limit = settings?.value
@@ -25,12 +25,12 @@ export function RateLimitIndicator() {
           : Number(settings.value) || DEFAULT_DAILY_LIMIT
         : DEFAULT_DAILY_LIMIT;
 
-      // Count today's quote requests
+      // Count today's orders
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       const { count } = await supabase
-        .from("quote_requests")
+        .from("orders")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user!.id)
         .gte("created_at", today.toISOString());
@@ -55,7 +55,7 @@ export function RateLimitIndicator() {
           ) : (
             <Activity className="h-4 w-4 text-muted-foreground" />
           )}
-          <span className="font-medium">Quote Requests Today</span>
+          <span className="font-medium">Orders Today</span>
         </div>
         <span className={isNearLimit ? "font-semibold text-amber-600" : "text-muted-foreground"}>
           {data.used} / {data.limit}

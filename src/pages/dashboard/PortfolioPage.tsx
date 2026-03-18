@@ -17,15 +17,14 @@ import { PieChart, TrendingUp, TrendingDown, Wallet, BarChart3, ArrowUpRight, Ar
 import { cn } from "@/lib/utils";
 import { useFormattedDate } from "@/hooks/use-formatted-date";
 
-interface OtcTrade {
+interface CompletedOrder {
   id: string;
   asset: string;
   side: "buy" | "sell";
-  net_amount: number;
-  gross_amount: number;
-  quoted_rate: number;
-  fee_amount: number;
-  fiat_currency: string;
+  total_receive_crypto: number;
+  total_pay_npr: number;
+  final_rate_npr: number;
+  fee_total_npr: number;
   network: string;
   status: string;
   created_at: string;
@@ -47,19 +46,21 @@ const ASSET_META: Record<string, { name: string; color: string }> = {
   USDC: { name: "USD Coin", color: "bg-sky-500" },
 };
 
-function computeHoldings(trades: OtcTrade[]): Holding[] {
+function computeHoldings(orders: CompletedOrder[]): Holding[] {
   const map: Record<string, { qty: number; costSum: number; boughtQty: number; soldQty: number }> = {};
 
-  for (const t of trades) {
-    if (!map[t.asset]) map[t.asset] = { qty: 0, costSum: 0, boughtQty: 0, soldQty: 0 };
-    const entry = map[t.asset];
-    if (t.side === "buy") {
-      entry.qty += Number(t.net_amount);
-      entry.costSum += Number(t.quoted_rate) * Number(t.net_amount);
-      entry.boughtQty += Number(t.net_amount);
+  for (const o of orders) {
+    if (!map[o.asset]) map[o.asset] = { qty: 0, costSum: 0, boughtQty: 0, soldQty: 0 };
+    const entry = map[o.asset];
+    const crypto = Number(o.total_receive_crypto);
+    const rate = Number(o.final_rate_npr);
+    if (o.side === "buy") {
+      entry.qty += crypto;
+      entry.costSum += rate * crypto;
+      entry.boughtQty += crypto;
     } else {
-      entry.qty -= Number(t.net_amount);
-      entry.soldQty += Number(t.net_amount);
+      entry.qty -= crypto;
+      entry.soldQty += crypto;
     }
   }
 
@@ -84,23 +85,23 @@ export default function PortfolioPage() {
   const { prices, isLoading: pricesLoading } = useMarketPrices();
   const nprData = useNprRate();
 
-  const { data: trades = [], isLoading: tradesLoading } = useQuery({
-    queryKey: ["portfolio-trades", user?.id],
+  const { data: orders = [], isLoading: ordersLoading } = useQuery({
+    queryKey: ["portfolio-orders", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       const { data, error } = await supabase
-        .from("otc_trades")
-        .select("id, asset, side, net_amount, gross_amount, quoted_rate, fee_amount, fiat_currency, network, status, created_at")
+        .from("orders")
+        .select("id, asset, side, total_receive_crypto, total_pay_npr, final_rate_npr, fee_total_npr, network, status, created_at")
         .eq("user_id", user.id)
         .eq("status", "completed")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as OtcTrade[];
+      return (data ?? []) as CompletedOrder[];
     },
     enabled: !!user?.id,
   });
 
-  const holdings = useMemo(() => computeHoldings(trades), [trades]);
+  const holdings = useMemo(() => computeHoldings(orders), [orders]);
 
   const priceMap = useMemo(() => {
     const m: Record<string, { price: number; change24h: number; image: string }> = {};
@@ -130,7 +131,7 @@ export default function PortfolioPage() {
     }, 0);
   }, [holdings, priceMap]);
 
-  const isLoading = tradesLoading || pricesLoading;
+  const isLoading = ordersLoading || pricesLoading;
 
   const fmt = (usd: number) => {
     const val = convertPrice(usd, currency, rate);
@@ -172,7 +173,7 @@ export default function PortfolioPage() {
               icon={Wallet}
               description={holdings.map(h => h.asset).join(", ") || t("portfolio.none")}
             />
-            <StatCard title={t("portfolio.completedTrades")} value={trades.length} icon={BarChart3} />
+            <StatCard title={t("portfolio.completedTrades")} value={orders.length} icon={BarChart3} />
           </>
         )}
       </div>
@@ -272,7 +273,7 @@ export default function PortfolioPage() {
           </Card>
         </TabsContent>
 
-        {/* Trade history */}
+        {/* Order history */}
         <TabsContent value="history">
           <Card>
             <CardHeader>
@@ -283,7 +284,7 @@ export default function PortfolioPage() {
                 <div className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12" />)}
                 </div>
-              ) : trades.length === 0 ? (
+              ) : orders.length === 0 ? (
                 <EmptyState
                   title={t("portfolio.noTrades")}
                   description={t("portfolio.noTradesDesc")}
@@ -304,26 +305,26 @@ export default function PortfolioPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {trades.map((trade) => (
-                      <TableRow key={trade.id}>
+                    {orders.map((order) => (
+                      <TableRow key={order.id}>
                         <TableCell className="text-muted-foreground">
-                          {formatDate(trade.created_at, "MMM d, yyyy")}
+                          {formatDate(order.created_at, "MMM d, yyyy")}
                         </TableCell>
                         <TableCell>
                           <span className={cn(
                             "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-                            trade.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                            order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
                           )}>
-                            {trade.side.toUpperCase()}
+                            {order.side.toUpperCase()}
                           </span>
                         </TableCell>
-                        <TableCell className="font-medium">{trade.asset}</TableCell>
-                        <TableCell className="text-muted-foreground">{trade.network}</TableCell>
+                        <TableCell className="font-medium">{order.asset}</TableCell>
+                        <TableCell className="text-muted-foreground">{order.network}</TableCell>
                         <TableCell className="text-right font-mono">
-                          {Number(trade.net_amount).toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                          {Number(order.total_receive_crypto).toLocaleString(undefined, { maximumFractionDigits: 8 })}
                         </TableCell>
-                        <TableCell className="text-right">{fmt(Number(trade.quoted_rate))}</TableCell>
-                        <TableCell className="text-right font-medium">{fmt(Number(trade.gross_amount))}</TableCell>
+                        <TableCell className="text-right">{fmt(Number(order.final_rate_npr))}</TableCell>
+                        <TableCell className="text-right font-medium">{fmt(Number(order.total_pay_npr))}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

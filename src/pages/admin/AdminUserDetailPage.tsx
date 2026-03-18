@@ -8,7 +8,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { ArrowLeft, Eye, Mail, Phone, MapPin, Calendar, Shield, Wallet, CreditCard, ArrowLeftRight, FileText, MessageSquare } from "lucide-react";
+import { ArrowLeft, Eye, Mail, Phone, MapPin, Calendar, Shield, Wallet, CreditCard, ShoppingCart, MessageSquare } from "lucide-react";
 import { AdminUserActions } from "@/components/admin/AdminUserActions";
 import { AdminNotes } from "@/components/admin/AdminNotes";
 import type { Database } from "@/integrations/supabase/types";
@@ -46,19 +46,10 @@ export default function AdminUserDetailPage() {
     enabled: !!id,
   });
 
-  const { data: quotes = [] } = useQuery({
-    queryKey: ["admin-user-quotes", id],
+  const { data: orders = [] } = useQuery({
+    queryKey: ["admin-user-orders", id],
     queryFn: async () => {
-      const { data } = await supabase.from("quote_requests").select("*").eq("user_id", id!).order("created_at", { ascending: false });
-      return data || [];
-    },
-    enabled: !!id,
-  });
-
-  const { data: trades = [] } = useQuery({
-    queryKey: ["admin-user-trades", id],
-    queryFn: async () => {
-      const { data } = await supabase.from("otc_trades").select("*").eq("user_id", id!).order("created_at", { ascending: false });
+      const { data } = await supabase.from("orders").select("*").eq("user_id", id!).order("created_at", { ascending: false });
       return data || [];
     },
     enabled: !!id,
@@ -198,10 +189,9 @@ export default function AdminUserDetailPage() {
       )}
 
       {/* Tabs */}
-      <Tabs defaultValue="quotes" className="mt-8">
+      <Tabs defaultValue="orders" className="mt-8">
         <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="quotes"><FileText className="mr-1 h-3.5 w-3.5" /> Quotes ({quotes.length})</TabsTrigger>
-          <TabsTrigger value="trades"><ArrowLeftRight className="mr-1 h-3.5 w-3.5" /> Trades ({trades.length})</TabsTrigger>
+          <TabsTrigger value="orders"><ShoppingCart className="mr-1 h-3.5 w-3.5" /> Orders ({orders.length})</TabsTrigger>
           <TabsTrigger value="wallet"><Wallet className="mr-1 h-3.5 w-3.5" /> Wallet ({walletTxs.length})</TabsTrigger>
           <TabsTrigger value="payment"><CreditCard className="mr-1 h-3.5 w-3.5" /> Payment Methods ({paymentMethods.length})</TabsTrigger>
           <TabsTrigger value="payouts"><Shield className="mr-1 h-3.5 w-3.5" /> Payout Addresses ({payoutAddresses.length})</TabsTrigger>
@@ -210,35 +200,19 @@ export default function AdminUserDetailPage() {
           <TabsTrigger value="logins">Login History</TabsTrigger>
         </TabsList>
 
-        {/* Quotes Tab */}
-        <TabsContent value="quotes">
+        {/* Orders Tab */}
+        <TabsContent value="orders">
           <DataTable
-            empty="No quote requests."
-            headers={["Side", "Asset", "Amount", "Status", "Date", ""]}
-            rows={quotes.map((q: any) => [
-              <span className="capitalize">{q.side}</span>,
-              q.asset,
-              q.amount_crypto ? `${q.amount_crypto} ${q.asset}` : `NPR ${Number(q.amount_fiat).toLocaleString()}`,
-              <StatusBadge status={q.status} />,
-              format(new Date(q.created_at), "PP"),
-              <Button variant="ghost" size="sm" asChild><Link to={`/admin/quotes/${q.id}`}><Eye className="h-3 w-3" /></Link></Button>,
-            ])}
-          />
-        </TabsContent>
-
-        {/* Trades Tab */}
-        <TabsContent value="trades">
-          <DataTable
-            empty="No trades."
-            headers={["Side", "Asset", "Amount", "Rate", "Status", "Date", ""]}
-            rows={trades.map((t: any) => [
-              <span className="capitalize">{t.side}</span>,
-              t.asset,
-              `${t.gross_amount} ${t.asset}`,
-              Number(t.quoted_rate).toLocaleString(),
-              <StatusBadge status={t.status} />,
-              format(new Date(t.created_at), "PP"),
-              <Button variant="ghost" size="sm" asChild><Link to={`/admin/trades/${t.id}`}><Eye className="h-3 w-3" /></Link></Button>,
+            empty="No orders."
+            headers={["Side", "Asset", "Amount (NPR)", "Rate", "Status", "Date", ""]}
+            rows={orders.map((o: any) => [
+              <span className="capitalize">{o.side}</span>,
+              o.asset,
+              `NPR ${Number(o.total_pay_npr).toLocaleString()}`,
+              Number(o.final_rate_npr).toLocaleString(),
+              <StatusBadge status={o.status} />,
+              format(new Date(o.created_at), "PP"),
+              <Button variant="ghost" size="sm" asChild><Link to={`/admin/orders/${o.id}`}><Eye className="h-3 w-3" /></Link></Button>,
             ])}
           />
         </TabsContent>

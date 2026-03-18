@@ -9,7 +9,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
-import { format, subDays, subMonths, startOfWeek, differenceInDays, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, startOfMonth } from "date-fns";
+import { format, subDays, differenceInDays, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, startOfWeek } from "date-fns";
 import { CalendarIcon, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
@@ -71,19 +71,19 @@ export default function AdminAnalyticsPage() {
     setDateRange({ from: subDays(new Date(), days), to: new Date() });
   }
 
-  // 1. Trade Volume
+  // 1. Order Volume
   const { data: volumeData, isLoading: volumeLoading } = useQuery({
     queryKey: ["admin-analytics-volume", sinceISO, untilISO],
     queryFn: async () => {
       const { data } = await supabase
-        .from("otc_trades")
-        .select("gross_amount, quoted_rate, created_at")
+        .from("orders")
+        .select("total_pay_npr, created_at")
         .gte("created_at", sinceISO)
         .lte("created_at", untilISO);
       const byDay: Record<string, number> = {};
-      for (const t of data || []) {
-        const day = format(new Date(t.created_at), "yyyy-MM-dd");
-        byDay[day] = (byDay[day] || 0) + Number(t.gross_amount) * Number(t.quoted_rate);
+      for (const o of data || []) {
+        const day = format(new Date(o.created_at), "yyyy-MM-dd");
+        byDay[day] = (byDay[day] || 0) + Number(o.total_pay_npr);
       }
       const days = eachDayOfInterval({ start: from, end: to });
       return days.map((d) => {
@@ -97,27 +97,27 @@ export default function AdminAnalyticsPage() {
   const { data: revenueData, isLoading: revLoading } = useQuery({
     queryKey: ["admin-analytics-revenue", sinceISO, untilISO],
     queryFn: async () => {
-      const [ledger, trades] = await Promise.all([
+      const [ledger, orders] = await Promise.all([
         supabase.from("ledger_entries").select("amount, created_at").eq("account_bucket", "fees_revenue").gte("created_at", sinceISO).lte("created_at", untilISO),
-        supabase.from("otc_trades").select("created_at").gte("created_at", sinceISO).lte("created_at", untilISO),
+        supabase.from("orders").select("created_at").gte("created_at", sinceISO).lte("created_at", untilISO),
       ]);
       const monthIntervals = eachMonthOfInterval({ start: from, end: to });
-      const months: Record<string, { revenue: number; trades: number }> = {};
+      const months: Record<string, { revenue: number; orders: number }> = {};
       for (const m of monthIntervals) {
-        months[format(m, "yyyy-MM")] = { revenue: 0, trades: 0 };
+        months[format(m, "yyyy-MM")] = { revenue: 0, orders: 0 };
       }
       for (const e of ledger.data || []) {
         const m = format(new Date(e.created_at), "yyyy-MM");
         if (months[m]) months[m].revenue += Number(e.amount);
       }
-      for (const t of trades.data || []) {
-        const m = format(new Date(t.created_at), "yyyy-MM");
-        if (months[m]) months[m].trades += 1;
+      for (const o of orders.data || []) {
+        const m = format(new Date(o.created_at), "yyyy-MM");
+        if (months[m]) months[m].orders += 1;
       }
       return Object.entries(months).map(([m, v]) => ({
         month: format(new Date(m + "-01"), "MMM yyyy"),
         revenue: Math.round(v.revenue),
-        trades: v.trades,
+        orders: v.orders,
       }));
     },
   });
@@ -149,18 +149,18 @@ export default function AdminAnalyticsPage() {
     },
   });
 
-  // 4. Asset Distribution (within date range)
+  // 4. Asset Distribution
   const { data: assetData, isLoading: assetLoading } = useQuery({
     queryKey: ["admin-analytics-assets", sinceISO, untilISO],
     queryFn: async () => {
       const { data } = await supabase
-        .from("otc_trades")
-        .select("asset, gross_amount, quoted_rate")
+        .from("orders")
+        .select("asset, total_pay_npr")
         .gte("created_at", sinceISO)
         .lte("created_at", untilISO);
       const byAsset: Record<string, number> = {};
-      for (const t of data || []) {
-        byAsset[t.asset] = (byAsset[t.asset] || 0) + Number(t.gross_amount) * Number(t.quoted_rate);
+      for (const o of data || []) {
+        byAsset[o.asset] = (byAsset[o.asset] || 0) + Number(o.total_pay_npr);
       }
       const total = Object.values(byAsset).reduce((a, b) => a + b, 0);
       return Object.entries(byAsset).map(([asset, value]) => ({
@@ -174,7 +174,7 @@ export default function AdminAnalyticsPage() {
   const volumeConfig = { volume: { label: "Volume (NPR)", color: "hsl(var(--primary))" } };
   const revenueConfig = {
     revenue: { label: "Revenue (NPR)", color: "hsl(142 60% 45%)" },
-    trades: { label: "Trade Count", color: "hsl(var(--primary))" },
+    orders: { label: "Order Count", color: "hsl(var(--primary))" },
   };
   const growthConfig = { users: { label: "Total Users", color: "hsl(210 70% 50%)" } };
   const assetConfig = Object.fromEntries(
@@ -183,7 +183,7 @@ export default function AdminAnalyticsPage() {
 
   return (
     <AdminLayout>
-      <PageHeader title="Analytics" description="Trade volume, revenue, user growth, and asset distribution.">
+      <PageHeader title="Analytics" description="Order volume, revenue, user growth, and asset distribution.">
         <div className="flex items-center gap-2">
           {PRESETS.map((p) => (
             <Button
@@ -227,11 +227,11 @@ export default function AdminAnalyticsPage() {
       </PageHeader>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        {/* Trade Volume */}
+        {/* Order Volume */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-medium">Trade Volume Over Time</CardTitle>
-            <ExportButton disabled={!volumeData?.length} onClick={() => exportCsv("trade-volume", ["Date", "Volume (NPR)"], volumeData || [], ["date", "volume"])} />
+            <CardTitle className="text-base font-medium">Order Volume Over Time</CardTitle>
+            <ExportButton disabled={!volumeData?.length} onClick={() => exportCsv("order-volume", ["Date", "Volume (NPR)"], volumeData || [], ["date", "volume"])} />
           </CardHeader>
           <CardContent>
             {volumeLoading ? (
@@ -253,8 +253,8 @@ export default function AdminAnalyticsPage() {
         {/* Revenue */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-medium">Revenue & Trades</CardTitle>
-            <ExportButton disabled={!revenueData?.length} onClick={() => exportCsv("revenue-trades", ["Month", "Revenue (NPR)", "Trades"], revenueData || [], ["month", "revenue", "trades"])} />
+            <CardTitle className="text-base font-medium">Revenue & Orders</CardTitle>
+            <ExportButton disabled={!revenueData?.length} onClick={() => exportCsv("revenue-orders", ["Month", "Revenue (NPR)", "Orders"], revenueData || [], ["month", "revenue", "orders"])} />
           </CardHeader>
           <CardContent>
             {revLoading ? (
@@ -268,7 +268,7 @@ export default function AdminAnalyticsPage() {
                   <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar yAxisId="left" dataKey="revenue" fill="var(--color-revenue)" radius={[4, 4, 0, 0]} />
-                  <Bar yAxisId="right" dataKey="trades" fill="var(--color-trades)" radius={[4, 4, 0, 0]} />
+                  <Bar yAxisId="right" dataKey="orders" fill="var(--color-orders)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ChartContainer>
             )}
@@ -308,7 +308,7 @@ export default function AdminAnalyticsPage() {
             {assetLoading ? (
               <Skeleton className="h-[250px] w-full" />
             ) : !assetData?.length ? (
-              <p className="flex h-[250px] items-center justify-center text-sm text-muted-foreground">No trade data in this range.</p>
+              <p className="flex h-[250px] items-center justify-center text-sm text-muted-foreground">No order data in this range.</p>
             ) : (
               <ChartContainer config={assetConfig} className="h-[250px] w-full">
                 <PieChart>
