@@ -13,13 +13,19 @@ const statusStyles: Record<string, string> = {
   // Quote
   draft: "bg-muted text-muted-foreground",
   submitted: "bg-primary/10 text-primary",
-  under_review: "bg-warning/10 text-warning",
   quoted: "bg-success/10 text-success",
   awaiting_user_acceptance: "bg-warning/10 text-warning",
   accepted: "bg-success/10 text-success",
   expired: "bg-muted text-muted-foreground",
   cancelled: "bg-muted text-muted-foreground",
   converted_to_trade: "bg-success/10 text-success",
+  // Order
+  rate_locked: "bg-primary/10 text-primary",
+  awaiting_payment: "bg-warning/10 text-warning",
+  under_review: "bg-warning/10 text-warning",
+  manual_review: "bg-destructive/10 text-destructive",
+  approved_for_settlement: "bg-success/10 text-success",
+  settlement_in_progress: "bg-primary/10 text-primary",
   // Trade
   pending_settlement: "bg-warning/10 text-warning",
   awaiting_fiat_payment: "bg-warning/10 text-warning",

@@ -48,6 +48,8 @@ import SupportDashboardPage from "./pages/dashboard/SupportDashboardPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import WalletPage from "./pages/dashboard/WalletPage";
 import PortfolioPage from "./pages/dashboard/PortfolioPage";
+import OrdersPage from "./pages/dashboard/OrdersPage";
+import OrderDetailPage from "./pages/dashboard/OrderDetailPage";
 
 // Admin
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -115,6 +117,8 @@ const App = () => (
 
             {/* User Dashboard — Protected */}
             <Route path="/dashboard" element={<ProtectedRoute><DashboardOverview /></ProtectedRoute>} />
+            <Route path="/dashboard/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+            <Route path="/dashboard/orders/:id" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
             <Route path="/dashboard/kyc" element={<ProtectedRoute><KycPage /></ProtectedRoute>} />
             <Route path="/dashboard/quotes" element={<ProtectedRoute><QuotesPage /></ProtectedRoute>} />
             <Route path="/dashboard/quotes/new" element={<ProtectedRoute><NewQuotePage /></ProtectedRoute>} />

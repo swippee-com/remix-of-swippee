@@ -31,7 +31,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     ? profile.full_name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : "U";
 
-  const ALLOWED_FROZEN_PATHS = ["/dashboard", "/dashboard/settings", "/dashboard/support"];
+  const ALLOWED_FROZEN_PATHS = ["/dashboard", "/dashboard/settings", "/dashboard/support", "/dashboard/orders"];
   const isFrozen = profile?.is_frozen ?? false;
 
   const NavContent = () => (
