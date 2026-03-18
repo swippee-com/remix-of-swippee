@@ -56,7 +56,7 @@ export function useTradeReadiness(side: "buy" | "sell"): UseTradeReadinessResult
         .limit(1);
       return (data?.length ?? 0) > 0;
     },
-    enabled: !!user && side === "sell",
+    enabled: !!user && side === "buy",
   });
 
   const steps: ReadinessStep[] = [
