@@ -62,6 +62,25 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Validate min order from pricing config
+    if (pricing.pricing_config_id) {
+      const { data: config } = await supabase
+        .from("pricing_configs")
+        .select("min_order_npr, max_auto_order_npr")
+        .eq("id", pricing.pricing_config_id)
+        .single();
+
+      if (config) {
+        const totalPay = pricing.total_pay_npr;
+        if (totalPay < config.min_order_npr) {
+          return new Response(
+            JSON.stringify({ error: `Minimum order is NPR ${config.min_order_npr.toLocaleString()}` }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+    }
+
     // Expire any existing active locks for this user
     await supabase
       .from("rate_locks")

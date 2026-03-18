@@ -310,6 +310,18 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
           />
         )}
 
+        {/* Min/Max validation */}
+        {pricing && amount > 0 && pricing.total_pay_npr < pricing.min_order_npr && (
+          <p className="mt-3 text-sm text-destructive">
+            Minimum order is रू {pricing.min_order_npr.toLocaleString()}
+          </p>
+        )}
+        {pricing && amount > 0 && pricing.total_pay_npr > pricing.max_auto_order_npr && (
+          <p className="mt-3 text-sm text-warning">
+            ⚠ Orders above रू {pricing.max_auto_order_npr.toLocaleString()} require manual review
+          </p>
+        )}
+
         {/* Error */}
         {error && state === "error" && (
           <p className="mt-3 text-sm text-destructive">{error}</p>
@@ -320,7 +332,10 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
           <Button
             variant={side === "buy" ? "default" : "destructive"}
             className={cn("w-full", isCompact ? "h-11" : "h-12 text-base font-semibold")}
-            disabled={!sideAvailable || placing || state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
+            disabled={
+              !sideAvailable || placing || state === "calculating" || state === "locking" || (state === "idle" && amount <= 0) ||
+              (pricing != null && amount > 0 && pricing.total_pay_npr < pricing.min_order_npr)
+            }
             onClick={handleCTA}
           >
             {(state === "calculating" || state === "locking") && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
