@@ -92,17 +92,17 @@ export function useTradeReadiness(side: "buy" | "sell"): UseTradeReadinessResult
       ? [
           {
             key: "payout",
-            label: "Add a payout address",
+            label: "Add your crypto wallet address (to receive crypto)",
             passed: hasPayoutAddress,
             href: "/dashboard/payout-addresses",
-            cta: "Add Payout Address",
+            cta: "Add Wallet Address",
           },
         ]
       : []),
   ];
 
   const allReady = steps.every((s) => s.passed);
-  const isLoading = kycLoading || pmLoading || (side === "sell" && payoutLoading);
+  const isLoading = kycLoading || pmLoading || (side === "buy" && payoutLoading);
 
   return { allReady, steps, isLoading };
 }
