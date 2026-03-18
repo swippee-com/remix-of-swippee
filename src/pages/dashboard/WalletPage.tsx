@@ -79,34 +79,61 @@ export default function WalletPage() {
             {transactions.length === 0 ? (
               <EmptyState icon={<Wallet className="mx-auto h-10 w-10" />} title={t("wallet.noTransactions")} description={t("wallet.noTransactionsDesc")} className="mt-4" />
             ) : (
-              <div className="mt-4 rounded-lg border bg-card shadow-card">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead><tr className="border-b bg-muted/50">
-                      <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colType")}</th>
-                      <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colAmount")}</th>
-                      <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colStatus")}</th>
-                      <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colDescription")}</th>
-                      <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colDate")}</th>
-                    </tr></thead>
-                    <tbody className="divide-y">
-                      {transactions.map((tx) => (
-                        <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="px-6 py-4 capitalize">{(tx.type as string).replace(/_/g, " ")}</td>
-                          <td className="px-6 py-4">
-                            <span className={tx.type === "deposit" || tx.type === "trade_credit" ? "text-green-600" : "text-red-600"}>
-                              {tx.type === "deposit" || tx.type === "trade_credit" ? "+" : "-"}NPR {Number(tx.amount).toLocaleString()}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4"><StatusBadge status={tx.status} /></td>
-                          <td className="px-6 py-4 text-muted-foreground text-xs max-w-[200px] truncate">{tx.description || "—"}</td>
-                          <td className="px-6 py-4 text-muted-foreground">{formatDate(tx.created_at, "PP")}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              <>
+                {/* Mobile: Card layout */}
+                <div className="mt-4 md:hidden space-y-3">
+                  {transactions.map((tx) => (
+                    <div key={tx.id} className="rounded-lg border bg-card p-4 shadow-card">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium capitalize">{(tx.type as string).replace(/_/g, " ")}</span>
+                        <StatusBadge status={tx.status} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={cn(
+                          "text-sm font-semibold",
+                          tx.type === "deposit" || tx.type === "trade_credit" ? "text-success" : "text-destructive"
+                        )}>
+                          {tx.type === "deposit" || tx.type === "trade_credit" ? "+" : "-"}NPR {Number(tx.amount).toLocaleString()}
+                        </span>
+                        <span className="text-xs text-muted-foreground">{formatDate(tx.created_at, "PP")}</span>
+                      </div>
+                      {tx.description && (
+                        <p className="mt-1.5 text-xs text-muted-foreground truncate">{tx.description}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              </div>
+
+                {/* Desktop: Table layout */}
+                <div className="mt-4 hidden md:block rounded-lg border bg-card shadow-card">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead><tr className="border-b bg-muted/50">
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colType")}</th>
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colAmount")}</th>
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colStatus")}</th>
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colDescription")}</th>
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">{t("wallet.colDate")}</th>
+                      </tr></thead>
+                      <tbody className="divide-y">
+                        {transactions.map((tx) => (
+                          <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
+                            <td className="px-6 py-4 capitalize">{(tx.type as string).replace(/_/g, " ")}</td>
+                            <td className="px-6 py-4">
+                              <span className={tx.type === "deposit" || tx.type === "trade_credit" ? "text-success" : "text-destructive"}>
+                                {tx.type === "deposit" || tx.type === "trade_credit" ? "+" : "-"}NPR {Number(tx.amount).toLocaleString()}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4"><StatusBadge status={tx.status} /></td>
+                            <td className="px-6 py-4 text-muted-foreground text-xs max-w-[200px] truncate">{tx.description || "—"}</td>
+                            <td className="px-6 py-4 text-muted-foreground">{formatDate(tx.created_at, "PP")}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </>
