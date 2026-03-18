@@ -88,7 +88,7 @@ export function useTradeReadiness(side: "buy" | "sell"): UseTradeReadinessResult
       href: "/dashboard/payment-methods",
       cta: "Add Payment Method",
     },
-    ...(side === "sell"
+    ...(side === "buy"
       ? [
           {
             key: "payout",
