@@ -211,27 +211,27 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="rounded-lg border bg-card shadow-card">
-            <div className="divide-y">
-              {recentOrders.map((order) => (
-                <Link key={order.id} to={`/dashboard/orders/${order.id}`} className="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors">
-                  <div>
-                    <p className="text-sm font-medium">
-                      <span className={cn(
-                        "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold mr-2",
-                        order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
-                      )}>
-                        {order.side === "buy" ? "BUY" : "SELL"}
-                      </span>
-                      {Number(order.total_receive_crypto)} {order.asset}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{formatDate(order.created_at, "PPp")}</p>
-                  </div>
-                  <StatusBadge status={order.status} />
-                </Link>
-              ))}
+              <div className="divide-y">
+                {recentOrders.map((order) => (
+                  <Link key={order.id} to={`/dashboard/orders/${order.id}`} className="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors">
+                    <div>
+                      <p className="text-sm font-medium">
+                        <span className={cn(
+                          "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold mr-2",
+                          order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                        )}>
+                          {order.side === "buy" ? "BUY" : "SELL"}
+                        </span>
+                        {Number(order.total_receive_crypto)} {order.asset}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{formatDate(order.created_at, "PPp")}</p>
+                    </div>
+                    <StatusBadge status={order.status} />
+                  </Link>
+                ))}
+              </div>
             </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
