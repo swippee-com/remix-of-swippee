@@ -32,9 +32,6 @@ export default function OrderDetailPage() {
   const { formatDate } = useFormattedDate();
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
-  const { t } = useLanguage();
-  const { formatDate } = useFormattedDate();
-  const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [refNumber, setRefNumber] = useState("");
   const [proofNotes, setProofNotes] = useState("");
