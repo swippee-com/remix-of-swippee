@@ -193,7 +193,7 @@ export default function PortfolioPage() {
           <TabsTrigger value="history">{t("portfolio.tradeHistory")}</TabsTrigger>
         </TabsList>
 
-        {/* Holdings table */}
+        {/* Holdings tab */}
         <TabsContent value="holdings">
           <Card>
             <CardHeader>
@@ -211,24 +211,12 @@ export default function PortfolioPage() {
                   icon={<PieChart className="h-10 w-10" />}
                 />
               ) : (
-                <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("portfolio.asset")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.quantity")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.avgCost")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.currentPrice")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.value")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.24h")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.pl")}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <>
+                  {/* Mobile: Card layout */}
+                  <div className="md:hidden space-y-3">
                     {holdings.map((h) => {
                       const mp = priceMap[h.asset];
-                      const currentPriceUsd = mp?.price ?? 0;
-                      const currentPriceNpr = currentPriceUsd * rate;
+                      const currentPriceNpr = (mp?.price ?? 0) * rate;
                       const change24h = mp?.change24h ?? 0;
                       const currentValueNpr = h.quantity * currentPriceNpr;
                       const pl = currentValueNpr - h.totalInvested;
@@ -236,48 +224,118 @@ export default function PortfolioPage() {
                       const meta = ASSET_META[h.asset];
 
                       return (
-                        <TableRow key={h.asset}>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
+                        <div key={h.asset} className="rounded-lg border bg-muted/20 p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2.5">
                               {mp?.image ? (
                                 <img src={mp.image} alt={h.asset} className="h-8 w-8 rounded-full" />
                               ) : (
                                 <div className={cn("h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-primary-foreground", meta?.color ?? "bg-muted")}>{h.asset[0]}</div>
                               )}
                               <div>
-                                <p className="font-medium">{h.asset}</p>
+                                <p className="font-medium text-sm">{h.asset}</p>
                                 <p className="text-xs text-muted-foreground">{meta?.name ?? h.asset}</p>
                               </div>
                             </div>
-                          </TableCell>
-                          <TableCell className="text-right font-mono">
-                            {h.quantity.toLocaleString(undefined, { maximumFractionDigits: 8 })}
-                          </TableCell>
-                          <TableCell className="text-right">{fmtNpr(h.avgCostBasis)}</TableCell>
-                          <TableCell className="text-right">{fmtNpr(currentPriceNpr)}</TableCell>
-                          <TableCell className="text-right font-medium">{fmtNpr(currentValueNpr)}</TableCell>
-                          <TableCell className="text-right">
-                            <span className={cn("inline-flex items-center gap-0.5 text-sm font-medium", change24h >= 0 ? "text-success" : "text-destructive")}>
+                            <span className={cn("inline-flex items-center gap-0.5 text-xs font-medium", change24h >= 0 ? "text-success" : "text-destructive")}>
                               {change24h >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                               {Math.abs(change24h).toFixed(2)}%
                             </span>
-                          </TableCell>
-                          <TableCell className="text-right">
+                          </div>
+                          <div className="grid grid-cols-2 gap-y-2 text-sm">
                             <div>
-                              <span className={cn("font-medium", pl >= 0 ? "text-success" : "text-destructive")}>
-                                {pl >= 0 ? "+" : ""}{fmtNpr(pl)}
-                              </span>
-                              <p className={cn("text-xs", plPct >= 0 ? "text-success" : "text-destructive")}>
-                                {plPct >= 0 ? "+" : ""}{plPct.toFixed(2)}%
+                              <p className="text-xs text-muted-foreground">{t("portfolio.quantity")}</p>
+                              <p className="font-mono">{h.quantity.toLocaleString(undefined, { maximumFractionDigits: 6 })}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground">{t("portfolio.value")}</p>
+                              <p className="font-medium">{fmtNpr(currentValueNpr)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">{t("portfolio.avgCost")}</p>
+                              <p>{fmtNpr(h.avgCostBasis)}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground">{t("portfolio.pl")}</p>
+                              <p className={cn("font-medium", pl >= 0 ? "text-success" : "text-destructive")}>
+                                {pl >= 0 ? "+" : ""}{fmtNpr(pl)} <span className="text-xs">({plPct >= 0 ? "+" : ""}{plPct.toFixed(1)}%)</span>
                               </p>
                             </div>
-                          </TableCell>
-                        </TableRow>
+                          </div>
+                        </div>
                       );
                     })}
-                  </TableBody>
-                </Table>
-                </div>
+                  </div>
+
+                  {/* Desktop: Table layout */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{t("portfolio.asset")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.quantity")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.avgCost")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.currentPrice")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.value")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.24h")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.pl")}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {holdings.map((h) => {
+                          const mp = priceMap[h.asset];
+                          const currentPriceUsd = mp?.price ?? 0;
+                          const currentPriceNpr = currentPriceUsd * rate;
+                          const change24h = mp?.change24h ?? 0;
+                          const currentValueNpr = h.quantity * currentPriceNpr;
+                          const pl = currentValueNpr - h.totalInvested;
+                          const plPct = h.totalInvested > 0 ? (pl / h.totalInvested) * 100 : 0;
+                          const meta = ASSET_META[h.asset];
+
+                          return (
+                            <TableRow key={h.asset}>
+                              <TableCell>
+                                <div className="flex items-center gap-3">
+                                  {mp?.image ? (
+                                    <img src={mp.image} alt={h.asset} className="h-8 w-8 rounded-full" />
+                                  ) : (
+                                    <div className={cn("h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-primary-foreground", meta?.color ?? "bg-muted")}>{h.asset[0]}</div>
+                                  )}
+                                  <div>
+                                    <p className="font-medium">{h.asset}</p>
+                                    <p className="text-xs text-muted-foreground">{meta?.name ?? h.asset}</p>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-right font-mono">
+                                {h.quantity.toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                              </TableCell>
+                              <TableCell className="text-right">{fmtNpr(h.avgCostBasis)}</TableCell>
+                              <TableCell className="text-right">{fmtNpr(currentPriceNpr)}</TableCell>
+                              <TableCell className="text-right font-medium">{fmtNpr(currentValueNpr)}</TableCell>
+                              <TableCell className="text-right">
+                                <span className={cn("inline-flex items-center gap-0.5 text-sm font-medium", change24h >= 0 ? "text-success" : "text-destructive")}>
+                                  {change24h >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                                  {Math.abs(change24h).toFixed(2)}%
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div>
+                                  <span className={cn("font-medium", pl >= 0 ? "text-success" : "text-destructive")}>
+                                    {pl >= 0 ? "+" : ""}{fmtNpr(pl)}
+                                  </span>
+                                  <p className={cn("text-xs", plPct >= 0 ? "text-success" : "text-destructive")}>
+                                    {plPct >= 0 ? "+" : ""}{plPct.toFixed(2)}%
+                                  </p>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
