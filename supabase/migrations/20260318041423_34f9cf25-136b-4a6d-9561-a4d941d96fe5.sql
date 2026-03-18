@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN settlement_tx_hash text, ADD COLUMN settlement_notes text;

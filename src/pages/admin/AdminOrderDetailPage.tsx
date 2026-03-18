@@ -5,9 +5,11 @@ import { Timeline } from "@/components/shared/Timeline";
 import { ProofImage } from "@/components/shared/ProofImage";
 import { AdminNotes } from "@/components/admin/AdminNotes";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,7 +18,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { User, Receipt, Lock, CreditCard, MapPin } from "lucide-react";
+import { User, Receipt, Lock, CreditCard, MapPin, ChevronDown, CheckCircle, XCircle, Truck, Play } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type OrderStatus = Database["public"]["Enums"]["order_status"];
@@ -27,12 +29,17 @@ const ORDER_STATUSES: OrderStatus[] = [
   "settlement_in_progress", "completed", "expired", "cancelled", "rejected",
 ];
 
+const TERMINAL_STATUSES: OrderStatus[] = ["completed", "expired", "cancelled", "rejected"];
+
 export default function AdminOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<OrderStatus | "">("");
   const [statusNote, setStatusNote] = useState("");
+  const [txHashInput, setTxHashInput] = useState("");
+  const [settlementNotesInput, setSettlementNotesInput] = useState("");
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["admin-order-detail", id],
@@ -74,18 +81,27 @@ export default function AdminOrderDetailPage() {
     enabled: !!id,
   });
 
-  const updateStatusMutation = useMutation({
-    mutationFn: async () => {
-      if (!newStatus) throw new Error("Select a status.");
-      const { error } = await supabase.from("orders").update({ status: newStatus }).eq("id", id!);
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-order-detail", id] });
+    queryClient.invalidateQueries({ queryKey: ["admin-order-history", id] });
+    queryClient.invalidateQueries({ queryKey: ["admin-order-proofs", id] });
+  };
+
+  const transitionMutation = useMutation({
+    mutationFn: async ({ toStatus, note, txHash, notes }: { toStatus: OrderStatus; note?: string; txHash?: string; notes?: string }) => {
+      const updates: Record<string, any> = { status: toStatus };
+      if (txHash) updates.settlement_tx_hash = txHash;
+      if (notes) updates.settlement_notes = notes;
+
+      const { error } = await supabase.from("orders").update(updates).eq("id", id!);
       if (error) throw error;
       await supabase.from("order_status_history").insert({
         order_id: id!,
         old_status: order!.status,
-        new_status: newStatus,
+        new_status: toStatus,
         actor_id: user!.id,
         actor_role: "admin",
-        note: statusNote || null,
+        note: note || null,
       });
       await supabase.from("audit_logs").insert({
         action: "order_status_update",
@@ -93,14 +109,15 @@ export default function AdminOrderDetailPage() {
         actor_role: "admin",
         target_type: "order",
         target_id: id!,
-        metadata: { from: order!.status, to: newStatus, note: statusNote || null },
+        metadata: { from: order!.status, to: toStatus, note: note || null },
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-order-detail", id] });
-      queryClient.invalidateQueries({ queryKey: ["admin-order-history", id] });
+      invalidateAll();
       setNewStatus("");
       setStatusNote("");
+      setTxHashInput("");
+      setSettlementNotesInput("");
       toast({ title: "Order status updated" });
     },
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
@@ -110,9 +127,21 @@ export default function AdminOrderDetailPage() {
     mutationFn: async ({ proofId, status }: { proofId: string; status: string }) => {
       const { error } = await supabase.from("payment_proofs").update({ status, reviewed_by: user!.id, reviewed_at: new Date().toISOString() }).eq("id", proofId);
       if (error) throw error;
+      // Auto-advance: when approving proof and order is payment_proof_uploaded → approved_for_settlement
+      if (status === "approved" && order && order.status === "payment_proof_uploaded") {
+        await supabase.from("orders").update({ status: "approved_for_settlement" as any }).eq("id", id!);
+        await supabase.from("order_status_history").insert({
+          order_id: id!,
+          old_status: order.status,
+          new_status: "approved_for_settlement" as any,
+          actor_id: user!.id,
+          actor_role: "admin",
+          note: "Payment proof approved — auto-advanced to settlement",
+        });
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-order-proofs", id] });
+      invalidateAll();
       toast({ title: "Proof reviewed" });
     },
   });
@@ -132,6 +161,84 @@ export default function AdminOrderDetailPage() {
     completed: true,
     active: i === history.length - 1,
   }));
+
+  const isTerminal = TERMINAL_STATUSES.includes(order.status);
+  const txHash = (order as any).settlement_tx_hash as string | null;
+  const sNotes = (order as any).settlement_notes as string | null;
+
+  // Contextual action buttons
+  const renderActionButtons = () => {
+    if (isTerminal) return <p className="text-sm text-muted-foreground">This order is in a terminal state.</p>;
+
+    const status = order.status as OrderStatus;
+    const isPending = transitionMutation.isPending;
+
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-2">
+          {status === "payment_proof_uploaded" && (
+            <Button onClick={() => transitionMutation.mutate({ toStatus: "approved_for_settlement", note: "Payment accepted by admin" })} disabled={isPending}>
+              <CheckCircle className="mr-1 h-4 w-4" /> Accept Payment
+            </Button>
+          )}
+
+          {status === "manual_review" && (
+            <>
+              <Button onClick={() => transitionMutation.mutate({ toStatus: "approved_for_settlement", note: "Manual review passed" })} disabled={isPending}>
+                <CheckCircle className="mr-1 h-4 w-4" /> Approve
+              </Button>
+              <Button variant="destructive" onClick={() => transitionMutation.mutate({ toStatus: "rejected", note: "Rejected after manual review" })} disabled={isPending}>
+                <XCircle className="mr-1 h-4 w-4" /> Reject
+              </Button>
+            </>
+          )}
+
+          {status === "under_review" && (
+            <Button onClick={() => transitionMutation.mutate({ toStatus: "approved_for_settlement", note: "Review passed" })} disabled={isPending}>
+              <CheckCircle className="mr-1 h-4 w-4" /> Approve
+            </Button>
+          )}
+
+          {status === "approved_for_settlement" && (
+            <div className="w-full space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="text-sm font-medium">TX Hash {order.side === "buy" ? "(your outgoing crypto tx)" : "(user's incoming crypto tx)"}</label>
+                  <Input className="mt-1 font-mono text-sm" placeholder="0x... or transaction hash" value={txHashInput} onChange={(e) => setTxHashInput(e.target.value)} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Settlement Notes</label>
+                  <Textarea className="mt-1" rows={2} value={settlementNotesInput} onChange={(e) => setSettlementNotesInput(e.target.value)} placeholder="Optional notes..." />
+                </div>
+              </div>
+              <Button onClick={() => transitionMutation.mutate({ toStatus: "settlement_in_progress", note: "Settlement started", txHash: txHashInput || undefined, notes: settlementNotesInput || undefined })} disabled={isPending}>
+                <Play className="mr-1 h-4 w-4" /> Begin Settlement
+              </Button>
+            </div>
+          )}
+
+          {status === "settlement_in_progress" && (
+            <div className="w-full space-y-3">
+              {!txHash && (
+                <div>
+                  <label className="text-sm font-medium">TX Hash</label>
+                  <Input className="mt-1 font-mono text-sm" placeholder="0x... or transaction hash" value={txHashInput} onChange={(e) => setTxHashInput(e.target.value)} />
+                </div>
+              )}
+              <Button onClick={() => transitionMutation.mutate({ toStatus: "completed", note: "Settlement completed", txHash: txHashInput || undefined })} disabled={isPending}>
+                <Truck className="mr-1 h-4 w-4" /> Mark Completed
+              </Button>
+            </div>
+          )}
+
+          {/* Cancel button for any non-terminal */}
+          <Button variant="outline" className="text-destructive border-destructive/30" onClick={() => transitionMutation.mutate({ toStatus: "cancelled", note: "Cancelled by admin" })} disabled={isPending}>
+            <XCircle className="mr-1 h-4 w-4" /> Cancel Order
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <AdminLayout>
@@ -178,6 +285,29 @@ export default function AdminOrderDetailPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Settlement Info */}
+        {(txHash || sNotes) && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Settlement Info</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              {txHash && (
+                <div>
+                  <p className="text-muted-foreground text-xs font-medium">TX Hash</p>
+                  <code className="text-sm break-all font-mono bg-muted px-2 py-1 rounded">{txHash}</code>
+                </div>
+              )}
+              {sNotes && (
+                <div>
+                  <p className="text-muted-foreground text-xs font-medium">Notes</p>
+                  <p>{sNotes}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Pricing Snapshot */}
         {order.rateLock && (
@@ -233,32 +363,47 @@ export default function AdminOrderDetailPage() {
         <AdminNotes targetId={id!} targetType="order" />
       </div>
 
-      {/* Update Status */}
+      {/* Quick Actions */}
       <Card className="mt-6">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Update Status</CardTitle>
+          <CardTitle className="text-base">Actions</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-sm font-medium">New Status</label>
-              <Select value={newStatus} onValueChange={(v) => setNewStatus(v as OrderStatus)}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select status" /></SelectTrigger>
-                <SelectContent>
-                  {ORDER_STATUSES.map((s) => (
-                    <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Note</label>
-              <Textarea className="mt-1" rows={2} value={statusNote} onChange={(e) => setStatusNote(e.target.value)} placeholder="Optional note..." />
-            </div>
-          </div>
-          <Button onClick={() => updateStatusMutation.mutate()} disabled={!newStatus || updateStatusMutation.isPending}>
-            {updateStatusMutation.isPending ? "Updating…" : "Update Status"}
-          </Button>
+        <CardContent>
+          {renderActionButtons()}
+
+          {/* Advanced: full dropdown override */}
+          {!isTerminal && (
+            <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="mt-4">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-muted-foreground">
+                  <ChevronDown className={`mr-1 h-3 w-3 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+                  Advanced Override
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-3 space-y-4 border-t pt-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-medium">New Status</label>
+                    <Select value={newStatus} onValueChange={(v) => setNewStatus(v as OrderStatus)}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="Select status" /></SelectTrigger>
+                      <SelectContent>
+                        {ORDER_STATUSES.map((s) => (
+                          <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Note</label>
+                    <Textarea className="mt-1" rows={2} value={statusNote} onChange={(e) => setStatusNote(e.target.value)} placeholder="Optional note..." />
+                  </div>
+                </div>
+                <Button onClick={() => { if (newStatus) transitionMutation.mutate({ toStatus: newStatus as OrderStatus, note: statusNote }); }} disabled={!newStatus || transitionMutation.isPending}>
+                  {transitionMutation.isPending ? "Updating…" : "Force Update"}
+                </Button>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
         </CardContent>
       </Card>
 
