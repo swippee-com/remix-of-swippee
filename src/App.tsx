@@ -117,6 +117,8 @@ const App = () => (
 
             {/* User Dashboard — Protected */}
             <Route path="/dashboard" element={<ProtectedRoute><DashboardOverview /></ProtectedRoute>} />
+            <Route path="/dashboard/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+            <Route path="/dashboard/orders/:id" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
             <Route path="/dashboard/kyc" element={<ProtectedRoute><KycPage /></ProtectedRoute>} />
             <Route path="/dashboard/quotes" element={<ProtectedRoute><QuotesPage /></ProtectedRoute>} />
             <Route path="/dashboard/quotes/new" element={<ProtectedRoute><NewQuotePage /></ProtectedRoute>} />
