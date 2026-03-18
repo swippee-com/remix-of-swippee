@@ -37,11 +37,6 @@ import ResetPassword from "./pages/auth/ResetPassword";
 // Dashboard
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import KycPage from "./pages/dashboard/KycPage";
-import QuotesPage from "./pages/dashboard/QuotesPage";
-import NewQuotePage from "./pages/dashboard/NewQuotePage";
-import QuoteDetailPage from "./pages/dashboard/QuoteDetailPage";
-import TradesPage from "./pages/dashboard/TradesPage";
-import TradeDetailPage from "./pages/dashboard/TradeDetailPage";
 import PaymentMethodsPage from "./pages/dashboard/PaymentMethodsPage";
 import PayoutAddressesPage from "./pages/dashboard/PayoutAddressesPage";
 import SupportDashboardPage from "./pages/dashboard/SupportDashboardPage";
@@ -57,10 +52,6 @@ import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminUserDetailPage from "./pages/admin/AdminUserDetailPage";
 import AdminKycPage from "./pages/admin/AdminKycPage";
-import AdminQuotesPage from "./pages/admin/AdminQuotesPage";
-import AdminQuoteDetailPage from "./pages/admin/AdminQuoteDetailPage";
-import AdminTradesPage from "./pages/admin/AdminTradesPage";
-import AdminTradeDetailPage from "./pages/admin/AdminTradeDetailPage";
 import AdminLedgerPage from "./pages/admin/AdminLedgerPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 import AdminSupportPage from "./pages/admin/AdminSupportPage";
@@ -124,13 +115,9 @@ const App = () => (
             <Route path="/dashboard/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
             <Route path="/dashboard/orders/:id" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
             <Route path="/dashboard/kyc" element={<ProtectedRoute><KycPage /></ProtectedRoute>} />
-            <Route path="/dashboard/quotes" element={<ProtectedRoute><QuotesPage /></ProtectedRoute>} />
-            <Route path="/dashboard/quotes/new" element={<ProtectedRoute><NewQuotePage /></ProtectedRoute>} />
-            <Route path="/dashboard/quotes/:id" element={<ProtectedRoute><QuoteDetailPage /></ProtectedRoute>} />
-            <Route path="/dashboard/trades" element={<ProtectedRoute><TradesPage /></ProtectedRoute>} />
             <Route path="/dashboard/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
             <Route path="/dashboard/portfolio" element={<ProtectedRoute><PortfolioPage /></ProtectedRoute>} />
-            <Route path="/dashboard/trades/:id" element={<ProtectedRoute><TradeDetailPage /></ProtectedRoute>} />
+            
             <Route path="/dashboard/payment-methods" element={<ProtectedRoute><PaymentMethodsPage /></ProtectedRoute>} />
             <Route path="/dashboard/payout-addresses" element={<ProtectedRoute><PayoutAddressesPage /></ProtectedRoute>} />
             <Route path="/dashboard/support" element={<ProtectedRoute><SupportDashboardPage /></ProtectedRoute>} />
@@ -142,10 +129,6 @@ const App = () => (
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/users/:id" element={<AdminRoute><AdminUserDetailPage /></AdminRoute>} />
             <Route path="/admin/kyc" element={<AdminRoute><AdminKycPage /></AdminRoute>} />
-            <Route path="/admin/quotes" element={<AdminRoute><AdminQuotesPage /></AdminRoute>} />
-            <Route path="/admin/quotes/:id" element={<AdminRoute><AdminQuoteDetailPage /></AdminRoute>} />
-            <Route path="/admin/trades" element={<AdminRoute><AdminTradesPage /></AdminRoute>} />
-            <Route path="/admin/trades/:id" element={<AdminRoute><AdminTradeDetailPage /></AdminRoute>} />
             <Route path="/admin/ledger" element={<AdminRoute><AdminLedgerPage /></AdminRoute>} />
             <Route path="/admin/audit-logs" element={<AdminRoute><AdminAuditLogsPage /></AdminRoute>} />
             <Route path="/admin/support" element={<AdminRoute><AdminSupportPage /></AdminRoute>} />
