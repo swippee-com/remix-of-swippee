@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useFormattedDate } from "@/hooks/use-formatted-date";
 import { useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { DepositModal } from "@/components/dashboard/DepositModal";
 import { WithdrawModal } from "@/components/dashboard/WithdrawModal";
