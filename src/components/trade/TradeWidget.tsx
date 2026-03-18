@@ -127,7 +127,11 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
             return (
               <button
                 key={s}
-                onClick={() => setSide(s)}
+                onClick={() => {
+                  setSide(s);
+                  setAmountType(s === "buy" ? "npr" : "crypto");
+                  setAmountStr("");
+                }}
                 className={cn(
                   "flex-1 rounded-md text-sm font-semibold transition-all relative",
                   isMobile ? "py-3" : "py-2",
