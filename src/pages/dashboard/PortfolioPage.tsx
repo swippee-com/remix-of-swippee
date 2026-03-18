@@ -115,26 +115,35 @@ export default function PortfolioPage() {
   const rate = nprData.rate;
   const sym = currencySymbol(currency);
 
+  // portfolioValue: current value in NPR (market USD price × NPR rate × qty)
   const portfolioValue = useMemo(() => {
     return holdings.reduce((sum, h) => {
       const usdPrice = priceMap[h.asset]?.price ?? 0;
-      return sum + h.quantity * usdPrice;
+      return sum + h.quantity * usdPrice * rate;
     }, 0);
-  }, [holdings, priceMap]);
+  }, [holdings, priceMap, rate]);
 
+  // totalPL: current NPR value minus cost basis (already in NPR)
   const totalPL = useMemo(() => {
     return holdings.reduce((sum, h) => {
       const usdPrice = priceMap[h.asset]?.price ?? 0;
-      const currentVal = h.quantity * usdPrice;
-      const costVal = h.avgCostBasis > 0 ? h.quantity * h.avgCostBasis : 0;
-      return sum + (currentVal - costVal);
+      const currentValNpr = h.quantity * usdPrice * rate;
+      const costValNpr = h.totalInvested; // already in NPR
+      return sum + (currentValNpr - costValNpr);
     }, 0);
-  }, [holdings, priceMap]);
+  }, [holdings, priceMap, rate]);
 
   const isLoading = ordersLoading || pricesLoading;
 
-  const fmt = (usd: number) => {
+  // Format a USD value into the selected currency
+  const fmtUsd = (usd: number) => {
     const val = convertPrice(usd, currency, rate);
+    return `${sym}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  // Format an NPR value into the selected currency
+  const fmtNpr = (npr: number) => {
+    const val = currency === "npr" ? npr : npr / rate;
     return `${sym}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
