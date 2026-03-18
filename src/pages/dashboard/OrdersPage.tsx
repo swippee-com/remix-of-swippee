@@ -41,6 +41,7 @@ export default function OrdersPage() {
   const { t } = useLanguage();
   const { formatDate } = useFormattedDate();
   const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const queryKeys = useMemo(() => [["orders-list", user?.id || ""]], [user?.id]);
   useRealtimeInvalidation("orders", queryKeys);
