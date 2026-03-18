@@ -98,7 +98,7 @@ export default function FeesPage() {
             </div>
             <div className="rounded-lg border bg-card p-6 shadow-card">
               <h2 className="font-semibold">No Hidden Fees</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Every quote includes all applicable fees. What you see is what you pay. No account fees, no deposit fees, no surprise charges.</p>
+              <p className="mt-2 text-sm text-muted-foreground"><p className="mt-2 text-sm text-muted-foreground">Every order includes all applicable fees. What you see is what you pay. No account fees, no deposit fees, no surprise charges.</p> No account fees, no deposit fees, no surprise charges.</p>
             </div>
           </div>
 
