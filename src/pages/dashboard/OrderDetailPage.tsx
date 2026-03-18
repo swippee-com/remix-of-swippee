@@ -238,7 +238,32 @@ export default function OrderDetailPage() {
         title={`${order.side === "buy" ? "Buy" : "Sell"} ${order.asset} — Order`}
         description={`${order.network} • ${order.order_type}`}
       >
-        <StatusBadge status={order.status} />
+        <div className="flex items-center gap-2">
+          <StatusBadge status={order.status} />
+          {canCancel && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <XCircle className="mr-1 h-3 w-3" /> Cancel Order
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Cancel this order?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will cancel your {order.side} order for {order.asset}. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep Order</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => cancelMutation.mutate()} disabled={cancelMutation.isPending}>
+                    {cancelMutation.isPending ? "Cancelling…" : "Yes, Cancel"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </PageHeader>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

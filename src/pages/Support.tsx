@@ -3,8 +3,40 @@ import { BRAND } from "@/config/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Mail, MessageCircle } from "lucide-react";
 import { usePageMeta } from "@/hooks/use-page-meta";
+
+const FAQ_ITEMS = [
+  {
+    q: "How long does it take to process an order?",
+    a: "Most orders are processed within 15–30 minutes during business hours. Complex or high-value orders may take up to 24 hours due to manual review.",
+  },
+  {
+    q: "Which banks and payment methods are supported?",
+    a: "We support all major Nepali banks via bank transfer, as well as eSewa, Khalti, and IME Pay digital wallets.",
+  },
+  {
+    q: "What are the minimum and maximum order limits?",
+    a: "The minimum order is NPR 1,000. Maximum limits depend on your KYC level — standard verified users can trade up to NPR 500,000 per order.",
+  },
+  {
+    q: "How do I complete KYC verification?",
+    a: "Go to Dashboard → KYC, fill in your personal details, upload your ID documents and a selfie, then submit for review. Verification usually takes 1–2 business days.",
+  },
+  {
+    q: "Can I cancel an order after placing it?",
+    a: "Yes, you can cancel orders that are still in 'Awaiting Payment' status from the order detail page. Once payment proof is submitted, cancellation is no longer possible.",
+  },
+  {
+    q: "What happens if my order expires?",
+    a: "Rate locks expire after 10 minutes. If the timer runs out before you submit payment, the order is automatically cancelled and you can place a new one at the current rate.",
+  },
+  {
+    q: "How do refunds work?",
+    a: "If an order is cancelled after payment, refunds are processed to your original payment method within 3–5 business days. See our Refund Policy for details.",
+  },
+];
 
 export default function SupportPage() {
   usePageMeta(
@@ -33,6 +65,19 @@ export default function SupportPage() {
                 <p className="mt-1 text-sm text-muted-foreground">Create a ticket from your dashboard.</p>
               </div>
             </div>
+          </div>
+
+          {/* FAQ */}
+          <div className="mt-10 rounded-lg border bg-card p-6 shadow-card">
+            <h2 className="text-lg font-semibold mb-4">Frequently Asked Questions</h2>
+            <Accordion type="single" collapsible className="w-full">
+              {FAQ_ITEMS.map((item, i) => (
+                <AccordionItem key={i} value={`faq-${i}`}>
+                  <AccordionTrigger className="text-left text-sm">{item.q}</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">{item.a}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
 
           <div className="mt-10 rounded-lg border bg-card p-6 shadow-card">
