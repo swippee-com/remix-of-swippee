@@ -41,6 +41,7 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
   const [amountStr, setAmountStr] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [gateOpen, setGateOpen] = useState(false);
+  const [placing, setPlacing] = useState(false);
 
   const amount = parseFloat(amountStr) || 0;
   const networks = ASSET_NETWORKS[asset] || ["TRC20"];
