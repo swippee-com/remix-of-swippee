@@ -11,6 +11,7 @@ import { useTradePricing, type TradeSide, type AmountType } from "@/hooks/use-tr
 import { RateLockTimer } from "./RateLockTimer";
 import { ReadinessGate } from "./ReadinessGate";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTradeReadiness } from "@/hooks/use-trade-readiness";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,8 +68,10 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
     setAmountStr("");
   };
 
+  const { allReady } = useTradeReadiness(side);
+
   const handleCTA = async () => {
-    if (!user) {
+    if (!user || !allReady) {
       setGateOpen(true);
       return;
     }
