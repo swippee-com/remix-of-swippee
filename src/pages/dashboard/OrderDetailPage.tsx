@@ -18,6 +18,8 @@ import { useState, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { PricingExplainer } from "@/components/trade/PricingExplainer";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Order = Tables<"orders">;
@@ -29,6 +31,7 @@ export default function OrderDetailPage() {
   const { t } = useLanguage();
   const { formatDate } = useFormattedDate();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const fileRef = useRef<HTMLInputElement>(null);
   const [refNumber, setRefNumber] = useState("");
   const [proofNotes, setProofNotes] = useState("");
@@ -255,10 +258,19 @@ export default function OrderDetailPage() {
           {timelineSteps.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t("orders.noHistory")}</p>
           ) : (
-            <Timeline steps={timelineSteps} />
+            <Timeline steps={timelineSteps} compact={isMobile} />
           )}
         </CardContent>
       </Card>
+
+      {/* Pricing Explainer */}
+      {rateLock && (
+        <Card className="mt-6">
+          <CardContent className="pt-6">
+            <PricingExplainer />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Payment Proofs */}
       <Card className="mt-6">
