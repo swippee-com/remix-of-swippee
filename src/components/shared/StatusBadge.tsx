@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { type KycStatus, type QuoteRequestStatus, type TradeStatus, type TicketStatus } from "@/types";
+import { type KycStatus, type OrderStatus, type TicketStatus } from "@/types";
 
-type StatusType = KycStatus | QuoteRequestStatus | TradeStatus | TicketStatus | string;
+type StatusType = KycStatus | OrderStatus | TicketStatus | string;
 
 const statusStyles: Record<string, string> = {
   // KYC
@@ -10,16 +10,8 @@ const statusStyles: Record<string, string> = {
   approved: "bg-success/10 text-success",
   rejected: "bg-destructive/10 text-destructive",
   needs_more_info: "bg-warning/10 text-warning",
-  // Quote
-  draft: "bg-muted text-muted-foreground",
-  submitted: "bg-primary/10 text-primary",
-  quoted: "bg-success/10 text-success",
-  awaiting_user_acceptance: "bg-warning/10 text-warning",
-  accepted: "bg-success/10 text-success",
-  expired: "bg-muted text-muted-foreground",
-  cancelled: "bg-muted text-muted-foreground",
-  converted_to_trade: "bg-success/10 text-success",
   // Order
+  draft: "bg-muted text-muted-foreground",
   rate_locked: "bg-primary/10 text-primary",
   awaiting_payment: "bg-warning/10 text-warning",
   payment_proof_uploaded: "bg-primary/10 text-primary",
@@ -27,16 +19,9 @@ const statusStyles: Record<string, string> = {
   manual_review: "bg-destructive/10 text-destructive",
   approved_for_settlement: "bg-success/10 text-success",
   settlement_in_progress: "bg-primary/10 text-primary",
-  // Trade
-  pending_settlement: "bg-warning/10 text-warning",
-  awaiting_fiat_payment: "bg-warning/10 text-warning",
-  fiat_received: "bg-success/10 text-success",
-  awaiting_crypto_transfer: "bg-warning/10 text-warning",
-  crypto_received: "bg-success/10 text-success",
-  ready_to_release: "bg-primary/10 text-primary",
   completed: "bg-success/10 text-success",
-  disputed: "bg-destructive/10 text-destructive",
-  failed: "bg-destructive/10 text-destructive",
+  expired: "bg-muted text-muted-foreground",
+  cancelled: "bg-muted text-muted-foreground",
   // Ticket
   open: "bg-primary/10 text-primary",
   pending_user: "bg-warning/10 text-warning",

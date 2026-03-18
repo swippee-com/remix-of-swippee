@@ -1,8 +1,7 @@
 // ===== Enums =====
 export type UserRole = "user" | "admin" | "compliance";
 export type KycStatus = "not_submitted" | "pending_review" | "approved" | "rejected" | "needs_more_info";
-export type QuoteRequestStatus = "draft" | "submitted" | "under_review" | "quoted" | "awaiting_user_acceptance" | "accepted" | "rejected" | "expired" | "cancelled" | "converted_to_trade";
-export type TradeStatus = "pending_settlement" | "awaiting_fiat_payment" | "payment_proof_uploaded" | "fiat_received" | "awaiting_crypto_transfer" | "crypto_received" | "ready_to_release" | "completed" | "disputed" | "cancelled" | "failed";
+export type OrderStatus = "draft" | "rate_locked" | "awaiting_payment" | "payment_proof_uploaded" | "under_review" | "manual_review" | "approved_for_settlement" | "settlement_in_progress" | "completed" | "expired" | "cancelled" | "rejected";
 export type TradeSide = "buy" | "sell";
 export type LedgerBucket = "client_receivable" | "client_payable" | "fees_revenue" | "settlement_pending" | "otc_inventory" | "fiat_clearing" | "crypto_clearing" | "manual_adjustment";
 export type LedgerDirection = "debit" | "credit";
@@ -19,58 +18,6 @@ export interface Profile {
   phone: string | null;
   country: string | null;
   avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface QuoteRequest {
-  id: string;
-  user_id: string;
-  side: TradeSide;
-  asset: string;
-  network: string;
-  fiat_currency: string;
-  amount_type: "crypto" | "fiat";
-  requested_amount: number;
-  preferred_payment_method_id: string | null;
-  payout_address: string | null;
-  notes: string | null;
-  status: QuoteRequestStatus;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Quote {
-  id: string;
-  request_id: string;
-  price_per_unit: number;
-  fees: number;
-  spread: number | null;
-  total_payable: number;
-  total_receivable: number;
-  expires_at: string;
-  instructions: string | null;
-  internal_note: string | null;
-  created_at: string;
-}
-
-export interface Trade {
-  id: string;
-  quote_id: string;
-  user_id: string;
-  side: TradeSide;
-  asset: string;
-  network: string;
-  fiat_currency: string;
-  quoted_rate: number;
-  fee: number;
-  gross_amount: number;
-  net_amount: number;
-  status: TradeStatus;
-  settlement_notes: string | null;
-  tx_hash: string | null;
-  payment_proof_url: string | null;
-  assigned_admin_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -149,14 +96,4 @@ export interface SupportTicket {
   status: TicketStatus;
   created_at: string;
   updated_at: string;
-}
-
-export interface TradeStatusHistory {
-  id: string;
-  trade_id: string;
-  from_status: TradeStatus | null;
-  to_status: TradeStatus;
-  changed_by: string | null;
-  notes: string | null;
-  created_at: string;
 }
