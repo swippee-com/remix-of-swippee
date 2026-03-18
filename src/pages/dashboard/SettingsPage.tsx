@@ -43,7 +43,6 @@ export default function SettingsPage() {
         .from("profiles")
         .update({
           full_name: fullName,
-          phone: phone || null,
           country: country || null,
         })
         .eq("id", user!.id);
