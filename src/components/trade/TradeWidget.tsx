@@ -68,8 +68,10 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
     setAmountStr("");
   };
 
+  const { allReady } = useTradeReadiness(side);
+
   const handleCTA = async () => {
-    if (!user) {
+    if (!user || !allReady) {
       setGateOpen(true);
       return;
     }
