@@ -78,7 +78,7 @@ export default function FeesPage() {
           <div className="mt-8 space-y-6">
             <div className="rounded-lg border bg-card p-6 shadow-card">
               <h2 className="font-semibold">Trading Fees</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Our OTC trading fee is applied per trade and disclosed upfront in every quote. Fees vary based on trade size, asset, and market conditions.</p>
+              <p className="mt-2 text-sm text-muted-foreground"><p className="mt-2 text-sm text-muted-foreground">Our trading fee is applied per order and disclosed upfront before you confirm. Fees vary based on trade size, asset, and market conditions.</p> Fees vary based on trade size, asset, and market conditions.</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="rounded-md bg-muted p-4">
                   <p className="text-sm font-medium">Standard Trades</p>
