@@ -227,11 +227,12 @@ export default function PortfolioPage() {
                   <TableBody>
                     {holdings.map((h) => {
                       const mp = priceMap[h.asset];
-                      const currentPrice = mp?.price ?? 0;
+                      const currentPriceUsd = mp?.price ?? 0;
+                      const currentPriceNpr = currentPriceUsd * rate;
                       const change24h = mp?.change24h ?? 0;
-                      const currentValue = h.quantity * currentPrice;
-                      const pl = currentValue - h.quantity * h.avgCostBasis;
-                      const plPct = h.avgCostBasis > 0 ? ((currentPrice - h.avgCostBasis) / h.avgCostBasis) * 100 : 0;
+                      const currentValueNpr = h.quantity * currentPriceNpr;
+                      const pl = currentValueNpr - h.totalInvested;
+                      const plPct = h.totalInvested > 0 ? (pl / h.totalInvested) * 100 : 0;
                       const meta = ASSET_META[h.asset];
 
                       return (
