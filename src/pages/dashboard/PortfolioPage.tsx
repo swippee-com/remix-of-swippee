@@ -359,45 +359,73 @@ export default function PortfolioPage() {
                   icon={<BarChart3 className="h-10 w-10" />}
                 />
               ) : (
-                <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("portfolio.date")}</TableHead>
-                      <TableHead>{t("portfolio.type")}</TableHead>
-                      <TableHead>{t("portfolio.asset")}</TableHead>
-                      <TableHead>{t("portfolio.network")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.amount")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.rate")}</TableHead>
-                      <TableHead className="text-right">{t("portfolio.total")}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <>
+                  {/* Mobile: Card layout */}
+                  <div className="md:hidden space-y-3">
                     {orders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="text-muted-foreground">
-                          {formatDate(order.created_at, "MMM d, yyyy")}
-                        </TableCell>
-                        <TableCell>
-                          <span className={cn(
-                            "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-                            order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
-                          )}>
-                            {order.side.toUpperCase()}
-                          </span>
-                        </TableCell>
-                        <TableCell className="font-medium">{order.asset}</TableCell>
-                        <TableCell className="text-muted-foreground">{order.network}</TableCell>
-                        <TableCell className="text-right font-mono">
-                          {Number(order.total_receive_crypto).toLocaleString(undefined, { maximumFractionDigits: 8 })}
-                        </TableCell>
-                        <TableCell className="text-right">{fmtNpr(Number(order.final_rate_npr))}</TableCell>
-                        <TableCell className="text-right font-medium">{fmtNpr(Number(order.total_pay_npr))}</TableCell>
-                      </TableRow>
+                      <div key={order.id} className="rounded-lg border bg-muted/20 p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className={cn(
+                              "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                              order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                            )}>
+                              {order.side.toUpperCase()}
+                            </span>
+                            <span className="font-medium text-sm">{order.asset}</span>
+                            <span className="text-xs text-muted-foreground">{order.network}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">{formatDate(order.created_at, "MMM d")}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-mono">{Number(order.total_receive_crypto).toLocaleString(undefined, { maximumFractionDigits: 6 })} {order.asset}</span>
+                          <span className="font-medium">{fmtNpr(Number(order.total_pay_npr))}</span>
+                        </div>
+                      </div>
                     ))}
-                  </TableBody>
-                </Table>
-                </div>
+                  </div>
+
+                  {/* Desktop: Table layout */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{t("portfolio.date")}</TableHead>
+                          <TableHead>{t("portfolio.type")}</TableHead>
+                          <TableHead>{t("portfolio.asset")}</TableHead>
+                          <TableHead>{t("portfolio.network")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.amount")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.rate")}</TableHead>
+                          <TableHead className="text-right">{t("portfolio.total")}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {orders.map((order) => (
+                          <TableRow key={order.id}>
+                            <TableCell className="text-muted-foreground">
+                              {formatDate(order.created_at, "MMM d, yyyy")}
+                            </TableCell>
+                            <TableCell>
+                              <span className={cn(
+                                "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+                                order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                              )}>
+                                {order.side.toUpperCase()}
+                              </span>
+                            </TableCell>
+                            <TableCell className="font-medium">{order.asset}</TableCell>
+                            <TableCell className="text-muted-foreground">{order.network}</TableCell>
+                            <TableCell className="text-right font-mono">
+                              {Number(order.total_receive_crypto).toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                            </TableCell>
+                            <TableCell className="text-right">{fmtNpr(Number(order.final_rate_npr))}</TableCell>
+                            <TableCell className="text-right font-medium">{fmtNpr(Number(order.total_pay_npr))}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
