@@ -97,10 +97,12 @@ export default function OrdersPage() {
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState
-            icon={ShoppingCart}
+            icon={<ShoppingCart className="mx-auto h-10 w-10" />}
             title={t("orders.noOrders")}
             description={t("orders.noOrdersDesc")}
-            action={{ label: t("orders.newOrder"), href: "/trade" }}
+            action={
+              <Button asChild><Link to="/trade">{t("orders.newOrder")}</Link></Button>
+            }
           />
         ) : (
           <table className="w-full text-sm">
