@@ -13,7 +13,6 @@ const statusStyles: Record<string, string> = {
   // Quote
   draft: "bg-muted text-muted-foreground",
   submitted: "bg-primary/10 text-primary",
-  under_review: "bg-warning/10 text-warning",
   quoted: "bg-success/10 text-success",
   awaiting_user_acceptance: "bg-warning/10 text-warning",
   accepted: "bg-success/10 text-success",
