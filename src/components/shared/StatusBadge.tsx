@@ -27,7 +27,6 @@ const statusStyles: Record<string, string> = {
   manual_review: "bg-destructive/10 text-destructive",
   approved_for_settlement: "bg-success/10 text-success",
   settlement_in_progress: "bg-primary/10 text-primary",
-  rejected: "bg-destructive/10 text-destructive",
   // Trade
   pending_settlement: "bg-warning/10 text-warning",
   awaiting_fiat_payment: "bg-warning/10 text-warning",
