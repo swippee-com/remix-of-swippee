@@ -93,7 +93,58 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 3. Check inventory
+    // 2b. Readiness checks
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("phone_verified")
+      .eq("id", userId)
+      .single();
+    if (!profile?.phone_verified) {
+      return new Response(
+        JSON.stringify({ error: "Phone number not verified. Please verify your phone first." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data: kycRows } = await supabase
+      .from("kyc_submissions")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("status", "approved")
+      .limit(1);
+    if (!kycRows || kycRows.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "KYC not approved. Please complete KYC verification first." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data: pmRows } = await supabase
+      .from("payment_methods")
+      .select("id")
+      .eq("user_id", userId)
+      .limit(1);
+    if (!pmRows || pmRows.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "No payment method found. Please add a payment method first." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (lock.side === "sell") {
+      const { data: payoutRows } = await supabase
+        .from("payout_addresses")
+        .select("id")
+        .eq("user_id", userId)
+        .limit(1);
+      if (!payoutRows || payoutRows.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "No payout address found. Please add a payout address first." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     let requiresManualReview = false;
     const { data: inventory } = await supabase
       .from("inventory_balances")
