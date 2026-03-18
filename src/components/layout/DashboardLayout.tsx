@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { LogOut, Menu, X, Sun, Moon, Globe, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/shared/NotificationBell";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
