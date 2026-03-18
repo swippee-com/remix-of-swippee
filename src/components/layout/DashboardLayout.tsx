@@ -90,8 +90,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile sidebar */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-foreground/20" onClick={() => setSidebarOpen(false)} />
-          <aside className="fixed inset-y-0 left-0 w-60 flex-col border-r bg-card flex">
+          <div className="fixed inset-0 bg-foreground/20 animate-in fade-in duration-200" onClick={() => setSidebarOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-60 flex-col border-r bg-card flex animate-in slide-in-from-left duration-200">
             <div className="flex h-16 items-center justify-between border-b px-6">
               <span className="text-lg font-bold">{BRAND.name}</span>
               <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}><X className="h-4 w-4" /></Button>
