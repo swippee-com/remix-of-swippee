@@ -65,8 +65,7 @@ export default function AdminAuditLogsPage() {
           <SelectContent>
             <SelectItem value="all">All Actions</SelectItem>
             <SelectItem value="kyc">KYC</SelectItem>
-            <SelectItem value="quote">Quotes</SelectItem>
-            <SelectItem value="trade">Trades</SelectItem>
+            <SelectItem value="order">Orders</SelectItem>
             <SelectItem value="role">Roles</SelectItem>
             <SelectItem value="ledger">Ledger</SelectItem>
           </SelectContent>
