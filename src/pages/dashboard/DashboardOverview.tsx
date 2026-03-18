@@ -15,6 +15,7 @@ import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { PriceTicker } from "@/components/shared/PriceTicker";
 import { cn } from "@/lib/utils";
+import { DashboardStatsSkeleton, RecentOrdersSkeleton } from "@/components/shared/DashboardSkeleton";
 
 const QUICK_TRADES = [
   { label: "Buy USDT", asset: "USDT", side: "buy" },
