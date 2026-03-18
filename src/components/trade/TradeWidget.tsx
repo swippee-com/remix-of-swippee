@@ -49,8 +49,8 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
   const amount = parseFloat(amountStr) || 0;
   const networks = ASSET_NETWORKS[asset] || ["TRC20"];
 
-  const { isAvailable, isLoading: availLoading } = useTradeAvailability();
-  const sideAvailable = isAvailable(asset, side);
+  const { isAvailable, isNetworkAvailable, isLoading: availLoading } = useTradeAvailability();
+  const sideAvailable = isNetworkAvailable(asset, side, network);
 
   const { state, pricing, rateLock, countdown, error, lockRate, refreshRate } = useTradePricing({
     asset,
