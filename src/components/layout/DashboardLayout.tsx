@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { LogOut, Menu, X, Sun, Moon, Globe, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/shared/NotificationBell";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -21,6 +21,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { profile, signOut } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const { locale, setLocale, t } = useLanguage();
+
+  const currentPageTitle = useMemo(() => {
+    const item = userNavItems.find((i) => i.href === location.pathname);
+    return item ? t(item.labelKey) : "";
+  }, [location.pathname, t]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -85,8 +90,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile sidebar */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-foreground/20" onClick={() => setSidebarOpen(false)} />
-          <aside className="fixed inset-y-0 left-0 w-60 flex-col border-r bg-card flex">
+          <div className="fixed inset-0 bg-foreground/20 animate-in fade-in duration-200" onClick={() => setSidebarOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-60 flex-col border-r bg-card flex animate-in slide-in-from-left duration-200">
             <div className="flex h-16 items-center justify-between border-b px-6">
               <span className="text-lg font-bold">{BRAND.name}</span>
               <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}><X className="h-4 w-4" /></Button>
@@ -99,9 +104,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="lg:pl-60">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur lg:px-8">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-2 lg:hidden">
+            <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
+              <Menu className="h-5 w-5" />
+            </Button>
+            {currentPageTitle && <span className="text-sm font-semibold truncate">{currentPageTitle}</span>}
+          </div>
           <div className="hidden lg:block" />
           <div className="flex items-center gap-2">
             {/* Language toggle */}

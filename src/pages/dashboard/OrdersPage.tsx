@@ -2,9 +2,11 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { OrderRowSkeleton } from "@/components/shared/DashboardSkeleton";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import { ShoppingCart, ArrowLeftRight } from "lucide-react";
+import { ShoppingCart, ArrowLeftRight, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +41,7 @@ export default function OrdersPage() {
   const { t } = useLanguage();
   const { formatDate } = useFormattedDate();
   const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const queryKeys = useMemo(() => [["orders-list", user?.id || ""]], [user?.id]);
   useRealtimeInvalidation("orders", queryKeys);
@@ -57,9 +60,21 @@ export default function OrdersPage() {
     enabled: !!user,
   });
 
-  const filtered = activeTab === "all"
-    ? orders
-    : orders.filter((o) => TAB_FILTERS[activeTab].includes(o.status));
+  const filtered = useMemo(() => {
+    let result = activeTab === "all"
+      ? orders
+      : orders.filter((o) => TAB_FILTERS[activeTab].includes(o.status));
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((o) =>
+        o.asset.toLowerCase().includes(q) ||
+        o.side.toLowerCase().includes(q) ||
+        o.id.toLowerCase().includes(q) ||
+        o.status.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [orders, activeTab, searchQuery]);
 
   return (
     <DashboardLayout>
@@ -89,12 +104,36 @@ export default function OrdersPage() {
         ))}
       </div>
 
+      {/* Search */}
+      <div className="mt-3 relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search by asset, side, ID, or status..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
       {/* Table */}
       <div className="mt-4 rounded-lg border bg-card shadow-card overflow-x-auto">
         {isLoading ? (
-          <div className="flex justify-center py-16">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          </div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b text-left text-muted-foreground">
+                <th className="px-4 py-3 font-medium">{t("orders.colSide")}</th>
+                <th className="px-4 py-3 font-medium">{t("orders.colAsset")}</th>
+                <th className="px-4 py-3 font-medium">{t("orders.colRate")}</th>
+                <th className="px-4 py-3 font-medium">{t("orders.colAmount")}</th>
+                <th className="px-4 py-3 font-medium">{t("orders.colStatus")}</th>
+                <th className="px-4 py-3 font-medium">{t("orders.colDate")}</th>
+                <th className="px-4 py-3 font-medium">{t("orders.colAction")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map((i) => <OrderRowSkeleton key={i} />)}
+            </tbody>
+          </table>
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={<ShoppingCart className="mx-auto h-10 w-10" />}

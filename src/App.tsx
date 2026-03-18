@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
@@ -88,6 +89,7 @@ const App = () => (
           <BrowserRouter>
             <AuthProvider>
               <LanguageProvider>
+          <ErrorBoundary>
           <ScrollToTop />
           <LoginTrackerWrapper />
           <Routes>
@@ -142,6 +144,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </ErrorBoundary>
               </LanguageProvider>
             </AuthProvider>
           </BrowserRouter>

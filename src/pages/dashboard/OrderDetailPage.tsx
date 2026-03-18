@@ -7,14 +7,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, ArrowLeft, HeadphonesIcon, ExternalLink } from "lucide-react";
+import { Upload, ArrowLeft, HeadphonesIcon, ExternalLink, XCircle } from "lucide-react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormattedDate } from "@/hooks/use-formatted-date";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { cn } from "@/lib/utils";
@@ -154,6 +165,29 @@ export default function OrderDetailPage() {
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
+  const cancelMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("orders").update({ status: "cancelled" as any }).eq("id", id!).eq("user_id", user!.id);
+      if (error) throw error;
+      await supabase.from("order_status_history").insert({
+        order_id: id!,
+        old_status: order!.status,
+        new_status: "cancelled" as any,
+        actor_id: user!.id,
+        actor_role: "user",
+        note: "Cancelled by user",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["order-detail", id] });
+      queryClient.invalidateQueries({ queryKey: ["order-history", id] });
+      toast({ title: "Order cancelled" });
+    },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
+  });
+
+  const canCancel = order && ["awaiting_payment", "rate_locked"].includes(order.status);
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -204,7 +238,32 @@ export default function OrderDetailPage() {
         title={`${order.side === "buy" ? "Buy" : "Sell"} ${order.asset} — Order`}
         description={`${order.network} • ${order.order_type}`}
       >
-        <StatusBadge status={order.status} />
+        <div className="flex items-center gap-2">
+          <StatusBadge status={order.status} />
+          {canCancel && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <XCircle className="mr-1 h-3 w-3" /> Cancel Order
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Cancel this order?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will cancel your {order.side} order for {order.asset}. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep Order</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => cancelMutation.mutate()} disabled={cancelMutation.isPending}>
+                    {cancelMutation.isPending ? "Cancelling…" : "Yes, Cancel"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </PageHeader>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

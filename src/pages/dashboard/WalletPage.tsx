@@ -1,6 +1,7 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
+import { WalletSkeleton } from "@/components/shared/DashboardSkeleton";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -64,7 +65,7 @@ export default function WalletPage() {
       </PageHeader>
 
       {isLoading ? (
-        <div className="flex justify-center py-12"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>
+        <div className="mt-6"><WalletSkeleton /></div>
       ) : (
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
