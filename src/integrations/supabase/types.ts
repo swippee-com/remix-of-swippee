@@ -492,6 +492,8 @@ export type Database = {
           rate_lock_id: string | null
           requires_manual_review: boolean
           risk_score: number | null
+          settlement_notes: string | null
+          settlement_tx_hash: string | null
           side: Database["public"]["Enums"]["trade_side"]
           status: Database["public"]["Enums"]["order_status"]
           total_pay_npr: number
@@ -514,6 +516,8 @@ export type Database = {
           rate_lock_id?: string | null
           requires_manual_review?: boolean
           risk_score?: number | null
+          settlement_notes?: string | null
+          settlement_tx_hash?: string | null
           side: Database["public"]["Enums"]["trade_side"]
           status?: Database["public"]["Enums"]["order_status"]
           total_pay_npr: number
@@ -536,6 +540,8 @@ export type Database = {
           rate_lock_id?: string | null
           requires_manual_review?: boolean
           risk_score?: number | null
+          settlement_notes?: string | null
+          settlement_tx_hash?: string | null
           side?: Database["public"]["Enums"]["trade_side"]
           status?: Database["public"]["Enums"]["order_status"]
           total_pay_npr?: number
