@@ -65,7 +65,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName, phone: normalizePhone(phone), phone_verified: true },
+        data: { full_name: fullName, phone: normalizePhone(phone) },
         emailRedirectTo: window.location.origin,
       },
     });
