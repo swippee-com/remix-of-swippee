@@ -1,17 +1,19 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowDownUp, Loader2, CheckCircle, Circle, AlertCircle } from "lucide-react";
+import { ArrowDownUp, Loader2, CheckCircle, Circle, AlertCircle, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { BRAND, type SupportedAsset, type SupportedNetwork } from "@/config/brand";
 import { useTradePricing, type TradeSide, type AmountType } from "@/hooks/use-trade-pricing";
 import { RateLockTimer } from "./RateLockTimer";
 import { ReadinessGate } from "./ReadinessGate";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTradeReadiness } from "@/hooks/use-trade-readiness";
+import { useTradeAvailability } from "@/hooks/use-trade-availability";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,6 +49,9 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
   const amount = parseFloat(amountStr) || 0;
   const networks = ASSET_NETWORKS[asset] || ["TRC20"];
 
+  const { isAvailable, isLoading: availLoading } = useTradeAvailability();
+  const sideAvailable = isAvailable(asset, side);
+
   const { state, pricing, rateLock, countdown, error, lockRate, refreshRate } = useTradePricing({
     asset,
     network,
@@ -69,10 +74,10 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
   };
 
   const { allReady, steps, isLoading: readinessLoading } = useTradeReadiness(side);
-  const incompleteSteps = steps.filter((s) => !s.passed);
   const completedCount = steps.filter((s) => s.passed).length;
 
   const handleCTA = async () => {
+    if (!sideAvailable) return;
     if (!user || !allReady) {
       setGateOpen(true);
       return;
@@ -101,13 +106,14 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
   };
 
   const ctaLabel = useMemo(() => {
+    if (!sideAvailable) return `${side === "buy" ? "Buying" : "Selling"} ${asset} is paused`;
     if (placing) return "Placing Order…";
     if (state === "calculating" || state === "locking") return "Calculating…";
     if (state === "expired") return "Refresh Rate";
     if (state === "locked") return `Confirm ${side === "buy" ? "Buy" : "Sell"} ${asset}`;
     if (state === "error") return "Try Again";
     return `${side === "buy" ? "Buy" : "Sell"} ${asset}`;
-  }, [state, side, asset, placing]);
+  }, [state, side, asset, placing, sideAvailable]);
 
   const isCompact = variant === "compact";
 
@@ -116,24 +122,40 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
       <div className={cn("rounded-xl border bg-card shadow-card", isCompact ? "p-4" : "p-6", className)}>
         {/* Buy/Sell Toggle */}
         <div className="flex rounded-lg bg-muted p-1 mb-4">
-          {(["buy", "sell"] as TradeSide[]).map((s) => (
-            <button
-              key={s}
-              onClick={() => setSide(s)}
-              className={cn(
-                "flex-1 rounded-md text-sm font-semibold transition-all",
-                isMobile ? "py-3" : "py-2",
-                side === s
-                  ? s === "buy"
-                    ? "bg-success text-success-foreground shadow-sm"
-                    : "bg-destructive text-destructive-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {s === "buy" ? "Buy" : "Sell"}
-            </button>
-          ))}
+          {(["buy", "sell"] as TradeSide[]).map((s) => {
+            const available = isAvailable(asset, s);
+            return (
+              <button
+                key={s}
+                onClick={() => setSide(s)}
+                className={cn(
+                  "flex-1 rounded-md text-sm font-semibold transition-all relative",
+                  isMobile ? "py-3" : "py-2",
+                  side === s
+                    ? s === "buy"
+                      ? "bg-success text-success-foreground shadow-sm"
+                      : "bg-destructive text-destructive-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {s === "buy" ? "Buy" : "Sell"}
+                {!available && !availLoading && (
+                  <Badge variant="outline" className="absolute -top-2 -right-1 text-[10px] px-1 py-0 border-warning text-warning bg-warning/10">
+                    Paused
+                  </Badge>
+                )}
+              </button>
+            );
+          })}
         </div>
+
+        {/* Unavailable banner */}
+        {!sideAvailable && !availLoading && (
+          <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-2 text-sm text-destructive">
+            <Ban className="h-4 w-4 shrink-0" />
+            <span>{side === "buy" ? "Buying" : "Selling"} {asset} is currently unavailable. Please check back later.</span>
+          </div>
+        )}
 
         {/* Asset & Network */}
         <div className="grid gap-3 grid-cols-2">
@@ -176,9 +198,11 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
               placeholder="0.00"
               value={amountStr}
               onChange={(e) => setAmountStr(e.target.value)}
+              disabled={!sideAvailable}
               className={cn(
                 "w-full bg-transparent font-semibold outline-none placeholder:text-muted-foreground/40",
-                isMobile ? "text-3xl" : "text-2xl"
+                isMobile ? "text-3xl" : "text-2xl",
+                !sideAvailable && "opacity-50"
               )}
             />
           </div>
@@ -186,7 +210,8 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
           <div className="flex justify-center">
             <button
               onClick={toggleAmountType}
-              className="rounded-full border bg-card p-2 text-muted-foreground hover:text-foreground transition-colors"
+              disabled={!sideAvailable}
+              className="rounded-full border bg-card p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
             >
               <ArrowDownUp className="h-4 w-4" />
             </button>
@@ -290,21 +315,22 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
           <p className="mt-3 text-sm text-destructive">{error}</p>
         )}
 
-        {/* CTA — sticky on mobile */}
+        {/* CTA */}
         <div className={cn(isMobile && "sticky bottom-0 bg-card pb-4 pt-2 -mx-4 px-4 mt-2 border-t border-border/50")}>
           <Button
             variant={side === "buy" ? "default" : "destructive"}
             className={cn("w-full", isCompact ? "h-11" : "h-12 text-base font-semibold")}
-            disabled={placing || state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
+            disabled={!sideAvailable || placing || state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
             onClick={handleCTA}
           >
             {(state === "calculating" || state === "locking") && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {!sideAvailable && <Ban className="mr-2 h-4 w-4" />}
             {ctaLabel}
           </Button>
         </div>
 
-        {/* Inline readiness checklist — shown when not all steps complete */}
-        {user && !allReady && !readinessLoading && (
+        {/* Inline readiness checklist */}
+        {user && sideAvailable && !allReady && !readinessLoading && (
           <div className="mt-4 rounded-lg border border-warning/30 bg-warning/5 p-3 space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium text-warning">
               <AlertCircle className="h-4 w-4 shrink-0" />
