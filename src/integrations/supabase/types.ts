@@ -705,7 +705,7 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
-          trade_id: string
+          trade_id: string | null
           user_id: string
         }
         Insert: {
@@ -719,7 +719,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
-          trade_id: string
+          trade_id?: string | null
           user_id: string
         }
         Update: {
@@ -733,7 +733,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
-          trade_id?: string
+          trade_id?: string | null
           user_id?: string
         }
         Relationships: [

@@ -102,7 +102,6 @@ export default function OrderDetailPage() {
       if (upErr) throw upErr;
       const { error } = await supabase.from("payment_proofs").insert({
         order_id: id!,
-        trade_id: id!, // FK constraint requires trade_id; using order_id as placeholder
         user_id: user!.id,
         file_name: file.name,
         file_path: path,
