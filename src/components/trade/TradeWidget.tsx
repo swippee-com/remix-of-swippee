@@ -76,7 +76,20 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
     if (state === "priced") {
       await lockRate();
     } else if (state === "locked" && rateLock) {
-      navigate(`/dashboard/orders?lock=${rateLock.id}`);
+      setPlacing(true);
+      try {
+        const { data, error: fnError } = await supabase.functions.invoke("place-order", {
+          body: { rate_lock_id: rateLock.id },
+        });
+        if (fnError || !data?.success) {
+          toast({ title: "Order failed", description: data?.error || fnError?.message || "Failed to place order", variant: "destructive" });
+          return;
+        }
+        toast({ title: "Order placed!", description: `Your ${side} order for ${asset} has been created.` });
+        navigate(`/dashboard/orders/${data.order.id}`);
+      } finally {
+        setPlacing(false);
+      }
     } else if (state === "expired") {
       refreshRate();
     }
