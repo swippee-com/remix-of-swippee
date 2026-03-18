@@ -22,6 +22,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { resolvedTheme, setTheme } = useTheme();
   const { locale, setLocale, t } = useLanguage();
 
+  const currentPageTitle = useMemo(() => {
+    const item = userNavItems.find((i) => i.href === location.pathname);
+    return item ? t(item.labelKey) : "";
+  }, [location.pathname, t]);
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
