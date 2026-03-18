@@ -19,7 +19,7 @@ import { toast } from "@/hooks/use-toast";
 import { useRealtimeInvalidation } from "@/hooks/use-realtime";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { PricingExplainer } from "@/components/trade/PricingExplainer";
+
 import type { Tables } from "@/integrations/supabase/types";
 
 type Order = Tables<"orders">;
@@ -335,14 +335,6 @@ export default function OrderDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Pricing Explainer */}
-      {rateLock && (
-        <Card className="mt-6">
-          <CardContent className="pt-6">
-            <PricingExplainer />
-          </CardContent>
-        </Card>
-      )}
 
       {/* Payment Proofs */}
       <Card className="mt-6">
