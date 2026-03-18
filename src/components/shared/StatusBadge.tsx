@@ -31,7 +31,6 @@ const statusStyles: Record<string, string> = {
   // Trade
   pending_settlement: "bg-warning/10 text-warning",
   awaiting_fiat_payment: "bg-warning/10 text-warning",
-  payment_proof_uploaded: "bg-primary/10 text-primary",
   fiat_received: "bg-success/10 text-success",
   awaiting_crypto_transfer: "bg-warning/10 text-warning",
   crypto_received: "bg-success/10 text-success",
