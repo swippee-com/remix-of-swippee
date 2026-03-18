@@ -23,7 +23,7 @@ interface OnboardingWizardProps {
   phoneVerified: boolean;
   kycStatus: string;
   paymentMethodCount: number;
-  quoteCount: number;
+  orderCount: number;
   dismissed: boolean;
   onDismiss: () => void;
 }
