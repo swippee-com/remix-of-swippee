@@ -261,7 +261,7 @@ export default function OrderDetailPage() {
           {timelineSteps.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t("orders.noHistory")}</p>
           ) : (
-            <Timeline steps={timelineSteps} />
+            <Timeline steps={timelineSteps} compact={isMobile} />
           )}
         </CardContent>
       </Card>
