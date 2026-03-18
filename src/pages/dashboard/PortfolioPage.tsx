@@ -166,10 +166,10 @@ export default function PortfolioPage() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-lg" />)
         ) : (
           <>
-            <StatCard title={t("portfolio.totalValue")} value={fmt(portfolioValue)} icon={PieChart} />
+            <StatCard title={t("portfolio.totalValue")} value={fmtNpr(portfolioValue)} icon={PieChart} />
             <StatCard
               title={t("portfolio.totalPL")}
-              value={fmt(totalPL)}
+              value={fmtNpr(totalPL)}
               icon={totalPL >= 0 ? TrendingUp : TrendingDown}
               trend={portfolioValue > 0 ? {
                 value: Math.round((totalPL / (portfolioValue - totalPL || 1)) * 10000) / 100,
