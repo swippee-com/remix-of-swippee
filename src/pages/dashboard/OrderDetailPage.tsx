@@ -165,6 +165,29 @@ export default function OrderDetailPage() {
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
+  const cancelMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("orders").update({ status: "cancelled" as any }).eq("id", id!).eq("user_id", user!.id);
+      if (error) throw error;
+      await supabase.from("order_status_history").insert({
+        order_id: id!,
+        old_status: order!.status,
+        new_status: "cancelled" as any,
+        actor_id: user!.id,
+        actor_role: "user",
+        note: "Cancelled by user",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["order-detail", id] });
+      queryClient.invalidateQueries({ queryKey: ["order-history", id] });
+      toast({ title: "Order cancelled" });
+    },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
+  });
+
+  const canCancel = order && ["awaiting_payment", "rate_locked"].includes(order.status);
+
   if (isLoading) {
     return (
       <DashboardLayout>
