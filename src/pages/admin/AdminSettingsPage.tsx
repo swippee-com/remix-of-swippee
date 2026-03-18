@@ -120,7 +120,7 @@ export default function AdminSettingsPage() {
             <div><label className="text-sm font-medium">Platform Name</label><Input className="mt-1" defaultValue={BRAND.name} /></div>
             <div><label className="text-sm font-medium">Default Fiat Currency</label><Input className="mt-1" defaultValue={BRAND.defaultFiatCurrency} /></div>
             <div><label className="text-sm font-medium">Support Email</label><Input className="mt-1" defaultValue={BRAND.supportEmail} /></div>
-            <div><label className="text-sm font-medium">Quote Expiry (minutes)</label><Input className="mt-1" type="number" defaultValue="30" /></div>
+            <div><label className="text-sm font-medium"><div><label className="text-sm font-medium">Rate Lock Expiry (minutes)</label><Input className="mt-1" type="number" defaultValue="30" /></div></label><Input className="mt-1" type="number" defaultValue="30" /></div>
           </div>
           <div className="mt-4"><Button>Save Settings</Button></div>
         </section>

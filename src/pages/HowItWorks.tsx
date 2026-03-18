@@ -8,10 +8,10 @@ import { usePageMeta } from "@/hooks/use-page-meta";
 const steps = [
   { icon: UserPlus, title: "1. Sign Up", description: "Create your account with email and password." },
   { icon: Shield, title: "2. Complete KYC", description: "Submit your identity documents for verification." },
-  { icon: FileText, title: "3. Request a Quote", description: "Tell us what you want to buy or sell, and the amount." },
-  { icon: ArrowLeftRight, title: "4. Receive Quote", description: "Our desk reviews your request and sends a competitive quote." },
-  { icon: CreditCard, title: "5. Make Payment", description: "Accept the quote and complete payment via your preferred method." },
-  { icon: CheckCircle, title: "6. Settlement", description: "We settle the trade and both parties receive confirmation." },
+  { icon: FileText, title: "3. Choose Asset & Amount", description: "Select the crypto you want to buy or sell and enter your amount." },
+  { icon: ArrowLeftRight, title: "4. Lock Your Rate", description: "Get a live rate and lock it in for a limited time." },
+  { icon: CreditCard, title: "5. Make Payment", description: "Complete payment via bank transfer or digital wallet." },
+  { icon: CheckCircle, title: "6. Settlement", description: "We process your order and you receive confirmation once settled." },
 ];
 
 export default function HowItWorksPage() {

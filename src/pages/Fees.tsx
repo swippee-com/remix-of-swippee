@@ -78,7 +78,7 @@ export default function FeesPage() {
           <div className="mt-8 space-y-6">
             <div className="rounded-lg border bg-card p-6 shadow-card">
               <h2 className="font-semibold">Trading Fees</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Our OTC trading fee is applied per trade and disclosed upfront in every quote. Fees vary based on trade size, asset, and market conditions.</p>
+              <p className="mt-2 text-sm text-muted-foreground"><p className="mt-2 text-sm text-muted-foreground">Our trading fee is applied per order and disclosed upfront before you confirm. Fees vary based on trade size, asset, and market conditions.</p> Fees vary based on trade size, asset, and market conditions.</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="rounded-md bg-muted p-4">
                   <p className="text-sm font-medium">Standard Trades</p>
@@ -98,7 +98,7 @@ export default function FeesPage() {
             </div>
             <div className="rounded-lg border bg-card p-6 shadow-card">
               <h2 className="font-semibold">No Hidden Fees</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Every quote includes all applicable fees. What you see is what you pay. No account fees, no deposit fees, no surprise charges.</p>
+              <p className="mt-2 text-sm text-muted-foreground"><p className="mt-2 text-sm text-muted-foreground">Every order includes all applicable fees. What you see is what you pay. No account fees, no deposit fees, no surprise charges.</p> No account fees, no deposit fees, no surprise charges.</p>
             </div>
           </div>
 
@@ -231,7 +231,7 @@ export default function FeesPage() {
             <div className="mt-6 flex justify-end">
               <Button asChild variant="hero">
                 <Link to="/auth/signup">
-                  Get a Quote <ArrowRight className="ml-1 h-4 w-4" />
+                  Start Trading <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
             </div>
