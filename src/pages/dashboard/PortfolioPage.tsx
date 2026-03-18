@@ -265,7 +265,7 @@ export default function PortfolioPage() {
                           <TableCell className="text-right">
                             <div>
                               <span className={cn("font-medium", pl >= 0 ? "text-success" : "text-destructive")}>
-                                {pl >= 0 ? "+" : ""}{fmt(pl)}
+                                {pl >= 0 ? "+" : ""}{fmtNpr(pl)}
                               </span>
                               <p className={cn("text-xs", plPct >= 0 ? "text-success" : "text-destructive")}>
                                 {plPct >= 0 ? "+" : ""}{plPct.toFixed(2)}%
