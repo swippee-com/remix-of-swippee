@@ -28,7 +28,7 @@ export default function LivePrices() {
   );
   const { prices, isLoading, lastUpdated } = useMarketPrices();
   const nprData = useNprRate();
-  const [currency, setCurrency] = useState<Currency>("usd");
+  const [currency, setCurrency] = useState<Currency>("npr");
   const [search, setSearch] = useState("");
   const [remoteResults, setRemoteResults] = useState<MarketPrice[]>([]);
   const [isSearching, setIsSearching] = useState(false);
