@@ -115,72 +115,106 @@ export default function OrdersPage() {
         />
       </div>
 
-      {/* Table */}
-      <div className="mt-4 rounded-lg border bg-card shadow-card overflow-x-auto">
+      {/* Content */}
+      <div className="mt-4">
         {isLoading ? (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">{t("orders.colSide")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colAsset")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colRate")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colAmount")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colStatus")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colDate")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colAction")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[1, 2, 3, 4, 5].map((i) => <OrderRowSkeleton key={i} />)}
-            </tbody>
-          </table>
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            icon={<ShoppingCart className="mx-auto h-10 w-10" />}
-            title={t("orders.noOrders")}
-            description={t("orders.noOrdersDesc")}
-            action={
-              <Button asChild><Link to="/trade">{t("orders.newOrder")}</Link></Button>
-            }
-          />
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">{t("orders.colSide")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colAsset")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colRate")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colAmount")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colStatus")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colDate")}</th>
-                <th className="px-4 py-3 font-medium">{t("orders.colAction")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((order) => (
-                <tr key={order.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
-                  <td className="px-4 py-3">
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold",
-                      order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
-                    )}>
-                      {order.side === "buy" ? "Buy" : "Sell"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium">{order.asset}</td>
-                  <td className="px-4 py-3">NPR {Number(order.final_rate_npr).toLocaleString()}</td>
-                  <td className="px-4 py-3">NPR {Number(order.total_pay_npr).toLocaleString()}</td>
-                  <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
-                  <td className="px-4 py-3 text-muted-foreground">{formatDate(order.created_at, "PP")}</td>
-                  <td className="px-4 py-3">
-                    <Button asChild variant="ghost" size="sm">
-                      <Link to={`/dashboard/orders/${order.id}`}>{t("orders.view")}</Link>
-                    </Button>
-                  </td>
+          <div className="rounded-lg border bg-card shadow-card overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left text-muted-foreground">
+                  <th className="px-4 py-3 font-medium">{t("orders.colSide")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colAsset")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colAmount")}</th>
+                  <th className="px-4 py-3 font-medium">{t("orders.colStatus")}</th>
                 </tr>
+              </thead>
+              <tbody>
+                {[1, 2, 3, 4, 5].map((i) => <OrderRowSkeleton key={i} />)}
+              </tbody>
+            </table>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-lg border bg-card shadow-card">
+            <EmptyState
+              icon={<ShoppingCart className="mx-auto h-10 w-10" />}
+              title={t("orders.noOrders")}
+              description={t("orders.noOrdersDesc")}
+              action={
+                <Button asChild><Link to="/trade">{t("orders.newOrder")}</Link></Button>
+              }
+            />
+          </div>
+        ) : (
+          <>
+            {/* Mobile: Card layout */}
+            <div className="md:hidden space-y-3">
+              {filtered.map((order) => (
+                <Link
+                  key={order.id}
+                  to={`/dashboard/orders/${order.id}`}
+                  className="block rounded-lg border bg-card p-4 shadow-card hover:bg-muted/30 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className={cn(
+                        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                        order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                      )}>
+                        {order.side === "buy" ? "Buy" : "Sell"}
+                      </span>
+                      <span className="font-medium">{order.asset}</span>
+                    </div>
+                    <StatusBadge status={order.status} />
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">NPR {Number(order.total_pay_npr).toLocaleString()}</span>
+                    <span className="text-xs text-muted-foreground">{formatDate(order.created_at, "PP")}</span>
+                  </div>
+                </Link>
               ))}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Desktop: Table layout */}
+            <div className="hidden md:block rounded-lg border bg-card shadow-card overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-muted-foreground">
+                    <th className="px-4 py-3 font-medium">{t("orders.colSide")}</th>
+                    <th className="px-4 py-3 font-medium">{t("orders.colAsset")}</th>
+                    <th className="px-4 py-3 font-medium">{t("orders.colRate")}</th>
+                    <th className="px-4 py-3 font-medium">{t("orders.colAmount")}</th>
+                    <th className="px-4 py-3 font-medium">{t("orders.colStatus")}</th>
+                    <th className="px-4 py-3 font-medium">{t("orders.colDate")}</th>
+                    <th className="px-4 py-3 font-medium">{t("orders.colAction")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((order) => (
+                    <tr key={order.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <span className={cn(
+                          "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                          order.side === "buy" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                        )}>
+                          {order.side === "buy" ? "Buy" : "Sell"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-medium">{order.asset}</td>
+                      <td className="px-4 py-3">NPR {Number(order.final_rate_npr).toLocaleString()}</td>
+                      <td className="px-4 py-3">NPR {Number(order.total_pay_npr).toLocaleString()}</td>
+                      <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
+                      <td className="px-4 py-3 text-muted-foreground">{formatDate(order.created_at, "PP")}</td>
+                      <td className="px-4 py-3">
+                        <Button asChild variant="ghost" size="sm">
+                          <Link to={`/dashboard/orders/${order.id}`}>{t("orders.view")}</Link>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </DashboardLayout>
