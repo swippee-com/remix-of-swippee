@@ -86,12 +86,12 @@ export function OnboardingWizard({
       cta: { label: "Add method", href: "/dashboard/payment-methods" },
     },
     {
-      key: "quote",
-      label: "Request your first quote",
-      description: "Create a quote request to start trading crypto OTC.",
+      key: "order",
+      label: "Place your first order",
+      description: "Buy or sell crypto with live pricing on our trade page.",
       icon: FileText,
-      completed: quoteCount > 0,
-      cta: { label: "New quote", href: "/dashboard/quotes/new" },
+      completed: orderCount > 0,
+      cta: { label: "Start trading", href: "/trade" },
     },
   ];
 
