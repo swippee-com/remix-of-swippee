@@ -333,8 +333,8 @@ export default function PortfolioPage() {
                         <TableCell className="text-right font-mono">
                           {Number(order.total_receive_crypto).toLocaleString(undefined, { maximumFractionDigits: 8 })}
                         </TableCell>
-                        <TableCell className="text-right">{fmt(Number(order.final_rate_npr))}</TableCell>
-                        <TableCell className="text-right font-medium">{fmt(Number(order.total_pay_npr))}</TableCell>
+                        <TableCell className="text-right">{fmtNpr(Number(order.final_rate_npr))}</TableCell>
+                        <TableCell className="text-right font-medium">{fmtNpr(Number(order.total_pay_npr))}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
