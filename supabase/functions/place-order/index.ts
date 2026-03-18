@@ -69,6 +69,22 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Validate min order
+    if (lock.pricing_config_id) {
+      const { data: pConfig } = await supabase
+        .from("pricing_configs")
+        .select("min_order_npr")
+        .eq("id", lock.pricing_config_id)
+        .single();
+
+      if (pConfig && lock.total_pay < pConfig.min_order_npr) {
+        return new Response(
+          JSON.stringify({ error: `Minimum order is NPR ${pConfig.min_order_npr}. This order is NPR ${lock.total_pay}.` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     // Check expiry
     if (new Date(lock.expires_at) < new Date()) {
       await supabase
