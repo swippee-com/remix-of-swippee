@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (lock.side === "sell") {
+    if (lock.side === "buy") {
       const { data: payoutRows } = await supabase
         .from("payout_addresses")
         .select("id")
@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
         .limit(1);
       if (!payoutRows || payoutRows.length === 0) {
         return new Response(
-          JSON.stringify({ error: "No payout address found. Please add a payout address first." }),
+          JSON.stringify({ error: "No crypto wallet address found. Please add a payout address to receive your crypto." }),
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
