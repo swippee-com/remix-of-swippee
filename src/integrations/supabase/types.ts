@@ -700,6 +700,7 @@ export type Database = {
           file_path: string
           id: string
           notes: string | null
+          order_id: string | null
           reference_number: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -713,6 +714,7 @@ export type Database = {
           file_path: string
           id?: string
           notes?: string | null
+          order_id?: string | null
           reference_number?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -726,6 +728,7 @@ export type Database = {
           file_path?: string
           id?: string
           notes?: string | null
+          order_id?: string | null
           reference_number?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -734,6 +737,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "payment_proofs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payment_proofs_trade_id_fkey"
             columns: ["trade_id"]
