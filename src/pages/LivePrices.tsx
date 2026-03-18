@@ -201,16 +201,6 @@ export default function LivePrices() {
                       <p className="text-xs text-muted-foreground">
                         Market Cap: {formatMarketCap(displayCap, currency)}
                       </p>
-                      {["USDT", "BTC", "ETH", "USDC"].includes(p.symbol.toUpperCase()) && (
-                        <div className="mt-3 flex gap-2">
-                          <Button size="sm" variant="default" className="h-7 text-xs flex-1" asChild>
-                            <Link to={`/trade?asset=${p.symbol.toUpperCase()}&side=buy`}>Buy</Link>
-                          </Button>
-                          <Button size="sm" variant="outline" className="h-7 text-xs flex-1" asChild>
-                            <Link to={`/trade?asset=${p.symbol.toUpperCase()}&side=sell`}>Sell</Link>
-                          </Button>
-                        </div>
-                      )}
                     </CardContent>
                   </Card>
                 );
