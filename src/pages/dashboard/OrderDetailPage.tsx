@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, ArrowLeft, HeadphonesIcon } from "lucide-react";
+import { Upload, ArrowLeft, HeadphonesIcon, ExternalLink } from "lucide-react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -35,6 +35,7 @@ export default function OrderDetailPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [refNumber, setRefNumber] = useState("");
   const [proofNotes, setProofNotes] = useState("");
+  const [userTxHash, setUserTxHash] = useState("");
 
   const queryKeys = [["order-detail", id || ""], ["order-history", id || ""], ["order-proofs", id || ""]];
   useRealtimeInvalidation("orders", queryKeys);
@@ -112,13 +113,43 @@ export default function OrderDetailPage() {
         notes: proofNotes || null,
       });
       if (error) throw error;
+
+      // Auto-transition: awaiting_payment or rate_locked → payment_proof_uploaded
+      if (order && ["awaiting_payment", "rate_locked"].includes(order.status)) {
+        await supabase.from("orders").update({ status: "payment_proof_uploaded" as any }).eq("id", id!);
+        await supabase.from("order_status_history").insert({
+          order_id: id!,
+          old_status: order.status,
+          new_status: "payment_proof_uploaded" as any,
+          actor_id: user!.id,
+          actor_role: "user",
+          note: "Payment proof uploaded by user",
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["order-proofs", id] });
+      queryClient.invalidateQueries({ queryKey: ["order-detail", id] });
+      queryClient.invalidateQueries({ queryKey: ["order-history", id] });
       setRefNumber("");
       setProofNotes("");
       if (fileRef.current) fileRef.current.value = "";
       toast({ title: "Payment proof uploaded" });
+    },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
+  });
+
+  // For sell orders: user submits their crypto tx hash
+  const submitTxHashMutation = useMutation({
+    mutationFn: async () => {
+      if (!userTxHash.trim()) throw new Error("Please enter a transaction hash.");
+      const { error } = await supabase.from("orders").update({ settlement_tx_hash: userTxHash.trim() } as any).eq("id", id!);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["order-detail", id] });
+      setUserTxHash("");
+      toast({ title: "Transaction hash submitted" });
     },
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
@@ -155,6 +186,9 @@ export default function OrderDetailPage() {
   }));
 
   const showUpload = ["awaiting_payment", "rate_locked"].includes(order.status);
+  const isSell = order.side === "sell";
+  const showUserTxHash = isSell && ["awaiting_payment", "rate_locked"].includes(order.status);
+  const txHash = (order as any).settlement_tx_hash as string | null;
 
   return (
     <DashboardLayout>
@@ -248,6 +282,44 @@ export default function OrderDetailPage() {
           </Card>
         )}
       </div>
+
+      {/* Settlement TX Hash display */}
+      {txHash && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-base">Settlement Transaction</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-1">Transaction Hash</p>
+            <code className="text-sm break-all font-mono bg-muted px-2 py-1 rounded">{txHash}</code>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Sell order: user submits crypto tx hash */}
+      {showUserTxHash && !txHash && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-base">Submit Crypto Transaction Hash</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-3">
+              After sending your {order.asset} to our address, paste your blockchain transaction hash below.
+            </p>
+            <form onSubmit={(e) => { e.preventDefault(); submitTxHashMutation.mutate(); }} className="flex gap-2">
+              <Input
+                placeholder="0x... or transaction hash"
+                value={userTxHash}
+                onChange={(e) => setUserTxHash(e.target.value)}
+                className="flex-1 font-mono text-sm"
+              />
+              <Button type="submit" size="sm" disabled={submitTxHashMutation.isPending}>
+                {submitTxHashMutation.isPending ? "Submitting…" : "Submit"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Timeline */}
       <Card className="mt-6">
