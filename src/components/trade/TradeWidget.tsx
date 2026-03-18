@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowDownUp, Loader2 } from "lucide-react";
+import { ArrowDownUp, Loader2, CheckCircle, Circle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -68,7 +68,9 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
     setAmountStr("");
   };
 
-  const { allReady } = useTradeReadiness(side);
+  const { allReady, steps, isLoading: readinessLoading } = useTradeReadiness(side);
+  const incompleteSteps = steps.filter((s) => !s.passed);
+  const completedCount = steps.filter((s) => s.passed).length;
 
   const handleCTA = async () => {
     if (!user || !allReady) {
@@ -300,6 +302,30 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
             {ctaLabel}
           </Button>
         </div>
+
+        {/* Inline readiness checklist — shown when not all steps complete */}
+        {user && !allReady && !readinessLoading && (
+          <div className="mt-4 rounded-lg border border-warning/30 bg-warning/5 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-warning">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{completedCount}/{steps.length} steps complete — finish setup to trade</span>
+            </div>
+            <div className="space-y-1">
+              {steps.map((step) => (
+                <div key={step.key} className="flex items-center gap-2 text-xs">
+                  {step.passed ? (
+                    <CheckCircle className="h-3.5 w-3.5 text-success shrink-0" />
+                  ) : (
+                    <Circle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  )}
+                  <span className={cn("flex-1", step.passed ? "text-muted-foreground line-through" : "text-foreground")}>
+                    {step.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <ReadinessGate open={gateOpen} onOpenChange={setGateOpen} side={side} />
