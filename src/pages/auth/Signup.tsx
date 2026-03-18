@@ -49,8 +49,13 @@ export default function SignupPage() {
       return;
     }
 
-    if (password.length < 6) {
-      toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+    if (password.length < 8) {
+      toast({ title: "Password must be at least 8 characters", variant: "destructive" });
+      return;
+    }
+
+    if (!/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+      toast({ title: "Password must include uppercase, number, and special character", variant: "destructive" });
       return;
     }
 
@@ -60,7 +65,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName, phone: normalizePhone(phone), phone_verified: true },
+        data: { full_name: fullName, phone: normalizePhone(phone) },
         emailRedirectTo: window.location.origin,
       },
     });
@@ -128,8 +133,9 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
             />
+            <p className="mt-1 text-xs text-muted-foreground">Min 8 chars with uppercase, number & special character</p>
           </div>
           <div>
             <label className="text-sm font-medium">Confirm Password</label>
@@ -140,7 +146,7 @@ export default function SignupPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
             />
           </div>
           <Button className="w-full" type="submit" disabled={loading || !phoneVerified}>

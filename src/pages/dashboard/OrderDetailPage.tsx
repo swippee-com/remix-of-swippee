@@ -111,6 +111,10 @@ export default function OrderDetailPage() {
     mutationFn: async () => {
       const file = fileRef.current?.files?.[0];
       if (!file) throw new Error("Please select a file.");
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+      if (file.size > MAX_FILE_SIZE) throw new Error("File size must be under 5MB.");
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
+      if (!allowedTypes.includes(file.type)) throw new Error("Only images and PDFs are allowed.");
       const ext = file.name.split(".").pop();
       const path = `${user!.id}/orders/${id}/${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("payment-proofs").upload(path, file);
@@ -154,8 +158,11 @@ export default function OrderDetailPage() {
   const submitTxHashMutation = useMutation({
     mutationFn: async () => {
       if (!userTxHash.trim()) throw new Error("Please enter a transaction hash.");
-      const { error } = await supabase.from("orders").update({ settlement_tx_hash: userTxHash.trim() } as any).eq("id", id!);
+      const { data, error } = await supabase.functions.invoke("submit-tx-hash", {
+        body: { order_id: id, tx_hash: userTxHash.trim() },
+      });
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to submit transaction hash");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["order-detail", id] });

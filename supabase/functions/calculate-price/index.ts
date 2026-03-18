@@ -31,7 +31,7 @@ async function fetchCryptoUsdPrice(asset: string): Promise<number> {
   return price;
 }
 
-async function fetchForexRate(): Promise<{ buy: number; sell: number }> {
+async function fetchForexRate(supabase: any): Promise<{ buy: number; sell: number }> {
   const today = new Date().toISOString().split("T")[0];
   const url = `https://www.nrb.org.np/api/forex/v1/rates?from=${today}&to=${today}&per_page=1&page=1`;
   try {
@@ -45,8 +45,15 @@ async function fetchForexRate(): Promise<{ buy: number; sell: number }> {
     if (!usdRate) throw new Error("USD rate not found");
     return { buy: parseFloat(usdRate.buy), sell: parseFloat(usdRate.sell) };
   } catch {
-    // Fallback
-    return { buy: 147.64, sell: 147.64 };
+    // Fallback: use last known rate from market_price_snapshots
+    const { data: snapshot } = await supabase
+      .from("market_price_snapshots")
+      .select("usd_npr_rate")
+      .order("fetched_at", { ascending: false })
+      .limit(1)
+      .single();
+    const fallbackRate = snapshot?.usd_npr_rate || 147.64;
+    return { buy: fallbackRate, sell: fallbackRate };
   }
 }
 
@@ -56,6 +63,31 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Auth check — require authenticated user
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseUser = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } =
+      await supabaseUser.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { asset, network, side, amount, amount_type, payment_method } =
       await req.json();
 
@@ -72,14 +104,12 @@ Deno.serve(async (req) => {
     );
 
     // 1. Get pricing config
-    let query = supabase
+    const { data: configs } = await supabase
       .from("pricing_configs")
       .select("*")
       .eq("asset", asset)
       .eq("is_active", true);
 
-    // Try side-specific first, fall back to null (both)
-    const { data: configs } = await query;
     const config =
       configs?.find((c: any) => c.side === side) ||
       configs?.find((c: any) => c.side === null) ||
@@ -95,7 +125,7 @@ Deno.serve(async (req) => {
     // 2. Fetch market data
     const [cryptoUsdPrice, forexRate] = await Promise.all([
       fetchCryptoUsdPrice(asset),
-      fetchForexRate(),
+      fetchForexRate(supabase),
     ]);
 
     const usdNprRate = forexRate.buy;
@@ -105,13 +135,13 @@ Deno.serve(async (req) => {
     const isStablecoin = asset === "USDT" || asset === "USDC";
 
     if (isStablecoin && config.fixed_markup_npr != null) {
-      // Stablecoin: fixed NPR markup
+      // Stablecoin: fixed NPR markup — differentiate buy vs sell
       if (side === "buy") {
-        // User buying from Swippee → Swippee sells → sell markup
+        // User buying from us → we sell → add markup
         finalRateNpr = usdNprRate + config.fixed_markup_npr;
       } else {
-        // User selling to Swippee → Swippee buys → buy markup
-        finalRateNpr = usdNprRate + config.fixed_markup_npr;
+        // User selling to us → we buy → subtract markup
+        finalRateNpr = usdNprRate - config.fixed_markup_npr;
       }
     } else if (config.percent_spread != null) {
       // Volatile asset: percentage spread
@@ -181,7 +211,6 @@ Deno.serve(async (req) => {
           total_receive_crypto:
             Math.round(totalReceiveCrypto * 100000000) / 100000000,
           requires_manual_review: requiresManualReview,
-          pricing_config_id: config.id,
           min_order_npr: config.min_order_npr,
           max_auto_order_npr: config.max_auto_order_npr,
         },

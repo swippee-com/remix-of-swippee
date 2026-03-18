@@ -143,7 +143,6 @@ export function useTradePricing(params: UseTradePricingParams) {
           payment_method: paymentMethod || null,
           amount_input_type: amountType,
           amount_input_value: amount,
-          pricing,
         },
       });
 
