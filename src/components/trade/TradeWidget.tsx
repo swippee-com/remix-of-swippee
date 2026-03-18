@@ -328,7 +328,7 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
         )}
 
         {/* CTA */}
-        <div className={cn(isMobile && "sticky bottom-0 bg-card pb-4 pt-2 -mx-4 px-4 mt-2 border-t border-border/50")}>
+        <div className={cn("mt-4", isMobile && "sticky bottom-0 bg-card pb-4 pt-2 -mx-4 px-4 border-t border-border/50")}>
           <Button
             variant={side === "buy" ? "default" : "destructive"}
             className={cn("w-full", isCompact ? "h-11" : "h-12 text-base font-semibold")}
