@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowDownUp, ChevronDown, Loader2 } from "lucide-react";
+import { ArrowDownUp, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,6 +11,7 @@ import { useTradePricing, type TradeSide, type AmountType } from "@/hooks/use-tr
 import { RateLockTimer } from "./RateLockTimer";
 import { ReadinessGate } from "./ReadinessGate";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ASSET_NETWORKS: Record<string, SupportedNetwork[]> = {
@@ -30,6 +31,7 @@ interface TradeWidgetProps {
 export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSide = "buy", className }: TradeWidgetProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [side, setSide] = useState<TradeSide>(defaultSide);
   const [asset, setAsset] = useState<SupportedAsset>(defaultAsset);
   const [network, setNetwork] = useState<SupportedNetwork>(ASSET_NETWORKS[defaultAsset]?.[0] || "TRC20");
@@ -71,7 +73,6 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
     if (state === "priced") {
       await lockRate();
     } else if (state === "locked" && rateLock) {
-      // Proceed to place order — navigate to confirmation
       navigate(`/dashboard/orders?lock=${rateLock.id}`);
     } else if (state === "expired") {
       refreshRate();
@@ -98,7 +99,8 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
               key={s}
               onClick={() => setSide(s)}
               className={cn(
-                "flex-1 rounded-md py-2 text-sm font-semibold transition-all",
+                "flex-1 rounded-md text-sm font-semibold transition-all",
+                isMobile ? "py-3" : "py-2",
                 side === s
                   ? s === "buy"
                     ? "bg-success text-success-foreground shadow-sm"
@@ -112,7 +114,7 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
         </div>
 
         {/* Asset & Network */}
-        <div className={cn("grid gap-3", isCompact ? "grid-cols-2" : "grid-cols-2")}>
+        <div className="grid gap-3 grid-cols-2">
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Asset</label>
             <Select value={asset} onValueChange={handleAssetChange}>
@@ -152,7 +154,10 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
               placeholder="0.00"
               value={amountStr}
               onChange={(e) => setAmountStr(e.target.value)}
-              className="w-full bg-transparent text-2xl font-semibold outline-none placeholder:text-muted-foreground/40"
+              className={cn(
+                "w-full bg-transparent font-semibold outline-none placeholder:text-muted-foreground/40",
+                isMobile ? "text-3xl" : "text-2xl"
+              )}
             />
           </div>
 
@@ -180,7 +185,7 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
                   key={`${pricing.total_receive_crypto}-${pricing.total_pay_npr}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-2xl font-semibold"
+                  className={cn("font-semibold", isMobile ? "text-3xl" : "text-2xl")}
                 >
                   {side === "buy"
                     ? amountType === "npr"
@@ -192,7 +197,7 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
                   }
                 </motion.p>
               ) : (
-                <p className="text-2xl font-semibold text-muted-foreground/40">0.00</p>
+                <p className={cn("font-semibold text-muted-foreground/40", isMobile ? "text-3xl" : "text-2xl")}>0.00</p>
               )}
             </AnimatePresence>
           </div>
@@ -263,16 +268,18 @@ export function TradeWidget({ variant = "full", defaultAsset = "USDT", defaultSi
           <p className="mt-3 text-sm text-destructive">{error}</p>
         )}
 
-        {/* CTA */}
-        <Button
-          variant={side === "buy" ? "default" : "destructive"}
-          className={cn("w-full mt-4", isCompact ? "h-11" : "h-12 text-base font-semibold")}
-          disabled={state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
-          onClick={handleCTA}
-        >
-          {(state === "calculating" || state === "locking") && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {ctaLabel}
-        </Button>
+        {/* CTA — sticky on mobile */}
+        <div className={cn(isMobile && "sticky bottom-0 bg-card pb-4 pt-2 -mx-4 px-4 mt-2 border-t border-border/50")}>
+          <Button
+            variant={side === "buy" ? "default" : "destructive"}
+            className={cn("w-full", isCompact ? "h-11" : "h-12 text-base font-semibold")}
+            disabled={state === "calculating" || state === "locking" || (state === "idle" && amount <= 0)}
+            onClick={handleCTA}
+          >
+            {(state === "calculating" || state === "locking") && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {ctaLabel}
+          </Button>
+        </div>
       </div>
 
       <ReadinessGate open={gateOpen} onOpenChange={setGateOpen} side={side} />
