@@ -1,7 +1,8 @@
 import {
   LayoutDashboard, Shield, CreditCard, Wallet, FileText, ArrowLeftRight,
   HeadphonesIcon, Settings, Users, ClipboardCheck, BookOpen, ScrollText,
-  Activity, BarChart3, WalletCards, PieChart, Megaphone, ShoppingCart
+  Activity, BarChart3, WalletCards, PieChart, Megaphone, ShoppingCart,
+  DollarSign, Package
 } from "lucide-react";
 import type { TranslationKey } from "@/i18n/en";
 
