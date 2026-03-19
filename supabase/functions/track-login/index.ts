@@ -59,8 +59,7 @@ Deno.serve(async (req) => {
     const loginMethod = body.login_method || "password";
     const sessionId = body.session_id || null;
 
-    // Use service role to insert (bypasses RLS)
-    const adminClient = createClient(supabaseUrl, serviceKey);
+    // Insert login event (reuse adminClient from rate limit check)
 
     // Insert login event
     await adminClient.from("login_events").insert({
