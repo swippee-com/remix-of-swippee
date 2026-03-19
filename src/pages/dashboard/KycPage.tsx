@@ -57,10 +57,28 @@ export default function KycPage() {
   const proofRef = useRef<HTMLInputElement>(null);
   const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
+  const ALLOWED_MIME_TYPES = [
+    "image/jpeg", "image/png", "image/gif", "image/webp", "image/bmp",
+    "application/pdf",
+  ];
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+  const validateFile = (file: File): string | null => {
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return `Invalid file type "${file.type}" for ${file.name}. Only images and PDFs are allowed.`;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return `File ${file.name} is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum is 10MB.`;
+    }
+    return null;
+  };
+
   const uploadFile = async (file: File, submissionId: string, docType: string) => {
+    const validationError = validateFile(file);
+    if (validationError) throw new Error(validationError);
     const ext = file.name.split(".").pop();
     const path = `${user!.id}/${submissionId}/${docType}.${ext}`;
-    const { error: uploadErr } = await supabase.storage.from("kyc-documents").upload(path, file, { upsert: true });
+    const { error: uploadErr } = await supabase.storage.from("kyc-documents").upload(path, file, { upsert: true, contentType: file.type });
     if (uploadErr) throw uploadErr;
     const { error: insertErr } = await supabase.from("kyc_documents").insert({ kyc_submission_id: submissionId, user_id: user!.id, document_type: docType, file_name: file.name, file_path: path });
     if (insertErr) throw insertErr;
