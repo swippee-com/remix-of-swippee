@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
       `https://bulk.bedbyaspokhrel.com.np/smsapi/index.php?${smsParams.toString()}`
     );
     const smsResult = await smsResponse.text();
-    console.log("SMS API response:", smsResult);
+    console.log("SMS API status:", smsResponse.status, "response length:", smsResult.length);
 
     if (smsResult.startsWith("ERR")) {
       return new Response(
