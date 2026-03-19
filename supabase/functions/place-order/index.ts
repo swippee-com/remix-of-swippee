@@ -38,6 +38,21 @@ Deno.serve(async (req) => {
     }
     const userId = claimsData.claims.sub as string;
 
+    // Rate limit: 5 order placements per 60 seconds per user
+    const rateLimitClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const { data: allowed } = await rateLimitClient.rpc("check_rate_limit", {
+      _key: userId, _endpoint: "place-order", _max_requests: 5, _window_seconds: 60,
+    });
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: "Too many order requests. Please wait." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { rate_lock_id, payment_method_id, payout_address_id } =
       await req.json();
 
