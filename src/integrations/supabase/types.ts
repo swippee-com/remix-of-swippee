@@ -1135,6 +1135,27 @@ export type Database = {
           },
         ]
       }
+      rate_limit_entries: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          key: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          key: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          key?: string
+        }
+        Relationships: []
+      }
       rate_locks: {
         Row: {
           amount_input_type: string
@@ -1493,6 +1514,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          _endpoint: string
+          _key: string
+          _max_requests: number
+          _window_seconds: number
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

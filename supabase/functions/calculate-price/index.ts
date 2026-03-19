@@ -87,6 +87,22 @@ Deno.serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    const userId = claimsData.claims.sub as string;
+
+    // Rate limit: 30 requests per 60 seconds per user
+    const rateLimitClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const { data: allowed } = await rateLimitClient.rpc("check_rate_limit", {
+      _key: userId, _endpoint: "calculate-price", _max_requests: 30, _window_seconds: 60,
+    });
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please wait a moment." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const { asset, network, side, amount, amount_type, payment_method } =
       await req.json();

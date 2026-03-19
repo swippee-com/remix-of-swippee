@@ -3,7 +3,7 @@ import { mainnet, bsc, polygon } from "wagmi/chains";
 
 export const wagmiConfig = getDefaultConfig({
   appName: "Swippee",
-  projectId: "00000000000000000000000000000000", // WalletConnect fallback — optional for injected wallets
+  projectId: "97b6f35c631dffd6b8276d01547da638",
   chains: [mainnet, bsc, polygon],
   ssr: false,
 });

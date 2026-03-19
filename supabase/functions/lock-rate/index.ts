@@ -155,6 +155,21 @@ Deno.serve(async (req) => {
     }
     const userId = claimsData.claims.sub as string;
 
+    // Rate limit: 10 lock requests per 60 seconds per user
+    const rateLimitClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const { data: allowed } = await rateLimitClient.rpc("check_rate_limit", {
+      _key: userId, _endpoint: "lock-rate", _max_requests: 10, _window_seconds: 60,
+    });
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: "Too many rate lock requests. Please wait." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const {
       asset,
       network,

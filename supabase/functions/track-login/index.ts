@@ -36,6 +36,18 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Rate limit: 10 login tracks per 60 seconds per user
+    const adminClient = createClient(supabaseUrl, serviceKey);
+    const { data: allowed } = await adminClient.rpc("check_rate_limit", {
+      _key: user.id, _endpoint: "track-login", _max_requests: 10, _window_seconds: 60,
+    });
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: "Too many requests" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Extract IP and user agent
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -47,8 +59,7 @@ Deno.serve(async (req) => {
     const loginMethod = body.login_method || "password";
     const sessionId = body.session_id || null;
 
-    // Use service role to insert (bypasses RLS)
-    const adminClient = createClient(supabaseUrl, serviceKey);
+    // Insert login event (reuse adminClient from rate limit check)
 
     // Insert login event
     await adminClient.from("login_events").insert({
